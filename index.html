@@ -1416,6 +1416,16 @@
       font-size: 0.68rem; line-height: 1.65; letter-spacing: 0.03em; overflow-x: auto; text-transform: none;
       white-space: pre-wrap; word-break: break-word;
     }
+    #teamsCard {
+      display: none !important;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #teamsCard.active {
+      display: block !important;
+      visibility: visible;
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
@@ -2677,6 +2687,8 @@
     const officeBtns = document.querySelectorAll('.office-btn');
 
     function openOffice(e) {
+      if (typeof hideTeamsWorkspace === 'function') hideTeamsWorkspace();
+      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       salesLeadCard.classList.remove('active', 'visible');
@@ -2699,6 +2711,12 @@
     }
 
     function closeOffice() {
+      if (typeof hideTeamsWorkspace === 'function') hideTeamsWorkspace();
+      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
+      if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
+      if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
+      if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible');
+      if (typeof officeMenuWrap !== 'undefined') officeMenuWrap.style.display = 'flex';
       officeOverlay.classList.remove('open');
       officeOverlay.setAttribute('aria-hidden', 'true');
       officeBtns.forEach((btn) => btn.classList.remove('wave-in'));
@@ -4456,8 +4474,20 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
       teamsFrame.src = url;
     }
 
+    function hideTeamsWorkspace() {
+      if (typeof teamsCard !== 'undefined' && teamsCard) {
+        teamsCard.classList.remove('active', 'visible', 'is-fullscreen');
+      }
+      if (typeof teardownTeamsFrame === 'function') teardownTeamsFrame();
+    }
+
     function showTeamsCard() {
+      if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible');
+      if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
+      if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
+      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
       officeMenuWrap.style.display = 'none';
+      updateTeamsHeaderLabels();
       teamsCard.classList.add('active');
       requestAnimationFrame(() => teamsCard.classList.add('visible'));
       loadTeamsFrame();
@@ -4514,6 +4544,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
