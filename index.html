@@ -1100,6 +1100,37 @@
       20%, 60% { transform: translateX(-6px); }
       40%, 80% { transform: translateX(6px); }
     }
+    .admin-card {
+      width: min(920px, calc(100vw - 2rem));
+    }
+
+    .admin-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .admin-tab {
+      padding: 8px 14px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      color: #000000;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .admin-tab:hover {
+      background: rgba(255, 255, 255, 0.38);
+    }
+
+    .admin-tab.active {
+      background: rgba(255, 255, 255, 0.58);
+      border-color: rgba(0, 0, 0, 0.28);
+    }
   </style>
 </head>
 <body>
@@ -1156,6 +1187,21 @@
           <button class="office-btn" type="button" data-role="jobs" style="animation-delay: 150ms"><span>BXB Jobs</span><span>→</span></button>
           <button class="office-btn" type="button" data-role="teams" style="animation-delay: 225ms"><span>BXB Teams</span><span>→</span></button>
           <button class="office-btn" type="button" data-role="collaborate" style="animation-delay: 300ms"><span>I want to collaborate</span><span>→</span></button>
+        </div>
+      </div>
+
+      <div class="sales-card admin-card" id="adminCard">
+        <div class="sales-scroll">
+          <div class="store-step-header">
+            <div class="store-title-wrap" id="adminHeaderWrap">
+              <span class="why-tag">ADMIN ACCESS</span>
+            </div>
+            <div class="store-header-actions">
+              <button class="why-close" id="adminBack" type="button">← BACK</button>
+              <button class="why-close" id="adminClose" type="button">CLOSE ×</button>
+            </div>
+          </div>
+          <div id="adminBody"></div>
         </div>
       </div>
 
@@ -2296,6 +2342,7 @@
 
     function openOffice(e) {
       salesLeadCard.classList.remove('active', 'visible');
+      adminCard.classList.remove('active', 'visible');
       officeMenuWrap.style.display = 'flex';
       e.preventDefault();
       closeWhy();
@@ -2458,9 +2505,200 @@
     document.querySelector('.office-btn[data-role="sales-lead"]').addEventListener('click', showSalesLeadCard);
     salesBack.addEventListener('click', backToOfficeMenu);
     salesClose.addEventListener('click', closeOffice);
+    const ADMIN_ID_KEY = 'bxb_admin_id';
+    const DEFAULT_ADMIN_ID = 'BXB-ADMIN-2026';
+
+    const BXB_AUTH = {
+      getAdminId() {
+        return localStorage.getItem(ADMIN_ID_KEY) || DEFAULT_ADMIN_ID;
+      },
+      async validateAdminId(inputId) {
+        // Ready for Supabase query swap later
+        return inputId.trim().toUpperCase() === this.getAdminId().toUpperCase();
+      },
+      async updateAdminId(newId) {
+        const clean = newId.trim().toUpperCase();
+        if (!clean) return false;
+        // Ready for Supabase update swap later
+        localStorage.setItem(ADMIN_ID_KEY, clean);
+        return true;
+      }
+    };
+
+    const adminCard = document.getElementById('adminCard');
+    const adminHeaderWrap = document.getElementById('adminHeaderWrap');
+    const adminBody = document.getElementById('adminBody');
+    const adminBack = document.getElementById('adminBack');
+    const adminClose = document.getElementById('adminClose');
+    let adminUnlocked = false;
+    let activeAdminTab = 'portfolio';
+
+    function renderAdminTabContent() {
+      if (activeAdminTab === 'portfolio') {
+        const count = getPortfolioItems().length;
+        return `<div class="sales-item-row"><h3 class="project-title">PORTFOLIO MANAGER</h3><p class="project-desc">${count} PROJECTS CURRENTLY LIVE. READY FOR FULL ADD / EDIT / DELETE CONTROLS.</p></div>`;
+      }
+      if (activeAdminTab === 'store') {
+        const stores = getStores();
+        const appCount = stores.reduce((sum, s) => sum + (s.apps || []).length, 0);
+        return `<div class="sales-item-row"><h3 class="project-title">STORE MANAGER</h3><p class="project-desc">${stores.length} REGIONAL STORES · ${appCount} APPS LIVE. READY FOR REGION, FLAG & APP CONTROLS.</p></div>`;
+      }
+      if (activeAdminTab === 'bespoke') {
+        const regs = getBespokeRegions();
+        const itemCount = regs.reduce((sum, r) => sum + (r.items || []).length, 0);
+        return `<div class="sales-item-row"><h3 class="project-title">BESPOKE MANAGER</h3><p class="project-desc">${regs.length} REGIONS · ${itemCount} OFFERINGS LIVE. READY FOR LABEL & OFFERING CONTROLS.</p></div>`;
+      }
+      if (activeAdminTab === 'sales-ids') {
+        const regs = getBespokeRegions();
+        return `
+          <div class="portfolio-grid">
+            ${regs.map((r) => `
+              <div class="sales-item-row">
+                <div class="region-left">
+                  ${renderFlagHtml(r, 'store-flag')}
+                  <h3 class="project-title">${r.name}</h3>
+                </div>
+                <div class="store-price" id="sid-${r.id}">${r.secretId || 'NONE'}</div>
+                <button class="sales-save-btn admin-gen-sid" type="button" data-region-id="${r.id}">GENERATE NEW ID</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      if (activeAdminTab === 'settings') {
+        return `
+          <form class="sales-login-box" id="adminSettingsForm" novalidate>
+            <p class="project-desc">CURRENT ADMIN ID: <strong>${BXB_AUTH.getAdminId()}</strong></p>
+            <input class="glass-input" id="newAdminIdInput" type="text" placeholder="NEW ADMIN ID" autocomplete="off" />
+            <div class="sales-error" id="adminSettingsMsg"></div>
+            <button class="store-purchase-btn" type="submit">UPDATE ADMIN ID</button>
+          </form>
+        `;
+      }
+      return '';
+    }
+
+    function renderAdminView() {
+      if (!adminUnlocked) {
+        adminHeaderWrap.innerHTML = '<span class="why-tag">ADMIN ACCESS</span>';
+        adminBody.innerHTML = `
+          <form class="sales-login-box" id="adminLoginForm" novalidate>
+            <p class="project-desc">ENTER YOUR MASTER ADMIN ID TO UNLOCK BXB CONTROL.</p>
+            <input class="glass-input" id="adminIdInput" type="text" placeholder="ADMIN ID" autocomplete="off" />
+            <div class="sales-error" id="adminError"></div>
+            <button class="store-purchase-btn" type="submit">ACCESS ADMIN</button>
+          </form>
+        `;
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const inputEl = document.getElementById('adminIdInput');
+          const errEl = document.getElementById('adminError');
+          const val = inputEl.value.trim();
+          inputEl.classList.remove('input-error');
+          void inputEl.offsetWidth;
+          if (!val) {
+            errEl.textContent = 'PLEASE ENTER YOUR ADMIN ID.';
+            inputEl.classList.add('input-error');
+            inputEl.focus();
+            return;
+          }
+          const ok = await BXB_AUTH.validateAdminId(val);
+          if (!ok) {
+            errEl.textContent = 'INVALID ADMIN ID. ACCESS DENIED.';
+            inputEl.classList.add('input-error');
+            inputEl.focus();
+            return;
+          }
+          adminUnlocked = true;
+          activeAdminTab = 'portfolio';
+          renderAdminView();
+        });
+        return;
+      }
+
+      adminHeaderWrap.innerHTML = '<span class="why-tag">ADMIN DASHBOARD</span>';
+      const tabs = [
+        { id: 'portfolio', label: 'PORTFOLIO' },
+        { id: 'store', label: 'STORE' },
+        { id: 'bespoke', label: 'BESPOKE' },
+        { id: 'sales-ids', label: 'SALES LEAD IDS' },
+        { id: 'settings', label: 'ADMIN SETTINGS' }
+      ];
+
+      adminBody.innerHTML = `
+        <div class="admin-tabs">
+          ${tabs.map((t) => `<button class="admin-tab ${activeAdminTab === t.id ? 'active' : ''}" type="button" data-tab="${t.id}">${t.label}</button>`).join('')}
+        </div>
+        <div id="adminTabPanel">${renderAdminTabContent()}</div>
+      `;
+
+      const settingsForm = document.getElementById('adminSettingsForm');
+      if (settingsForm) {
+        settingsForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const inp = document.getElementById('newAdminIdInput');
+          const msg = document.getElementById('adminSettingsMsg');
+          inp.classList.remove('input-error');
+          void inp.offsetWidth;
+          if (!inp.value.trim()) {
+            msg.style.color = '#9e0000';
+            msg.textContent = 'PLEASE ENTER A NEW ADMIN ID.';
+            inp.classList.add('input-error');
+            return;
+          }
+          await BXB_AUTH.updateAdminId(inp.value);
+          renderAdminView();
+          const newMsg = document.getElementById('adminSettingsMsg');
+          if (newMsg) {
+            newMsg.style.color = '#000000';
+            newMsg.textContent = 'ADMIN ID UPDATED ✓';
+          }
+        });
+      }
+    }
+
+    adminBody.addEventListener('click', (e) => {
+      const tabBtn = e.target.closest('.admin-tab');
+      if (tabBtn) {
+        activeAdminTab = tabBtn.dataset.tab;
+        renderAdminView();
+        return;
+      }
+      const genBtn = e.target.closest('.admin-gen-sid');
+      if (genBtn) {
+        const rid = genBtn.dataset.regionId;
+        generateSalesLeadSecretId(rid);
+        renderAdminView();
+      }
+    });
+
+    function showAdminCard() {
+      adminUnlocked = false;
+      renderAdminView();
+      officeMenuWrap.style.display = 'none';
+      adminCard.classList.add('active');
+      requestAnimationFrame(() => adminCard.classList.add('visible'));
+    }
+
+    function backFromAdmin() {
+      adminCard.classList.remove('visible');
+      setTimeout(() => {
+        adminCard.classList.remove('active');
+        adminUnlocked = false;
+        officeMenuWrap.style.display = 'flex';
+        officeBtns.forEach((b) => b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach((b) => b.classList.add('wave-in'));
+      }, 220);
+    }
+
+    document.querySelector('.office-btn[data-role="admin"]').addEventListener('click', showAdminCard);
+    adminBack.addEventListener('click', backFromAdmin);
+    adminClose.addEventListener('click', closeOffice);
   </script>
 </body>
 </html>
+
 
 
 
