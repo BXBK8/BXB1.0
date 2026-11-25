@@ -1131,6 +1131,42 @@
       background: rgba(255, 255, 255, 0.58);
       border-color: rgba(0, 0, 0, 0.28);
     }
+    .jobs-card { width: min(860px, calc(100vw - 2rem)); }
+
+    .calc-section { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .calc-title { font-size: 0.72rem; letter-spacing: 0.14em; opacity: 0.65; margin-bottom: 2px; }
+    .calc-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .calc-select, .calc-input-sm {
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(255,255,255,0.32); border: 1px solid rgba(0,0,0,0.14);
+      color: #000; font-size: 0.8rem; letter-spacing: 0.06em;
+      outline: none; cursor: pointer;
+    }
+    .calc-select:focus, .calc-input-sm:focus { background: rgba(255,255,255,0.5); }
+    .calc-output-box {
+      padding: 16px 18px; border-radius: 16px;
+      background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.28);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .calc-big { font-size: 1.08rem; letter-spacing: 0.08em; }
+    .calc-sub { font-size: 0.72rem; letter-spacing: 0.06em; opacity: 0.72; }
+    .calc-bar-wrap { height: 7px; border-radius: 9999px; background: rgba(0,0,0,0.12); overflow: hidden; margin-top: 2px; }
+    .calc-bar-fill { height: 100%; border-radius: 9999px; background: #FF4500; transition: width 0.5s cubic-bezier(0.22,1,0.36,1); }
+    .calc-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 9999px; font-size: 0.7rem; letter-spacing: 0.08em; }
+    .badge-locked { background: rgba(0,0,0,0.14); }
+    .badge-unlocked { background: rgba(80,200,80,0.28); }
+    .deal-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); }
+    .deal-toggle { display: flex; border-radius: 9999px; overflow: hidden; border: 1px solid rgba(0,0,0,0.14); }
+    .deal-toggle button { padding: 4px 10px; font-size: 0.65rem; letter-spacing: 0.06em; background: rgba(255,255,255,0.18); border: none; cursor: pointer; color: #000; }
+    .deal-toggle button.selected { background: rgba(255,255,255,0.58); }
+    .qty-ctrl { display: flex; align-items: center; gap: 6px; }
+    .qty-ctrl button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14); background: rgba(255,255,255,0.28); cursor: pointer; font-size: 0.9rem; color: #000; }
+    .suggest-box { padding: 14px 16px; border-radius: 14px; background: rgba(255,69,0,0.1); border: 1px solid rgba(255,69,0,0.28); font-size: 0.74rem; letter-spacing: 0.05em; line-height: 1.6; }
+    .collapsible-trigger { cursor: pointer; font-size: 0.72rem; letter-spacing: 0.08em; opacity: 0.72; display: flex; align-items: center; gap: 6px; }
+    .formula-box { padding: 12px 14px; border-radius: 12px; background: rgba(0,0,0,0.07); font-size: 0.7rem; letter-spacing: 0.05em; line-height: 1.65; display: none; }
+    .formula-box.open { display: block; }
+    .warn-red { color: #9e0000; font-size: 0.72rem; letter-spacing: 0.06em; }
+    .price-editor-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); }
   </style>
 </head>
 <body>
@@ -1202,6 +1238,19 @@
             </div>
           </div>
           <div id="adminBody"></div>
+        </div>
+      </div>
+
+      <div class="sales-card jobs-card" id="jobsCard">
+        <div class="sales-scroll">
+          <div class="store-step-header">
+            <div class="store-title-wrap" id="jobsHeaderWrap"><span class="why-tag">BXB JOBS</span></div>
+            <div class="store-header-actions">
+              <button class="why-close" id="jobsBack" type="button">← BACK</button>
+              <button class="why-close" id="jobsClose" type="button">CLOSE ×</button>
+            </div>
+          </div>
+          <div id="jobsBody"></div>
         </div>
       </div>
 
@@ -2343,6 +2392,7 @@
     function openOffice(e) {
       salesLeadCard.classList.remove('active', 'visible');
       adminCard.classList.remove('active', 'visible');
+      if(typeof jobsCard!=='undefined') jobsCard.classList.remove('active', 'visible');
       officeMenuWrap.style.display = 'flex';
       e.preventDefault();
       closeWhy();
@@ -2695,9 +2745,378 @@
     document.querySelector('.office-btn[data-role="admin"]').addEventListener('click', showAdminCard);
     adminBack.addEventListener('click', backFromAdmin);
     adminClose.addEventListener('click', closeOffice);
+    const CALC_SETTINGS_KEY = 'bxb_calc_settings';
+    const REGION_SALARIES_KEY = 'bxb_region_salaries';
+    const FX_RATES_KEY = 'bxb_fx_rates';
+    const DEV_APPS_KEY = 'bxb_dev_applications';
+
+    const DEFAULT_CALC = { commission_rate:0.17, delivery_cost_pct:0.30, payment_fee_pct:0.03, profit_target_pct:0.20, fx_buffer_pct:0.03, deals_required:5, prices_in:'USD' };
+    const DEFAULT_SALARIES = [
+      { id:'gh', name:'Ghana', currency_code:'GHS', is_usd:false, salary_min_usd:220, salary_max_usd:220, bespoke_region_id:'ghana', store_region_id:'ghana' },
+      { id:'us', name:'USA',   currency_code:'USD', is_usd:true,  salary_min_usd:4279,salary_max_usd:5916, bespoke_region_id:'mena',  store_region_id:'mena' }
+    ];
+    const DEFAULT_FX = [
+      { currency_code:'GHS', rate_to_usd:0.0667, locked_on:'2026-11-01' },
+      { currency_code:'USD', rate_to_usd:1,      locked_on:'2026-11-01' }
+    ];
+
+    function getCalcSettings(){ try{ return JSON.parse(localStorage.getItem(CALC_SETTINGS_KEY))||DEFAULT_CALC; }catch{ return DEFAULT_CALC; } }
+    function getRegionSalaries(){ try{ const r=JSON.parse(localStorage.getItem(REGION_SALARIES_KEY)); return Array.isArray(r)?r:[...DEFAULT_SALARIES]; }catch{ return [...DEFAULT_SALARIES]; } }
+    function getFxRates(){ try{ const r=JSON.parse(localStorage.getItem(FX_RATES_KEY)); return Array.isArray(r)?r:[...DEFAULT_FX]; }catch{ return [...DEFAULT_FX]; } }
+    function getDevApps(){ try{ return JSON.parse(localStorage.getItem(DEV_APPS_KEY))||[]; }catch{ return []; } }
+    function getFxRate(code){ const r=getFxRates().find(x=>x.currency_code===code); return r?r.rate_to_usd:1; }
+    function toUSD(amount,code){ return amount*getFxRate(code); }
+    function fromUSD(usd,code){ const r=getFxRate(code); return r?usd/r:usd; }
+    function fmt(n,code){ return new Intl.NumberFormat('en-US',{style:'currency',currency:code||'USD',maximumFractionDigits:0}).format(n); }
+
+    function calcMRT(salaryUSD, cfg, fx_buffer){
+      const buf = cfg.payment_fee_pct + (fx_buffer||0);
+      return salaryUSD / (cfg.delivery_cost_pct - buf);
+    }
+
+    const jobsCard = document.getElementById('jobsCard');
+    const jobsHeaderWrap = document.getElementById('jobsHeaderWrap');
+    const jobsBody = document.getElementById('jobsBody');
+    const jobsBack = document.getElementById('jobsBack');
+    const jobsClose = document.getElementById('jobsClose');
+    let jobsView = 'menu';
+    let jobsCalcMode = 'rep';
+
+    function getCalcCatalog(regionSalary){
+      const stores = getStores();
+      const bespokeRegs = getBespokeRegions();
+      let catalog = [];
+      const sr = stores.find(s=>s.id===regionSalary.store_region_id);
+      if(sr) sr.apps.forEach(a=>{ const p=parseFloat((a.pricePerMonth||'0').replace(/[^0-9.]/g,''))||0; catalog.push({id:a.id,name:a.name,priceUSD:regionSalary.is_usd?p:toUSD(p,regionSalary.currency_code),priceLoc:p,source:'store'}); });
+      const br = bespokeRegs.find(b=>b.id===regionSalary.bespoke_region_id);
+      if(br) br.items.forEach(it=>{ const p=parseFloat((it.price||'0').replace(/[^0-9.]/g,''))||0; catalog.push({id:it.id,name:it.name,priceUSD:regionSalary.is_usd?p:toUSD(p,regionSalary.currency_code),priceLoc:p,source:'bespoke'}); });
+      return catalog;
+    }
+
+    function renderJobsView(){
+      jobsHeaderWrap.innerHTML = '<span class="why-tag">BXB JOBS</span>';
+      if(jobsView==='menu'){
+        jobsBody.innerHTML=`<div class="office-stack" style="margin-top:8px;">
+          <button class="office-btn" id="devBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Dev positions</span><span>→</span></button>
+          <button class="office-btn" id="salesPosBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Sales positions</span><span>→</span></button>
+        </div>`;
+        document.getElementById('devBtn').onclick=()=>{ jobsView='dev'; renderJobsView(); };
+        document.getElementById('salesPosBtn').onclick=()=>{ jobsView='sales'; jobsCalcMode='rep'; renderJobsView(); };
+        return;
+      }
+      if(jobsView==='dev'){
+        jobsHeaderWrap.innerHTML='<span class="why-tag">DEV POSITIONS</span>';
+        jobsBody.innerHTML=`<form class="sales-login-box" id="devAppForm" novalidate style="max-width:520px;">
+          <p class="project-desc" style="margin-bottom:4px;">OPEN APPLICATION — WE REVIEW ALL SUBMISSIONS.</p>
+          <input class="glass-input" id="devName" type="text" placeholder="FULL NAME" autocomplete="off"/>
+          <input class="glass-input" id="devCountry" type="text" placeholder="COUNTRY" autocomplete="off"/>
+          <input class="glass-input" id="devGithub" type="text" placeholder="GITHUB LINK" autocomplete="off"/>
+          <input class="glass-input" id="devEmail" type="email" placeholder="EMAIL ADDRESS" autocomplete="off"/>
+          <div class="sales-error" id="devErr"></div>
+          <button class="store-purchase-btn" type="submit">APPLY</button>
+        </form>`;
+        document.getElementById('devAppForm').onsubmit=e=>{
+          e.preventDefault();
+          const name=document.getElementById('devName');
+          const country=document.getElementById('devCountry');
+          const github=document.getElementById('devGithub');
+          const email=document.getElementById('devEmail');
+          const err=document.getElementById('devErr');
+          [name,country,github,email].forEach(i=>i.classList.remove('input-error'));
+          let valid=true;
+          function markErr(el,msg){ el.classList.add('input-error'); err.textContent=msg; void el.offsetWidth; valid=false; }
+          if(!email.value.trim()||!email.value.includes('@')) markErr(email,'PLEASE ENTER A VALID EMAIL ADDRESS.');
+          if(!github.value.trim()) markErr(github,'PLEASE ENTER YOUR GITHUB LINK.');
+          if(!country.value.trim()) markErr(country,'PLEASE ENTER YOUR COUNTRY.');
+          if(!name.value.trim()) markErr(name,'PLEASE ENTER YOUR FULL NAME.');
+          if(!valid) return;
+          const apps=getDevApps();
+          apps.push({id:'dev-'+Date.now(),name:name.value.trim(),country:country.value.trim(),github:github.value.trim(),email:email.value.trim(),submitted:new Date().toISOString()});
+          localStorage.setItem(DEV_APPS_KEY,JSON.stringify(apps));
+          jobsBody.innerHTML=`<div class="calc-output-box" style="margin-top:12px;"><p class="calc-big">APPLICATION RECEIVED ✓</p><p class="calc-sub">WE WILL BE IN TOUCH AT ${email.value.trim().toUpperCase()}.</p></div>`;
+        };
+        return;
+      }
+      if(jobsView==='sales'){
+        jobsHeaderWrap.innerHTML='<span class="why-tag">SALES POSITIONS</span>';
+        const cfg=getCalcSettings();
+        const salaries=getRegionSalaries();
+        const salesLeadId = (() => { try{ return sessionStorage.getItem('bxb_sales_lead_logged_region'); }catch{ return null; }})();
+
+        // Determine available mode based on login state
+        const isAdmin = adminUnlocked;
+        const isSalesLead = !!salesLeadId;
+
+        let modeBar='';
+        if(isAdmin) modeBar=`<div class="calc-row" style="gap:8px;margin-bottom:12px;">
+          <button class="admin-tab ${jobsCalcMode==='rep'?'active':''}" data-cmode="rep">REP VIEW</button>
+          <button class="admin-tab ${jobsCalcMode==='lead'?'active':''}" data-cmode="lead">SALES LEAD</button>
+          <button class="admin-tab ${jobsCalcMode==='admin'?'active':''}" data-cmode="admin">ADMIN</button>
+        </div>`;
+        else if(isSalesLead) modeBar=`<div class="calc-row" style="gap:8px;margin-bottom:12px;">
+          <button class="admin-tab ${jobsCalcMode==='rep'?'active':''}" data-cmode="rep">REP VIEW</button>
+          <button class="admin-tab ${jobsCalcMode==='lead'?'active':''}" data-cmode="lead">SALES LEAD</button>
+        </div>`;
+
+        const regionOptions=salaries.map((s,i)=>`<option value="${i}">${s.name} (${s.currency_code})</option>`).join('');
+        const salaryBandOptions=`<option value="min">LOW (MIN)</option><option value="max">HIGH (MAX)</option>`;
+
+        jobsBody.innerHTML=`
+          <div class="calc-section">
+            <p class="project-desc" style="line-height:1.75;margin-bottom:6px;">
+              POSITION EXPLANATION<br/><br/>
+              How your pay works. Every sale you close earns you 17% commission on its price, no matter how many deals you close that month. On top of that, you unlock your monthly base salary when you do two things: close at least 5 paid deals, and make sure those 5 deals add up to at least your country's Minimum Revenue Target. The target exists because every sale must first pay for delivering the service, payment fees, your commission, and the company's profit before any money is left for a salary. We call what remains the Safe Share, which is 30% of every dollar sold. Your target is your country's monthly salary divided by 0.30, plus a small 3% currency buffer if you are paid in a non-USD currency. For example, a rep in Ghana with a $220 salary needs about $756 in total sales across 5 deals, roughly $151 per deal. A rep in the USA with a $4,279 salary needs about $14,263, roughly $2,853 per deal. Salaries differ by country because they are matched to local living costs, and the target scales with them, so everyone faces the same fairness rule: your salary must be paid for by the sales you bring in. All targets are calculated in USD and shown in your local currency using an exchange rate locked on the 1st of each month, so the target will not change on you mid-month. Service prices in the calculator are shown in your own country's prices, so you can see exactly which services and how many deals get you to your target. If you close more than 5 deals, you simply earn more commission. Refunded or unpaid sales do not count.
+            </p>
+            ${modeBar}
+            <hr style="border:none;border-top:1px solid rgba(0,0,0,0.1);margin:4px 0;"/>
+            <p class="calc-title">SALES & EARNINGS CALCULATOR</p>
+            <div class="calc-row">
+              <div><p class="calc-title">REGION</p><select class="calc-select" id="calcRegion">${regionOptions}</select></div>
+              <div><p class="calc-title">SALARY BAND</p><select class="calc-select" id="calcBand">${salaryBandOptions}</select></div>
+            </div>
+            <div id="calcOutput"></div>
+          </div>`;
+
+        // Mode tab switching
+        jobsBody.querySelectorAll('[data-cmode]').forEach(btn=>{
+          btn.onclick=()=>{ jobsCalcMode=btn.dataset.cmode; renderJobsView(); };
+        });
+
+        function computeCalc(){
+          const ridx=parseInt(document.getElementById('calcRegion').value)||0;
+          const band=document.getElementById('calcBand').value;
+          const sal=salaries[ridx]||salaries[0];
+          const salUSD=band==='max'?sal.salary_max_usd:sal.salary_min_usd;
+          const fxBuf=sal.is_usd?0:cfg.fx_buffer_pct;
+          const mrt=calcMRT(salUSD,cfg,fxBuf);
+          const avgDeal=mrt/cfg.deals_required;
+          const catalog=getCalcCatalog(sal);
+          const fxRate=getFxRate(sal.currency_code);
+          const mrtLoc=sal.is_usd?mrt:fromUSD(mrt,sal.currency_code);
+          const avgDealLoc=sal.is_usd?avgDeal:fromUSD(avgDeal,sal.currency_code);
+          const salLoc=sal.is_usd?salUSD:fromUSD(salUSD,sal.currency_code);
+
+          const dealStates = window._dealStates||{};
+          const dealQtys = window._dealQtys||{};
+
+          let totalRevenueUSD=0, paidDeals=0;
+          catalog.forEach(item=>{
+            const qty=dealQtys[item.id]||0;
+            const st=dealStates[item.id]||'paid';
+            if(st==='paid'){ totalRevenueUSD+=item.priceUSD*qty; paidDeals+=qty; }
+          });
+          const commissionUSD=totalRevenueUSD*cfg.commission_rate;
+          const deliveryCost=totalRevenueUSD*cfg.delivery_cost_pct;
+          const payFees=totalRevenueUSD*cfg.payment_fee_pct;
+          const companyProfit=totalRevenueUSD-(commissionUSD+deliveryCost+payFees+salUSD);
+          const profitTarget=totalRevenueUSD*cfg.profit_target_pct;
+          const salaryUnlocked=paidDeals>=cfg.deals_required && totalRevenueUSD>=mrt;
+          const repTotalUSD=commissionUSD+(salaryUnlocked?salUSD:0);
+          const dealPct=Math.min(100,(paidDeals/cfg.deals_required)*100);
+          const revPct=Math.min(100,(totalRevenueUSD/mrt)*100);
+          const profitWarn=totalRevenueUSD>0&&companyProfit<profitTarget;
+
+          // Suggestions
+          let suggestions='';
+          const remaining=Math.max(0,mrt-totalRevenueUSD);
+          const dealsLeft=Math.max(0,cfg.deals_required-paidDeals);
+          if(remaining>0&&catalog.length>0){
+            const sorted=[...catalog].filter(i=>(i.priceUSD||0)>0).sort((a,b)=>b.priceUSD-a.priceUSD).slice(0,3);
+            suggestions=`<div class="suggest-box"><p class="calc-title" style="margin-bottom:6px;">WHAT DO I STILL NEED?</p>` +
+              sorted.map(it=>{
+                const needed=Math.ceil(remaining/it.priceUSD);
+                const loc=sal.is_usd?it.priceUSD:fromUSD(it.priceUSD,sal.currency_code);
+                return `· ${Math.max(needed,dealsLeft)} × ${it.name} @ ${fmt(loc,sal.currency_code)} closes the gap.`;
+              }).join('<br/>') + '</div>';
+          }
+
+          // Deal rows
+          const dealRows=catalog.length?catalog.map(item=>{
+            const qty=dealQtys[item.id]||0;
+            const st=dealStates[item.id]||'paid';
+            const loc=sal.is_usd?item.priceUSD:fromUSD(item.priceUSD,sal.currency_code);
+            return `<div class="deal-row" data-item="${item.id}">
+              <span style="flex:1;font-size:0.76rem;letter-spacing:0.05em;">${item.name}<br/><span style="opacity:0.65;">${fmt(loc,sal.currency_code)}</span></span>
+              <div class="qty-ctrl"><button class="qty-minus" data-item="${item.id}">−</button><span style="font-size:0.8rem;min-width:20px;text-align:center;">${qty}</span><button class="qty-plus" data-item="${item.id}">+</button></div>
+              <div class="deal-toggle">
+                <button class="toggle-paid ${st==='paid'?'selected':''}" data-item="${item.id}">PAID</button>
+                <button class="toggle-refund ${st==='refund'?'selected':''}" data-item="${item.id}">REFUND</button>
+                <button class="toggle-unpaid ${st==='unpaid'?'selected':''}" data-item="${item.id}">UNPAID</button>
+              </div>
+            </div>`;
+          }).join(''): '<p class="calc-sub" style="padding:8px 0;">NO CATALOG ITEMS FOR THIS REGION YET.</p>';
+
+          // Admin extras
+          let adminPanel='';
+          if(jobsCalcMode==='admin'){
+            const teamRows=salaries.map(s=>{
+              const su=band==='max'?s.salary_max_usd:s.salary_min_usd;
+              const fb=s.is_usd?0:cfg.fx_buffer_pct;
+              const mt=calcMRT(su,cfg,fb);
+              const ad=mt/cfg.deals_required;
+              return `<div class="deal-row"><span style="flex:1;font-size:0.76rem;">${s.name}</span><span class="calc-sub">${fmt(su,'USD')} SALARY</span><span class="calc-sub">MRT ${fmt(mt,'USD')}</span><span class="calc-sub">AVG DEAL ${fmt(ad,'USD')}</span></div>`;
+            }).join('');
+
+            const fxAdminRows=getFxRates().map(r=>`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+              <span style="font-size:0.76rem;min-width:48px;">${r.currency_code}</span>
+              <input class="calc-input-sm fx-rate-input" data-code="${r.currency_code}" type="number" value="${r.rate_to_usd}" step="0.0001" style="width:110px;"/>
+              <span class="calc-sub">LOCKED ${r.locked_on}</span>
+              <button class="sales-save-btn save-fx-btn" data-code="${r.currency_code}" style="font-size:0.65rem;">SAVE</button>
+            </div>`).join('');
+
+            adminPanel=`<div class="calc-output-box" style="margin-top:8px;gap:12px;">
+              <p class="calc-title">TEAM TARGET TABLE</p>${teamRows}
+              <p class="calc-title" style="margin-top:8px;">FX RATES (LOCKED ${new Date().toISOString().slice(0,10)})</p>
+              ${fxAdminRows}
+              <button class="store-purchase-btn" id="exportCsvBtn" style="margin-top:4px;">EXPORT TO CSV</button>
+            </div>`;
+          }
+
+          // Sales lead price editor
+          let leadPanel='';
+          if(jobsCalcMode==='lead'){
+            const ridx2=parseInt(document.getElementById('calcRegion').value)||0;
+            const sal2=salaries[ridx2]||salaries[0];
+            const br=getBespokeRegions().find(b=>b.id===sal2.bespoke_region_id);
+            if(br){
+              const editorRows=(br.items||[]).map(it=>{
+                const p=parseFloat((it.price||'0').replace(/[^0-9.]/g,''))||0;
+                return `<div class="price-editor-row">
+                  <span style="flex:1;font-size:0.76rem;">${it.name}</span>
+                  <input class="calc-input-sm lead-price-inp" data-bid="${br.id}" data-iid="${it.id}" type="text" value="${it.price||''}" style="width:120px;"/>
+                  <button class="sales-save-btn lead-save-price" data-bid="${br.id}" data-iid="${it.id}">SAVE</button>
+                </div>`;
+              }).join('');
+              leadPanel=`<div class="calc-output-box" style="margin-top:8px;gap:10px;">
+                <p class="calc-title">PRICE EDITOR — ${br.name} ${(br.categoryLabel||'SERVICES').toUpperCase()}</p>
+                ${editorRows||'<p class="calc-sub">NO ITEMS.</p>'}
+              </div>`;
+            }
+          }
+
+          document.getElementById('calcOutput').innerHTML=`
+            <div class="calc-output-box">
+              <p class="calc-title">YOUR MINIMUM REVENUE TARGET (MRT)</p>
+              <p class="calc-big">${fmt(mrtLoc,sal.currency_code)} <span class="calc-sub">(${fmt(mrt,'USD')})</span></p>
+              <p class="calc-sub">YOU NEED AT LEAST ${cfg.deals_required} PAID DEALS TOTALLING THIS AMOUNT · ROUGHLY ${fmt(avgDealLoc,sal.currency_code)} / DEAL</p>
+              <p class="calc-title" style="margin-top:8px;">SALARY BAND</p>
+              <p class="calc-big">${fmt(salLoc,sal.currency_code)} / MONTH <span class="calc-sub">(${fmt(salUSD,'USD')})</span></p>
+            </div>
+            <p class="calc-title">DEAL SIMULATOR</p>
+            ${dealRows}
+            <div class="calc-output-box">
+              <p class="calc-title">DEAL COUNT <span style="float:right;">${paidDeals} / ${cfg.deals_required}</span></p>
+              <div class="calc-bar-wrap"><div class="calc-bar-fill" style="width:${dealPct}%"></div></div>
+              <p class="calc-title" style="margin-top:8px;">REVENUE <span style="float:right;">${fmt(totalRevenueUSD,'USD')} / ${fmt(mrt,'USD')}</span></p>
+              <div class="calc-bar-wrap"><div class="calc-bar-fill" style="width:${revPct}%"></div></div>
+              <div class="calc-row" style="margin-top:10px;gap:12px;flex-wrap:wrap;">
+                <div><p class="calc-title">COMMISSION</p><p class="calc-big">${fmt(commissionUSD,'USD')}</p></div>
+                <div><p class="calc-title">TOTAL PAY</p><p class="calc-big">${fmt(repTotalUSD,'USD')} <span class="calc-sub">${fmt(sal.is_usd?repTotalUSD:fromUSD(repTotalUSD,sal.currency_code),sal.currency_code)}</span></p></div>
+                <div><p class="calc-title">SALARY STATUS</p><span class="calc-badge ${salaryUnlocked?'badge-unlocked':'badge-locked'}">${salaryUnlocked?'✓ UNLOCKED':'⟳ LOCKED'}</span></div>
+              </div>
+              ${profitWarn?`<p class="warn-red" style="margin-top:8px;">⚠ COMPANY PROFIT (${fmt(companyProfit,'USD')}) IS BELOW ${(cfg.profit_target_pct*100).toFixed(0)}% TARGET AT CURRENT SALES.</p>`:''}
+            </div>
+            ${suggestions}
+            ${leadPanel}
+            ${adminPanel}
+            <div>
+              <p class="collapsible-trigger" id="formulaTrigger">▸ HOW IS THIS CALCULATED?</p>
+              <div class="formula-box" id="formulaBox">
+                PRICE_USD → converted at locked FX rate<br/>
+                COMMISSION = PRICE_USD × ${(cfg.commission_rate*100).toFixed(0)}%<br/>
+                DELIVERY_COST = TOTAL_SALES × ${(cfg.delivery_cost_pct*100).toFixed(0)}%<br/>
+                PAYMENT_FEES = TOTAL_SALES × ${(cfg.payment_fee_pct*100).toFixed(0)}%<br/>
+                SAFE_SHARE = ${(cfg.delivery_cost_pct*100).toFixed(0)}% of every dollar sold<br/>
+                MRT = SALARY_USD ÷ SAFE_SHARE + ${(cfg.fx_buffer_pct*100).toFixed(0)}% FX buffer<br/>
+                COMPANY_PROFIT = TOTAL − COMMISSION − DELIVERY − FEES − SALARY
+              </div>
+            </div>
+          `;
+
+          document.getElementById('formulaTrigger').onclick=()=>{
+            const fb=document.getElementById('formulaBox');
+            fb.classList.toggle('open');
+            document.getElementById('formulaTrigger').textContent=(fb.classList.contains('open')?'▾':'▸')+' HOW IS THIS CALCULATED?';
+          };
+
+          // Deal controls
+          jobsBody.querySelectorAll('.qty-plus').forEach(btn=>btn.onclick=()=>{
+            const id=btn.dataset.item; window._dealQtys=window._dealQtys||{}; window._dealQtys[id]=(window._dealQtys[id]||0)+1; computeCalc();
+          });
+          jobsBody.querySelectorAll('.qty-minus').forEach(btn=>btn.onclick=()=>{
+            const id=btn.dataset.item; window._dealQtys=window._dealQtys||{}; window._dealQtys[id]=Math.max(0,(window._dealQtys[id]||0)-1); computeCalc();
+          });
+          jobsBody.querySelectorAll('.toggle-paid').forEach(btn=>btn.onclick=()=>{ window._dealStates=window._dealStates||{}; window._dealStates[btn.dataset.item]='paid'; computeCalc(); });
+          jobsBody.querySelectorAll('.toggle-refund').forEach(btn=>btn.onclick=()=>{ window._dealStates=window._dealStates||{}; window._dealStates[btn.dataset.item]='refund'; computeCalc(); });
+          jobsBody.querySelectorAll('.toggle-unpaid').forEach(btn=>btn.onclick=()=>{ window._dealStates=window._dealStates||{}; window._dealStates[btn.dataset.item]='unpaid'; computeCalc(); });
+
+          // Admin FX save
+          jobsBody.querySelectorAll('.save-fx-btn').forEach(btn=>btn.onclick=()=>{
+            const code=btn.dataset.code;
+            const val=parseFloat(jobsBody.querySelector(`.fx-rate-input[data-code="${code}"]`).value)||1;
+            const rates=getFxRates();
+            const idx=rates.findIndex(r=>r.currency_code===code);
+            const today=new Date().toISOString().slice(0,10);
+            if(idx>=0) rates[idx]={...rates[idx],rate_to_usd:val,locked_on:today};
+            else rates.push({currency_code:code,rate_to_usd:val,locked_on:today});
+            localStorage.setItem(FX_RATES_KEY,JSON.stringify(rates));
+            btn.textContent='SAVED ✓'; setTimeout(()=>btn.textContent='SAVE',1600);
+            computeCalc();
+          });
+
+          // Admin CSV export
+          const csvBtn=document.getElementById('exportCsvBtn');
+          if(csvBtn) csvBtn.onclick=()=>{
+            const rows=[['REGION','SALARY USD','MRT USD','AVG DEAL USD'],...salaries.map(s=>{ const su=band==='max'?s.salary_max_usd:s.salary_min_usd; const fb=s.is_usd?0:cfg.fx_buffer_pct; const mt=calcMRT(su,cfg,fb); return [s.name,su.toFixed(0),(mt).toFixed(0),(mt/cfg.deals_required).toFixed(0)]; })];
+            const csv=rows.map(r=>r.join(',')).join('\n');
+            const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='bxb_team_targets.csv'; a.click();
+          };
+
+          // Lead price save
+          jobsBody.querySelectorAll('.lead-save-price').forEach(btn=>btn.onclick=()=>{
+            const inp=jobsBody.querySelector(`.lead-price-inp[data-iid="${btn.dataset.iid}"]`);
+            if(!inp) return;
+            updateBespokeItem(btn.dataset.bid,btn.dataset.iid,{price:inp.value.trim().toUpperCase()});
+            btn.textContent='SAVED ✓'; setTimeout(()=>btn.textContent='SAVE',1600);
+            computeCalc();
+          });
+        }
+
+        document.getElementById('calcRegion').onchange=computeCalc;
+        document.getElementById('calcBand').onchange=computeCalc;
+        window._dealStates={}; window._dealQtys={};
+        computeCalc();
+      }
+    }
+
+    document.querySelector('.office-btn[data-role="jobs"]').addEventListener('click', ()=>{
+      jobsView='menu'; window._dealStates={}; window._dealQtys={};
+      renderJobsView();
+      officeMenuWrap.style.display='none';
+      jobsCard.classList.add('active');
+      requestAnimationFrame(()=>jobsCard.classList.add('visible'));
+    });
+
+    function backFromJobs(){
+      jobsCard.classList.remove('visible');
+      setTimeout(()=>{
+        jobsCard.classList.remove('active');
+        officeMenuWrap.style.display='flex';
+        officeBtns.forEach(b=>b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach(b=>b.classList.add('wave-in'));
+      },220);
+    }
+
+    jobsBack.addEventListener('click',()=>{
+      if(jobsView!=='menu'){ jobsView='menu'; renderJobsView(); }
+      else backFromJobs();
+    });
+    jobsClose.addEventListener('click', closeOffice);
   </script>
 </body>
 </html>
+
 
 
 
