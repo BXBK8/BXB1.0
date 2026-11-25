@@ -168,7 +168,7 @@
       left: 50%;
       transform: translateX(-50%);
       width: 50vw;
-      max-width: 720px;
+      width: max(50vw, max-content); max-width: 90vw;
       min-width: 320px;
       height: 60px;
       padding: 0 28px;
@@ -197,6 +197,7 @@
     }
 
     .nav-links a {
+      white-space: nowrap;
       color: #000000;
       text-decoration: none;
       font-size: 0.85rem;
@@ -253,12 +254,13 @@
 
   <div class="site-layer" id="siteLayer">
     <nav class="glass-nav">
-      <a href="#" class="nav-brand">BXB</a>
-      <div class="nav-links">
-        <a href="#">Home</a>
-        <a href="#">Work</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+      <div class="nav-links" style="width: 100%; justify-content: space-between; gap: 18px;">
+        <a href="#">WHY ?</a>
+        <a href="#">PORTFOLIO</a>
+        <a href="#">STORE</a>
+        <a href="#">BESPOKE</a>
+        <a href="#">OFFICE</a>
+        <a href="#">CONNECT</a>
       </div>
     </nav>
 
@@ -574,6 +576,7 @@
   </script>
 </body>
 </html>
+
 
 
 
