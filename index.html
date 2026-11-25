@@ -782,6 +782,73 @@
       from { opacity: 0; transform: translateY(14px) scale(0.975); filter: blur(4px); }
       to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
     }
+    .bespoke-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 96px 16px 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .bespoke-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bespoke-card {
+      position: relative;
+      width: min(960px, calc(100vw - 2rem));
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(24px) saturate(1.35);
+      -webkit-backdrop-filter: blur(24px) saturate(1.35);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      text-align: left;
+      color: #000000;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bespoke-overlay.open .bespoke-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .bespoke-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 160px 160px;
+    }
+
+    .bespoke-scroll {
+      position: relative;
+      z-index: 1;
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+      padding: clamp(20px, 3.5vw, 34px);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+      transition: height 440ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .bespoke-scroll::-webkit-scrollbar { width: 5px; }
+    .bespoke-scroll::-webkit-scrollbar-track { background: transparent; }
+    .bespoke-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.25); border-radius: 9999px; }
+
+    #bespokeGrid, #bespokeTitleWrap {
+      transition: opacity 340ms cubic-bezier(0.22, 1, 0.36, 1), transform 340ms cubic-bezier(0.22, 1, 0.36, 1), filter 340ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
   </style>
 </head>
 <body>
@@ -801,7 +868,7 @@
         <a href="#" id="navWhy">WHY ?</a>
         <a href="#" id="navPortfolio">PORTFOLIO</a>
         <a href="#" id="navStore">STORE</a>
-        <a href="#">BESPOKE</a>
+        <a href="#" id="navBespoke">BESPOKE</a>
         <a href="#">OFFICE</a>
         <a href="#">CONNECT</a>
       </div>
@@ -826,7 +893,24 @@
         </div>
       </div></div>
     </div>
-        <div class="store-overlay" id="storeOverlay" aria-hidden="true">
+            <div class="bespoke-overlay" id="bespokeOverlay" aria-hidden="true">
+      <div class="bespoke-card" id="bespokeCard">
+        <div class="bespoke-scroll" id="bespokeScroll">
+          <div class="store-step-header">
+            <div class="store-title-wrap" id="bespokeTitleWrap">
+              <span class="why-tag">BESPOKE · SELECT REGION</span>
+            </div>
+            <div class="store-header-actions">
+              <button class="why-close" id="bespokeBack" type="button" style="display: none;">← BACK</button>
+              <button class="why-close" id="bespokeClose" type="button">CLOSE ×</button>
+            </div>
+          </div>
+          <div class="portfolio-grid" id="bespokeGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="store-overlay" id="storeOverlay" aria-hidden="true">
       <div class="store-card" id="storeCard">
         <div class="store-scroll">
           <div class="store-step-header">
@@ -1190,6 +1274,7 @@
     }
 
     function openWhy(e) {
+      if (typeof closeBespoke === 'function') closeBespoke();
       if (typeof closeStore === 'function') closeStore();
       if (typeof closePortfolio === 'function') closePortfolio();
       e.preventDefault();
@@ -1325,6 +1410,7 @@
     const portfolioClose = document.getElementById('portfolioClose');
 
     function openPortfolio(e) {
+      if (typeof closeBespoke === 'function') closeBespoke();
       if (typeof closeStore === 'function') closeStore();
       e.preventDefault();
       closeWhy();
@@ -1336,7 +1422,7 @@
     function closePortfolio() {
       portfolioOverlay.classList.remove('open');
       portfolioOverlay.setAttribute('aria-hidden', 'true');
-      if (!whyOverlay.classList.contains('open') && !storeOverlay.classList.contains('open')) {
+      if (!whyOverlay.classList.contains('open') && !storeOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
         heroCenter.classList.remove('hero-hidden');
       }
     }
@@ -1602,6 +1688,7 @@
     const storeClose = document.getElementById('storeClose');
 
     function openStore(e) {
+      if (typeof closeBespoke === 'function') closeBespoke();
       storeTransitioning = false;
       storeGrid.classList.remove('store-exit');
       storeTitleWrap.classList.remove('store-exit');
@@ -1618,7 +1705,7 @@
     function closeStore() {
       storeOverlay.classList.remove('open');
       storeOverlay.setAttribute('aria-hidden', 'true');
-      if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open')) {
+      if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
         heroCenter.classList.remove('hero-hidden');
       }
     }
@@ -1631,9 +1718,291 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && storeOverlay.classList.contains('open')) closeStore();
     });
+    const BESPOKE_STORAGE_KEY = 'bxb_bespoke_regions';
+    const DEFAULT_BESPOKE_REGIONS = [
+      {
+        id: 'ghana',
+        name: 'GHANA',
+        flagUrl: '',
+        flagText: 'GH',
+        categoryLabel: 'SERVICES',
+        items: [
+          {
+            id: 'gh-ai-ops',
+            name: 'CUSTOM AI AUTOMATION',
+            price: '$1,500',
+            description: 'END-TO-END AUTONOMOUS AGENTS TAILORED FOR LOCAL TEAMS AND OPERATIONS.',
+            categoryLabel: 'SERVICES',
+            actionUrl: ''
+          },
+          {
+            id: 'gh-web-sys',
+            name: 'BESPOKE WEB SYSTEMS',
+            price: '$2,200',
+            description: 'HIGH-SPEED CUSTOM PLATFORMS BUILT TO RUN 24/7/365 ON YOUR COMMAND.',
+            categoryLabel: 'SERVICES',
+            actionUrl: ''
+          }
+        ]
+      },
+      {
+        id: 'mena',
+        name: 'MENA',
+        flagUrl: '',
+        flagText: 'MN',
+        categoryLabel: 'SOLUTIONS',
+        items: [
+          {
+            id: 'mena-enterprise',
+            name: 'ENTERPRISE ETHER MESH',
+            price: '$3,800',
+            description: 'DEDICATED MULTI-REGION INFRASTRUCTURE AND REAL-TIME DATA PIPELINES.',
+            categoryLabel: 'SOLUTIONS',
+            actionUrl: ''
+          },
+          {
+            id: 'mena-robotics',
+            name: 'ROBOTIC WORKFLOW SUITE',
+            price: '$4,500',
+            description: 'CUSTOM HARDWARE & SOFTWARE ORCHESTRATION FOR HIGH-VOLUME ORGANISATIONS.',
+            categoryLabel: 'SOLUTIONS',
+            actionUrl: ''
+          }
+        ]
+      }
+    ];
+
+    let activeBespokeRegionId = null;
+    let bespokeTransitioning = false;
+
+    function getBespokeRegions() {
+      try {
+        const raw = localStorage.getItem(BESPOKE_STORAGE_KEY);
+        if (!raw) {
+          localStorage.setItem(BESPOKE_STORAGE_KEY, JSON.stringify(DEFAULT_BESPOKE_REGIONS));
+          return JSON.parse(JSON.stringify(DEFAULT_BESPOKE_REGIONS));
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : JSON.parse(JSON.stringify(DEFAULT_BESPOKE_REGIONS));
+      } catch {
+        return JSON.parse(JSON.stringify(DEFAULT_BESPOKE_REGIONS));
+      }
+    }
+
+    function saveBespokeRegions(regions) {
+      localStorage.setItem(BESPOKE_STORAGE_KEY, JSON.stringify(regions));
+      renderBespokeView();
+    }
+
+    function addBespokeRegion(region) {
+      const regions = getBespokeRegions();
+      const newReg = {
+        id: region.id || 'reg-' + Date.now(),
+        name: region.name || 'NEW REGION',
+        flagUrl: region.flagUrl || '',
+        flagText: region.flagText || '',
+        categoryLabel: region.categoryLabel || 'SERVICES',
+        items: region.items || []
+      };
+      regions.push(newReg);
+      saveBespokeRegions(regions);
+      return newReg;
+    }
+
+    function updateBespokeRegion(regionId, updates) {
+      const regions = getBespokeRegions().map((r) => (r.id === regionId ? { ...r, ...updates } : r));
+      saveBespokeRegions(regions);
+    }
+
+    function deleteBespokeRegion(regionId) {
+      if (activeBespokeRegionId === regionId) activeBespokeRegionId = null;
+      const regions = getBespokeRegions().filter((r) => r.id !== regionId);
+      saveBespokeRegions(regions);
+    }
+
+    function addBespokeItem(regionId, item) {
+      const regions = getBespokeRegions().map((r) => {
+        if (r.id !== regionId) return r;
+        const newItem = { id: item.id || 'item-' + Date.now(), ...item };
+        return { ...r, items: [...(r.items || []), newItem] };
+      });
+      saveBespokeRegions(regions);
+    }
+
+    function updateBespokeItem(regionId, itemId, updates) {
+      const regions = getBespokeRegions().map((r) => {
+        if (r.id !== regionId) return r;
+        return { ...r, items: (r.items || []).map((it) => (it.id === itemId ? { ...it, ...updates } : it)) };
+      });
+      saveBespokeRegions(regions);
+    }
+
+    function deleteBespokeItem(regionId, itemId) {
+      const regions = getBespokeRegions().map((r) => {
+        if (r.id !== regionId) return r;
+        return { ...r, items: (r.items || []).filter((it) => it.id !== itemId) };
+      });
+      saveBespokeRegions(regions);
+    }
+
+    const bespokeGrid = document.getElementById('bespokeGrid');
+    const bespokeTitleWrap = document.getElementById('bespokeTitleWrap');
+    const bespokeBack = document.getElementById('bespokeBack');
+    const bespokeScroll = document.getElementById('bespokeScroll');
+
+    function renderBespokeView() {
+      const regions = getBespokeRegions();
+      if (!activeBespokeRegionId) {
+        bespokeBack.style.display = 'none';
+        bespokeTitleWrap.innerHTML = '<span class="why-tag">BESPOKE · SELECT REGION</span>';
+        bespokeGrid.innerHTML = regions.map((r, idx) => {
+          const items = r.items || [];
+          const label = (r.categoryLabel || 'SERVICES').toUpperCase();
+          return `
+            <button class="region-card store-card-anim" style="animation-delay: ${idx * 60}ms" type="button" data-region-id="${r.id}">
+              <div class="region-left">
+                ${renderFlagHtml(r, 'region-flag-lg')}
+                <div>
+                  <div class="project-title">${r.name}</div>
+                  <div class="region-meta">${items.length} ${label}</div>
+                </div>
+              </div>
+              <span>→</span>
+            </button>
+          `;
+        }).join('');
+        return;
+      }
+
+      const region = regions.find((r) => r.id === activeBespokeRegionId);
+      if (!region) {
+        activeBespokeRegionId = null;
+        renderBespokeView();
+        return;
+      }
+
+      const regionLabel = (region.categoryLabel || 'SERVICES').toUpperCase();
+      bespokeBack.style.display = 'inline-block';
+      bespokeTitleWrap.innerHTML = `${renderFlagHtml(region, 'store-flag')}<span class="why-tag">${region.name} · ${regionLabel}</span>`;
+
+      const items = region.items || [];
+      if (!items.length) {
+        bespokeGrid.innerHTML = `<p class="project-desc">NO ${regionLabel} LISTED FOR THIS REGION YET.</p>`;
+        return;
+      }
+
+      bespokeGrid.innerHTML = items.map((item, idx) => {
+        const badgeLabel = (item.categoryLabel || regionLabel).toUpperCase();
+        return `
+          <article class="project-card store-card-anim" style="animation-delay: ${idx * 65}ms">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+              <h3 class="project-title">${item.name}</h3>
+              <span class="tech-badge">${badgeLabel}</span>
+            </div>
+            <div class="store-price">${item.price || ''}</div>
+            <p class="project-desc">${item.description || ''}</p>
+            <button class="store-purchase-btn bespoke-inquire-btn" type="button" data-url="${item.actionUrl || ''}">INQUIRE</button>
+          </article>
+        `;
+      }).join('');
+    }
+    renderBespokeView();
+
+    function transitionBespokeStep(nextRegionId) {
+      if (bespokeTransitioning) return;
+      bespokeTransitioning = true;
+
+      const startHeight = bespokeScroll.offsetHeight;
+      bespokeScroll.style.height = startHeight + 'px';
+
+      bespokeGrid.classList.add('store-exit');
+      bespokeTitleWrap.classList.add('store-exit');
+
+      setTimeout(() => {
+        activeBespokeRegionId = nextRegionId;
+        renderBespokeView();
+
+        const maxH = Math.floor(window.innerHeight - 130);
+        bespokeScroll.style.height = 'auto';
+        const targetHeight = Math.min(bespokeScroll.scrollHeight, maxH);
+        bespokeScroll.style.height = startHeight + 'px';
+        void bespokeScroll.offsetHeight;
+        bespokeScroll.style.height = targetHeight + 'px';
+
+        requestAnimationFrame(() => {
+          bespokeGrid.classList.remove('store-exit');
+          bespokeTitleWrap.classList.remove('store-exit');
+        });
+
+        setTimeout(() => {
+          bespokeScroll.style.height = '';
+          bespokeTransitioning = false;
+        }, 520);
+      }, 300);
+    }
+
+    bespokeGrid.addEventListener('click', (e) => {
+      const regBtn = e.target.closest('.region-card');
+      if (regBtn) {
+        transitionBespokeStep(regBtn.dataset.regionId);
+        return;
+      }
+      const inqBtn = e.target.closest('.bespoke-inquire-btn');
+      if (!inqBtn) return;
+      const url = inqBtn.dataset.url;
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      inqBtn.classList.add('purchased');
+      inqBtn.textContent = 'INQUIRY RECEIVED ✓';
+      setTimeout(() => {
+        inqBtn.classList.remove('purchased');
+        inqBtn.textContent = 'INQUIRE';
+      }, 2000);
+    });
+
+    bespokeBack.addEventListener('click', () => transitionBespokeStep(null));
+
+    const navBespoke = document.getElementById('navBespoke');
+    const bespokeOverlay = document.getElementById('bespokeOverlay');
+    const bespokeClose = document.getElementById('bespokeClose');
+
+    function openBespoke(e) {
+      e.preventDefault();
+      closeWhy();
+      closePortfolio();
+      closeStore();
+      bespokeTransitioning = false;
+      bespokeGrid.classList.remove('store-exit');
+      bespokeTitleWrap.classList.remove('store-exit');
+      activeBespokeRegionId = null;
+      renderBespokeView();
+      bespokeOverlay.classList.add('open');
+      bespokeOverlay.setAttribute('aria-hidden', 'false');
+      heroCenter.classList.add('hero-hidden');
+    }
+
+    function closeBespoke() {
+      bespokeOverlay.classList.remove('open');
+      bespokeOverlay.setAttribute('aria-hidden', 'true');
+      if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !storeOverlay.classList.contains('open')) {
+        heroCenter.classList.remove('hero-hidden');
+      }
+    }
+
+    navBespoke.addEventListener('click', openBespoke);
+    bespokeClose.addEventListener('click', closeBespoke);
+    bespokeOverlay.addEventListener('click', (e) => {
+      if (e.target === bespokeOverlay) closeBespoke();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && bespokeOverlay.classList.contains('open')) closeBespoke();
+    });
   </script>
 </body>
 </html>
+
 
 
 
