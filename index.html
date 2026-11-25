@@ -125,23 +125,6 @@
       cursor: crosshair;
     }
 
-    .hint {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      color: #000000;
-      background: rgba(255, 255, 255, 0.25);
-      padding: 8px 18px;
-      border-radius: 12px;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-
     .site-layer {
       position: relative;
       z-index: 2;
@@ -641,7 +624,6 @@
 
   <div class="intro-layer" id="introLayer">
     <canvas id="logoCanvas"></canvas>
-    <div class="hint" id="hint">Click the logo to shatter · <span id="pct">0</span>%</div>
   </div>
 
   <script>
@@ -692,8 +674,6 @@
     const ctx = canvas.getContext('2d');
     const introLayer = document.getElementById('introLayer');
     const siteLayer = document.getElementById('siteLayer');
-    const hint = document.getElementById('hint');
-    const pctEl = document.getElementById('pct');
 
     const rows = LOGO_MAP.length;
     const cols = LOGO_MAP[0].length;
@@ -734,8 +714,6 @@
       particles = [];
       clearedCount = 0;
       autoCompleting = false;
-      pctEl.textContent = '0';
-      hint.style.opacity = '1';
       introLayer.classList.remove('done', 'no-pointer');
       siteLayer.classList.remove('revealed');
       startTime = performance.now();
@@ -779,7 +757,6 @@
     function triggerAutoComplete() {
       if (autoCompleting) return;
       autoCompleting = true;
-      hint.style.opacity = '0';
       introLayer.classList.add('no-pointer');
 
       for (let i = 0; i < particles.length; i++) {
@@ -843,7 +820,6 @@
       }
 
       const pct = Math.min(100, Math.round((clearedCount / particles.length) * 100));
-      pctEl.textContent = pct;
 
       if (clearedCount / particles.length >= 0.8) {
         triggerAutoComplete();
@@ -1140,6 +1116,7 @@
   </script>
 </body>
 </html>
+
 
 
 
