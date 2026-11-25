@@ -265,6 +265,17 @@
       background-repeat: repeat;
       background-size: 160px 160px;
     }
+    @media (max-width: 900px), (orientation: portrait) {
+      .mesh-bg {
+        inset: -10%;
+        filter: blur(65px) saturate(1.35);
+      }
+      .blob-1 { width: 58vmax; height: 58vmax; top: 8%; left: 5%; }
+      .blob-2 { width: 52vmax; height: 52vmax; top: 22%; right: 0%; }
+      .blob-3 { width: 60vmax; height: 60vmax; bottom: 10%; left: 12%; }
+      .blob-4 { width: 46vmax; height: 46vmax; bottom: 18%; right: 5%; }
+      .blob-cursor { width: 44vmax; height: 44vmax; }
+    }
   </style>
 </head>
 <body>
@@ -602,6 +613,7 @@
   </script>
 </body>
 </html>
+
 
 
 
