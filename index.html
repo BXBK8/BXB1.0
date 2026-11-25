@@ -234,26 +234,6 @@
       font-size: 0.95rem;
       letter-spacing: 0.08em;
     }
-
-    .replay-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: rgba(255, 255, 255, 0.22);
-      color: #000000;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-
-    .replay-btn:hover {
-      background: rgba(255, 255, 255, 0.35);
-    }
     .grain-overlay {
       position: fixed;
       inset: 0;
@@ -657,7 +637,6 @@
         </div>
       </div>
     </div>
-    <button class="replay-btn" id="replayBtn">Replay Intro</button>
   </div>
 
   <div class="intro-layer" id="introLayer">
@@ -715,7 +694,6 @@
     const siteLayer = document.getElementById('siteLayer');
     const hint = document.getElementById('hint');
     const pctEl = document.getElementById('pct');
-    const replayBtn = document.getElementById('replayBtn');
 
     const rows = LOGO_MAP.length;
     const cols = LOGO_MAP[0].length;
@@ -871,8 +849,6 @@
         triggerAutoComplete();
       }
     });
-
-    replayBtn.addEventListener('click', initParticles);
 
     function easeOutCubic(t) {
       return 1 - Math.pow(1 - t, 3);
@@ -1164,6 +1140,7 @@
   </script>
 </body>
 </html>
+
 
 
 
