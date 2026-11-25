@@ -663,6 +663,104 @@
     .store-purchase-btn.purchased {
       background: rgba(255, 255, 255, 0.65);
     }
+    .store-step-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .store-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .store-flag {
+      width: 28px;
+      height: 20px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      display: grid;
+      place-items: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.04em;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .store-flag img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .store-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .region-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: #000000;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s ease, transform 0.18s ease;
+    }
+
+    .region-card:hover {
+      background: rgba(255, 255, 255, 0.34);
+      transform: translateY(-2px);
+    }
+
+    .region-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .region-flag-lg {
+      width: 44px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .region-flag-lg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .region-meta {
+      font-size: 0.68rem;
+      opacity: 0.72;
+      margin-top: 3px;
+      letter-spacing: 0.08em;
+    }
   </style>
 </head>
 <body>
@@ -710,9 +808,14 @@
         <div class="store-overlay" id="storeOverlay" aria-hidden="true">
       <div class="store-card" id="storeCard">
         <div class="store-scroll">
-          <div class="why-header">
-            <span class="why-tag">STORE</span>
-            <button class="why-close" id="storeClose" type="button">CLOSE ×</button>
+          <div class="store-step-header">
+            <div class="store-title-wrap" id="storeTitleWrap">
+              <span class="why-tag">STORE · SELECT REGION</span>
+            </div>
+            <div class="store-header-actions">
+              <button class="why-close" id="storeBack" type="button" style="display: none;">← BACK TO STORES</button>
+              <button class="why-close" id="storeClose" type="button">CLOSE ×</button>
+            </div>
           </div>
           <div class="portfolio-grid" id="storeGrid"></div>
         </div>
@@ -1225,110 +1328,221 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && portfolioOverlay.classList.contains('open')) closePortfolio();
     });
-    const STORE_STORAGE_KEY = 'bxb_store_items';
-    const DEFAULT_STORE_ITEMS = [
+    const STORES_STORAGE_KEY = 'bxb_regional_stores';
+    const DEFAULT_REGIONAL_STORES = [
       {
-        id: 'bxb-automate',
-        title: 'BXB AUTOMATE',
-        description: 'AUTONOMOUS 24/7/365 WORKFLOW ENGINE FOR TEAMS AND SOLO OPERATORS.',
-        price: '$29 / MONTH',
-        logoUrl: '',
-        logoText: 'BA',
-        checkoutUrl: ''
+        id: 'ghana',
+        name: 'GHANA',
+        flagUrl: '',
+        flagText: 'GH',
+        apps: [
+          {
+            id: 'gh-automate',
+            name: 'BXB AUTOMATE GH',
+            logoUrl: '',
+            logoText: 'BA',
+            description: '24/7/365 AUTONOMOUS WORKFLOW ENGINE BUILT FOR GHANA TEAMS.',
+            pricePerMonth: '$29 / MONTH',
+            checkoutUrl: ''
+          },
+          {
+            id: 'gh-payflow',
+            name: 'BXB PAYFLOW',
+            logoUrl: '',
+            logoText: 'BP',
+            description: 'INSTANT MOBILE-MONEY & BUSINESS LEDGER SYNC ON COMMAND.',
+            pricePerMonth: '$39 / MONTH',
+            checkoutUrl: ''
+          }
+        ]
       },
       {
-        id: 'bxb-pulse',
-        title: 'BXB PULSE',
-        description: 'REAL-TIME SYSTEM TELEMETRY, ALERTS, AND INSTANT COMMAND ROUTING.',
-        price: '$49 / MONTH',
-        logoUrl: '',
-        logoText: 'BP',
-        checkoutUrl: ''
-      },
-      {
-        id: 'bxb-vault',
-        title: 'BXB VAULT',
-        description: 'ENCRYPTED ETHER STORAGE AND ZERO-LATENCY API SYNC FOR ORGANISATIONS.',
-        price: '$79 / MONTH',
-        logoUrl: '',
-        logoText: 'BV',
-        checkoutUrl: ''
+        id: 'mena',
+        name: 'MENA',
+        flagUrl: '',
+        flagText: 'MN',
+        apps: [
+          {
+            id: 'mena-pulse',
+            name: 'BXB PULSE MENA',
+            logoUrl: '',
+            logoText: 'MP',
+            description: 'REAL-TIME ENTERPRISE TELEMETRY AND COMMAND ROUTING ACROSS MENA.',
+            pricePerMonth: '$49 / MONTH',
+            checkoutUrl: ''
+          },
+          {
+            id: 'mena-vault',
+            name: 'BXB VAULT',
+            logoUrl: '',
+            logoText: 'BV',
+            description: 'ENCRYPTED ETHER STORAGE AND ZERO-LATENCY API SYNC FOR ORGANISATIONS.',
+            pricePerMonth: '$79 / MONTH',
+            checkoutUrl: ''
+          }
+        ]
       }
     ];
 
-    function getStoreItems() {
+    let activeStoreId = null;
+
+    function getStores() {
       try {
-        const raw = localStorage.getItem(STORE_STORAGE_KEY);
+        const raw = localStorage.getItem(STORES_STORAGE_KEY);
         if (!raw) {
-          localStorage.setItem(STORE_STORAGE_KEY, JSON.stringify(DEFAULT_STORE_ITEMS));
-          return [...DEFAULT_STORE_ITEMS];
+          localStorage.setItem(STORES_STORAGE_KEY, JSON.stringify(DEFAULT_REGIONAL_STORES));
+          return JSON.parse(JSON.stringify(DEFAULT_REGIONAL_STORES));
         }
         const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [...DEFAULT_STORE_ITEMS];
+        return Array.isArray(parsed) ? parsed : JSON.parse(JSON.stringify(DEFAULT_REGIONAL_STORES));
       } catch {
-        return [...DEFAULT_STORE_ITEMS];
+        return JSON.parse(JSON.stringify(DEFAULT_REGIONAL_STORES));
       }
     }
 
-    function saveStoreItems(items) {
-      localStorage.setItem(STORE_STORAGE_KEY, JSON.stringify(items));
-      renderStore();
+    function saveStores(stores) {
+      localStorage.setItem(STORES_STORAGE_KEY, JSON.stringify(stores));
+      renderStoreView();
     }
 
-    function addStoreItem(item) {
-      const items = getStoreItems();
-      const newItem = { id: item.id || 'app-' + Date.now(), ...item };
-      items.push(newItem);
-      saveStoreItems(items);
-      return newItem;
+    function addStore(store) {
+      const stores = getStores();
+      const newStore = { id: store.id || 'store-' + Date.now(), name: store.name || 'NEW', flagUrl: store.flagUrl || '', flagText: store.flagText || '', apps: store.apps || [] };
+      stores.push(newStore);
+      saveStores(stores);
+      return newStore;
     }
 
-    function updateStoreItem(id, updates) {
-      const items = getStoreItems().map((it) => (it.id === id ? { ...it, ...updates } : it));
-      saveStoreItems(items);
+    function updateStore(storeId, updates) {
+      const stores = getStores().map((s) => (s.id === storeId ? { ...s, ...updates } : s));
+      saveStores(stores);
     }
 
-    function deleteStoreItem(id) {
-      const items = getStoreItems().filter((it) => it.id !== id);
-      saveStoreItems(items);
+    function deleteStore(storeId) {
+      if (activeStoreId === storeId) activeStoreId = null;
+      const stores = getStores().filter((s) => s.id !== storeId);
+      saveStores(stores);
+    }
+
+    function addAppToStore(storeId, app) {
+      const stores = getStores().map((s) => {
+        if (s.id !== storeId) return s;
+        const newApp = { id: app.id || 'app-' + Date.now(), ...app };
+        return { ...s, apps: [...(s.apps || []), newApp] };
+      });
+      saveStores(stores);
+    }
+
+    function updateAppInStore(storeId, appId, updates) {
+      const stores = getStores().map((s) => {
+        if (s.id !== storeId) return s;
+        return { ...s, apps: (s.apps || []).map((a) => (a.id === appId ? { ...a, ...updates } : a)) };
+      });
+      saveStores(stores);
+    }
+
+    function deleteAppFromStore(storeId, appId) {
+      const stores = getStores().map((s) => {
+        if (s.id !== storeId) return s;
+        return { ...s, apps: (s.apps || []).filter((a) => a.id !== appId) };
+      });
+      saveStores(stores);
     }
 
     const storeGrid = document.getElementById('storeGrid');
-    function renderStore() {
-      const items = getStoreItems();
-      storeGrid.innerHTML = items.map((item) => {
-        const logoHtml = item.logoUrl
-          ? `<img src="${item.logoUrl}" alt="${item.title}" />`
-          : `<span>${item.logoText || (item.title || 'BX').slice(0, 2)}</span>`;
+    const storeTitleWrap = document.getElementById('storeTitleWrap');
+    const storeBack = document.getElementById('storeBack');
+
+    function renderFlagHtml(store, cls) {
+      if (store.flagUrl) {
+        return `<div class="${cls}"><img src="${store.flagUrl}" alt="${store.name}" /></div>`;
+      }
+      return `<div class="${cls}"><span>${store.flagText || (store.name || 'ST').slice(0, 2)}</span></div>`;
+    }
+
+    function renderStoreView() {
+      const stores = getStores();
+      if (!activeStoreId) {
+        storeBack.style.display = 'none';
+        storeTitleWrap.innerHTML = '<span class="why-tag">STORE · SELECT REGION</span>';
+        storeGrid.innerHTML = stores.map((s) => {
+          const count = (s.apps || []).length;
+          return `
+            <button class="region-card" type="button" data-store-id="${s.id}">
+              <div class="region-left">
+                ${renderFlagHtml(s, 'region-flag-lg')}
+                <div>
+                  <div class="project-title">${s.name} STORE</div>
+                  <div class="region-meta">${count} ${count === 1 ? 'APP' : 'APPS'} AVAILABLE</div>
+                </div>
+              </div>
+              <span>→</span>
+            </button>
+          `;
+        }).join('');
+        return;
+      }
+
+      const store = stores.find((s) => s.id === activeStoreId);
+      if (!store) {
+        activeStoreId = null;
+        renderStoreView();
+        return;
+      }
+
+      storeBack.style.display = 'inline-block';
+      storeTitleWrap.innerHTML = `${renderFlagHtml(store, 'store-flag')}<span class="why-tag">${store.name} STORE</span>`;
+
+      const apps = store.apps || [];
+      if (!apps.length) {
+        storeGrid.innerHTML = '<p class="project-desc">NO APPS IN THIS REGIONAL STORE YET.</p>';
+        return;
+      }
+
+      storeGrid.innerHTML = apps.map((app) => {
+        const logoHtml = app.logoUrl
+          ? `<img src="${app.logoUrl}" alt="${app.name}" />`
+          : `<span>${app.logoText || (app.name || 'BX').slice(0, 2)}</span>`;
         return `
           <article class="project-card">
             <div class="project-head">
               <div class="project-logo">${logoHtml}</div>
-              <h3 class="project-title">${item.title}</h3>
+              <h3 class="project-title">${app.name}</h3>
             </div>
-            <p class="project-desc">${item.description || ''}</p>
-            <div class="store-price">${item.price || ''}</div>
-            <button class="store-purchase-btn" type="button" data-id="${item.id}" data-url="${item.checkoutUrl || ''}">PURCHASE</button>
+            <p class="project-desc">${app.description || ''}</p>
+            <div class="store-price">${app.pricePerMonth || ''}</div>
+            <button class="store-purchase-btn" type="button" data-url="${app.checkoutUrl || ''}">PURCHASE</button>
           </article>
         `;
       }).join('');
     }
-    renderStore();
+    renderStoreView();
 
     storeGrid.addEventListener('click', (e) => {
-      const btn = e.target.closest('.store-purchase-btn');
-      if (!btn) return;
-      const url = btn.dataset.url;
+      const regionBtn = e.target.closest('.region-card');
+      if (regionBtn) {
+        activeStoreId = regionBtn.dataset.storeId;
+        renderStoreView();
+        return;
+      }
+      const purchaseBtn = e.target.closest('.store-purchase-btn');
+      if (!purchaseBtn) return;
+      const url = purchaseBtn.dataset.url;
       if (url) {
         window.open(url, '_blank', 'noopener,noreferrer');
         return;
       }
-      btn.classList.add('purchased');
-      btn.textContent = 'ADDED TO ORDER ✓';
+      purchaseBtn.classList.add('purchased');
+      purchaseBtn.textContent = 'ADDED TO ORDER ✓';
       setTimeout(() => {
-        btn.classList.remove('purchased');
-        btn.textContent = 'PURCHASE';
+        purchaseBtn.classList.remove('purchased');
+        purchaseBtn.textContent = 'PURCHASE';
       }, 2000);
+    });
+
+    storeBack.addEventListener('click', () => {
+      activeStoreId = null;
+      renderStoreView();
     });
 
     const navStore = document.getElementById('navStore');
@@ -1339,6 +1553,8 @@
       e.preventDefault();
       closeWhy();
       closePortfolio();
+      activeStoreId = null;
+      renderStoreView();
       storeOverlay.classList.add('open');
       storeOverlay.setAttribute('aria-hidden', 'false');
       heroCenter.classList.add('hero-hidden');
@@ -1363,6 +1579,7 @@
   </script>
 </body>
 </html>
+
 
 
 
