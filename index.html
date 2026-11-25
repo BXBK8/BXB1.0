@@ -1567,6 +1567,34 @@
       .connect-popover { border-radius: 20px; padding: 7px; gap: 6px; }
       .connect-badge { padding: 7px 11px; font-size: 0.66rem; }
     }
+    .office-wrap {
+      transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .office-wrap.fade-out {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.985);
+      pointer-events: none;
+    }
+    #jobsBody {
+      transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform, opacity;
+    }
+    #jobsBody.subview-out {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.985);
+      pointer-events: none;
+    }
+    #jobsBody.subview-in {
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+    }
+    .teams-frame {
+      opacity: 0;
+      transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .teams-frame.frame-ready {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -4903,6 +4931,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
