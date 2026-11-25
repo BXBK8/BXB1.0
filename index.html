@@ -150,6 +150,7 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
+      z-index: 6;
       width: max(50vw, fit-content);
       max-width: calc(100vw - 2rem);
       min-height: 60px;
@@ -1146,6 +1147,123 @@
     .formula-box.open { display: block; }
     .warn-red { color: #9e0000; font-size: 0.72rem; letter-spacing: 0.06em; }
     .price-editor-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); }
+    .globe-stage {
+      width: 100%;
+      height: 100%;
+      padding-top: 84px;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .globe-stage { padding-top: 104px; }
+    }
+
+    #globeCanvas {
+      display: block;
+      border-radius: 50%;
+      cursor: grab;
+      touch-action: none;
+      pointer-events: auto;
+    }
+
+    #globeCanvas:active { cursor: grabbing; }
+
+    .intel-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      padding: 96px 16px 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .intel-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .intel-card {
+      position: relative;
+      width: min(680px, calc(100vw - 2rem));
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(24px) saturate(1.35);
+      -webkit-backdrop-filter: blur(24px) saturate(1.35);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      text-align: left;
+      color: #000000;
+      transform: translateY(18px) scale(0.96);
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .intel-overlay.open .intel-card { transform: translateY(0) scale(1); }
+
+    .intel-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 160px 160px;
+    }
+
+    .intel-scroll {
+      position: relative;
+      z-index: 1;
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+      padding: clamp(20px, 3.5vw, 32px);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+    }
+
+    .intel-scroll::-webkit-scrollbar { width: 5px; }
+    .intel-scroll::-webkit-scrollbar-track { background: transparent; }
+    .intel-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.25); border-radius: 9999px; }
+
+    .intel-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .intel-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 5px 12px; border-radius: 9999px;
+      font-size: 0.65rem; letter-spacing: 0.08em;
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      background: rgba(255, 255, 255, 0.24);
+    }
+    .intel-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .intel-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .intel-stat-box {
+      padding: 12px 14px; border-radius: 14px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .intel-stat-label { font-size: 0.62rem; letter-spacing: 0.1em; opacity: 0.68; }
+    .intel-stat-val { font-size: 0.88rem; letter-spacing: 0.07em; }
+    .intel-stat-sub { font-size: 0.66rem; letter-spacing: 0.05em; opacity: 0.78; }
+
+    .journal-feed { display: flex; flex-direction: column; gap: 8px; }
+    .journal-entry {
+      display: flex; flex-direction: column; gap: 5px;
+      padding: 12px 14px; border-radius: 14px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+    }
+    .journal-ts { display: flex; align-items: center; gap: 7px; font-size: 0.64rem; letter-spacing: 0.08em; opacity: 0.72; }
+    .journal-ts.is-live { opacity: 1; }
+    .journal-text { font-size: 0.76rem; letter-spacing: 0.04em; line-height: 1.55; }
   </style>
 </head>
 <body>
@@ -1170,6 +1288,16 @@
         <a href="#">CONNECT</a>
       </div>
     </nav>
+
+    <div class="globe-stage">
+      <canvas id="globeCanvas"></canvas>
+    </div>
+
+    <div class="intel-overlay" id="countryIntelOverlay" aria-hidden="true">
+      <div class="intel-card" id="countryIntelCard">
+        <div class="intel-scroll" id="countryIntelScroll"></div>
+      </div>
+    </div>
 
 
     <div class="why-overlay" id="whyOverlay" aria-hidden="true">
@@ -1625,6 +1753,7 @@
     }
 
     function openWhy(e) {
+      if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
       if (typeof closeBespoke === 'function') closeBespoke();
       if (typeof closeStore === 'function') closeStore();
@@ -1760,6 +1889,7 @@
     const portfolioClose = document.getElementById('portfolioClose');
 
     function openPortfolio(e) {
+      if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
       if (typeof closeBespoke === 'function') closeBespoke();
       if (typeof closeStore === 'function') closeStore();
@@ -2039,6 +2169,7 @@
     const storeClose = document.getElementById('storeClose');
 
     function openStore(e) {
+      if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
       if (typeof closeBespoke === 'function') closeBespoke();
       storeTransitioning = false;
@@ -2321,6 +2452,7 @@
     const bespokeClose = document.getElementById('bespokeClose');
 
     function openBespoke(e) {
+      if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
       e.preventDefault();
       closeWhy();
@@ -2356,6 +2488,7 @@
     const officeBtns = document.querySelectorAll('.office-btn');
 
     function openOffice(e) {
+      if (typeof closeCountryIntel === 'function') closeCountryIntel();
       salesLeadCard.classList.remove('active', 'visible');
       adminCard.classList.remove('active', 'visible');
       if(typeof jobsCard!=='undefined') jobsCard.classList.remove('active', 'visible');
@@ -3077,9 +3210,451 @@
       else backFromJobs();
     });
     jobsClose.addEventListener('click', closeOffice);
+    const GLOBE_COUNTRIES_KEY = 'globe_countries';
+    const COUNTRY_JOURNAL_KEY = 'country_journal';
+    const H24_MS = 86400000;
+    const SEED_NOW = Date.now();
+
+    const DEFAULT_GLOBE_COUNTRIES = [
+      { id: 'gh', name: 'GHANA',     flagText: 'GH', flagUrl: '', lat: 7.9,  lng: -1.0,  salesTeam: true,  salesTeamSize: 4, salesLead: 'KWAME MENSAH',  productsShipped: true,  shipCount: 14, activeTools: true,  tools: ['BXB AUTOMATE', 'BXB PAYFLOW'] },
+      { id: 'us', name: 'USA',       flagText: 'US', flagUrl: '', lat: 38.0, lng: -97.0, salesTeam: true,  salesTeamSize: 9, salesLead: 'ELENA ROSTOVA', productsShipped: true,  shipCount: 42, activeTools: false, tools: [] },
+      { id: 'ae', name: 'UAE',       flagText: 'AE', flagUrl: '', lat: 23.4, lng: 53.8,  salesTeam: false, salesTeamSize: 0, salesLead: '',              productsShipped: true,  shipCount: 11, activeTools: true,  tools: ['BXB VAULT', 'BXB PULSE'] },
+      { id: 'sg', name: 'SINGAPORE', flagText: 'SG', flagUrl: '', lat: 1.35, lng: 103.8, salesTeam: false, salesTeamSize: 0, salesLead: '',              productsShipped: false, shipCount: 0,  activeTools: true,  tools: ['BXB AUTOMATE'] }
+    ];
+
+    const DEFAULT_COUNTRY_JOURNAL = [
+      { id: 'j-gh-1', countryId: 'gh', text: 'ACCRA SALES DESK CLOSED 2 NEW BXB PAYFLOW ACCOUNTS.', ts: SEED_NOW - 3600000 * 2 },
+      { id: 'j-gh-2', countryId: 'gh', text: 'BXB AUTOMATE NODE UPGRADED TO V2.4 ACROSS CLIENT FLEETS.', ts: SEED_NOW - 3600000 * 36 },
+      { id: 'j-us-1', countryId: 'us', text: 'SHIPPED BATCH #42 HARDWARE UNITS TO EAST COAST PARTNERS.', ts: SEED_NOW - 3600000 * 7 },
+      { id: 'j-us-2', countryId: 'us', text: 'NORTH AMERICA Q4 ENTERPRISE PIPELINE TARGET LOCKED.', ts: SEED_NOW - H24_MS * 3 },
+      { id: 'j-ae-1', countryId: 'ae', text: 'BXB VAULT REAL-TIME SYNC ACTIVATED FOR DUBAI LOGISTICS HUB.', ts: SEED_NOW - 3600000 * 14 },
+      { id: 'j-sg-1', countryId: 'sg', text: 'AUTONOMOUS WORKFLOW CLUSTER MAINTAINING 99.98% UPTIME.', ts: SEED_NOW - H24_MS * 2 }
+    ];
+
+    function getGlobeCountries() {
+      try {
+        const raw = localStorage.getItem(GLOBE_COUNTRIES_KEY);
+        if (!raw) {
+          localStorage.setItem(GLOBE_COUNTRIES_KEY, JSON.stringify(DEFAULT_GLOBE_COUNTRIES));
+          return JSON.parse(JSON.stringify(DEFAULT_GLOBE_COUNTRIES));
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : JSON.parse(JSON.stringify(DEFAULT_GLOBE_COUNTRIES));
+      } catch {
+        return JSON.parse(JSON.stringify(DEFAULT_GLOBE_COUNTRIES));
+      }
+    }
+
+    function getCountryJournal() {
+      try {
+        const raw = localStorage.getItem(COUNTRY_JOURNAL_KEY);
+        if (!raw) {
+          localStorage.setItem(COUNTRY_JOURNAL_KEY, JSON.stringify(DEFAULT_COUNTRY_JOURNAL));
+          return JSON.parse(JSON.stringify(DEFAULT_COUNTRY_JOURNAL));
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : JSON.parse(JSON.stringify(DEFAULT_COUNTRY_JOURNAL));
+      } catch {
+        return JSON.parse(JSON.stringify(DEFAULT_COUNTRY_JOURNAL));
+      }
+    }
+
+    let activeIntelCountryId = null;
+
+    function saveGlobeCountries(countries) {
+      localStorage.setItem(GLOBE_COUNTRIES_KEY, JSON.stringify(countries));
+      refreshCountryDotHighlights();
+      if (activeIntelCountryId && countryIntelOverlay.classList.contains('open')) {
+        const updated = countries.find((c) => c.id === activeIntelCountryId);
+        if (updated) renderCountryIntel(updated);
+      }
+    }
+
+    function saveCountryJournal(entries) {
+      localStorage.setItem(COUNTRY_JOURNAL_KEY, JSON.stringify(entries));
+      if (activeIntelCountryId && countryIntelOverlay.classList.contains('open')) {
+        const current = getGlobeCountries().find((c) => c.id === activeIntelCountryId);
+        if (current) renderCountryIntel(current);
+      }
+    }
+
+    function toggleCountrySalesTeam(countryId, active) {
+      saveGlobeCountries(getGlobeCountries().map((c) => (c.id === countryId ? { ...c, salesTeam: Boolean(active) } : c)));
+    }
+
+    function updateCountryGlobeStats(countryId, updates) {
+      saveGlobeCountries(getGlobeCountries().map((c) => (c.id === countryId ? { ...c, ...updates } : c)));
+    }
+
+    function addCountryJournalEntry(countryId, text, timestamp = Date.now()) {
+      const entries = getCountryJournal();
+      const newEntry = { id: 'j-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6), countryId, text: String(text || '').trim(), ts: timestamp };
+      entries.unshift(newEntry);
+      saveCountryJournal(entries);
+      return newEntry;
+    }
+
+    function deleteCountryJournalEntry(entryId) {
+      saveCountryJournal(getCountryJournal().filter((e) => e.id !== entryId));
+    }
+
+    if (!localStorage.getItem(GLOBE_COUNTRIES_KEY)) localStorage.setItem(GLOBE_COUNTRIES_KEY, JSON.stringify(DEFAULT_GLOBE_COUNTRIES));
+    if (!localStorage.getItem(COUNTRY_JOURNAL_KEY)) localStorage.setItem(COUNTRY_JOURNAL_KEY, JSON.stringify(DEFAULT_COUNTRY_JOURNAL));
+
+    const globeCanvas = document.getElementById('globeCanvas');
+    const globeCtx = globeCanvas.getContext('2d');
+    const countryIntelOverlay = document.getElementById('countryIntelOverlay');
+    const countryIntelScroll = document.getElementById('countryIntelScroll');
+
+    let globeSize = 360, globeR = 165, globeOX = 180, globeOY = 180;
+
+    function resizeGlobe() {
+      const dprCap = Math.min(window.devicePixelRatio || 1, 1.5);
+      const navClearance = window.innerWidth <= 768 ? 116 : 96;
+      const avail = Math.min(window.innerWidth * 0.86, (window.innerHeight - navClearance) * 0.86, 480);
+      globeSize = Math.max(avail, 230);
+      globeR = globeSize * 0.45;
+      globeOX = globeSize / 2;
+      globeOY = globeSize / 2;
+
+      globeCanvas.style.width = globeSize + 'px';
+      globeCanvas.style.height = globeSize + 'px';
+      globeCanvas.width = Math.round(globeSize * dprCap);
+      globeCanvas.height = Math.round(globeSize * dprCap);
+      globeCtx.setTransform(dprCap, 0, 0, dprCap, 0, 0);
+    }
+
+    const CONTINENT_POLYS = [
+      [[70,-165],[71,-155],[69,-135],[70,-95],[63,-80],[58,-64],[52,-55],[45,-62],[41,-70],[35,-75],[25,-80],[30,-85],[29,-95],[20,-97],[21,-87],[15,-83],[9,-79],[8,-77],[14,-92],[18,-104],[24,-110],[32,-117],[40,-124],[49,-125],[58,-137],[61,-150],[55,-162],[62,-166]],
+      [[83,-35],[81,-18],[70,-22],[60,-44],[66,-53],[76,-70],[82,-55]],
+      [[11,-74],[10,-62],[5,-52],[0,-50],[-5,-35],[-13,-38],[-23,-42],[-34,-53],[-42,-64],[-54,-68],[-53,-74],[-42,-74],[-30,-71],[-18,-70],[-5,-81],[4,-77]],
+      [[36,-9],[43,-9],[44,-2],[48,-5],[51,2],[54,8],[57,8],[59,5],[63,5],[70,20],[70,30],[65,40],[60,30],[54,20],[50,24],[46,30],[44,28],[40,26],[37,22],[40,18],[44,12],[40,15],[38,12],[43,5],[41,2],[36,-5]],
+      [[58,-6],[58,-2],[53,1],[50,-5],[54,-5]],
+      [[55,-8],[53,-6],[51,-9],[53,-10]],
+      [[36,-6],[37,10],[32,15],[31,32],[22,37],[12,44],[11,51],[2,45],[-5,40],[-11,40],[-18,35],[-26,33],[-34,25],[-34,18],[-22,14],[-12,13],[-4,11],[4,9],[5,-4],[5,-10],[12,-17],[21,-17],[28,-13]],
+      [[-12,49],[-16,50],[-25,47],[-25,44],[-17,44]],
+      [[41,28],[42,42],[40,50],[46,48],[55,58],[68,60],[73,80],[75,110],[71,140],[67,175],[60,165],[54,140],[45,135],[40,128],[35,129],[38,122],[31,122],[22,114],[20,106],[12,109],[8,105],[13,100],[2,104],[8,98],[16,96],[22,91],[16,81],[8,77],[20,72],[25,67],[25,57],[24,52],[13,44],[20,39],[29,34],[34,36],[37,27]],
+      [[45,142],[42,141],[38,141],[34,136],[31,130],[34,130],[38,139],[41,140]],
+      [[5,95],[-5,105],[-6,104],[2,97]],
+      [[6,116],[1,118],[-3,116],[-3,110],[2,109]],
+      [[-6,105],[-8,114],[-9,113],[-7,106]],
+      [[18,120],[18,122],[8,126],[7,122],[14,120]],
+      [[-12,131],[-12,136],[-15,136],[-12,142],[-19,147],[-26,153],[-37,150],[-38,141],[-34,135],[-32,126],[-34,115],[-22,114],[-16,123]],
+      [[-35,173],[-38,178],[-46,168],[-44,167],[-38,174]]
+    ];
+
+    function pointInPoly(lat, lng, poly) {
+      let inside = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const yi = poly[i][0], xi = poly[i][1];
+        const yj = poly[j][0], xj = poly[j][1];
+        if (((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-9) + xi)) inside = !inside;
+      }
+      return inside;
+    }
+
+    function isLand(lat, lng) {
+      for (let i = 0; i < CONTINENT_POLYS.length; i++) {
+        if (pointInPoly(lat, lng, CONTINENT_POLYS[i])) return true;
+      }
+      return false;
+    }
+
+    const LAND_DOTS = (() => {
+      const dots = [];
+      const dLat = 3.2;
+      for (let lat = -58; lat <= 82; lat += dLat) {
+        const latRad = lat * Math.PI / 180;
+        const dLng = dLat / Math.max(0.24, Math.cos(latRad));
+        for (let lng = -180; lng < 180; lng += dLng) {
+          if (isLand(lat, lng)) {
+            const lngRad = lng * Math.PI / 180;
+            const cosLat = Math.cos(latRad);
+            dots.push({ ux: cosLat * Math.sin(lngRad), uy: Math.sin(latRad), uz: cosLat * Math.cos(lngRad), highlight: null });
+          }
+        }
+      }
+      return dots;
+    })();
+
+    const STATUS_COLORS = {
+      sales:   { hex: '#ffbe0b', rgb: [255, 190, 11] },
+      shipped: { hex: '#38bdf8', rgb: [56, 189, 248] },
+      tools:   { hex: '#34d399', rgb: [52, 211, 153] }
+    };
+
+    function getCountryStatuses(c) {
+      const list = [];
+      if (c.salesTeam) list.push(STATUS_COLORS.sales);
+      if (c.productsShipped) list.push(STATUS_COLORS.shipped);
+      if (c.activeTools) list.push(STATUS_COLORS.tools);
+      return list;
+    }
+
+    function refreshCountryDotHighlights() {
+      const active = getGlobeCountries().map((c) => {
+        const statuses = getCountryStatuses(c);
+        if (!statuses.length) return null;
+        const latR = c.lat * Math.PI / 180, lngR = c.lng * Math.PI / 180, cosL = Math.cos(latR);
+        return { cx: cosL * Math.sin(lngR), cy: Math.sin(latR), cz: cosL * Math.cos(lngR), rgb: statuses[0].rgb };
+      }).filter(Boolean);
+
+      for (let i = 0; i < LAND_DOTS.length; i++) {
+        const d = LAND_DOTS[i];
+        let bestDot = 0.989, bestRgb = null;
+        for (let j = 0; j < active.length; j++) {
+          const a = active[j];
+          const dotProd = d.ux * a.cx + d.uy * a.cy + d.uz * a.cz;
+          if (dotProd > bestDot) { bestDot = dotProd; bestRgb = a.rgb; }
+        }
+        d.highlight = bestRgb;
+      }
+    }
+
+    refreshCountryDotHighlights();
+    window.addEventListener('resize', resizeGlobe);
+    resizeGlobe();
+
+    let rotY = 0.35, rotX = -0.18, velY = 0.002, velX = 0;
+    let dragging = false, lastDX = 0, lastDY = 0, dragPX = 0, dragPY = 0, dragTravel = 0, beaconPhase = 0;
+
+    function rotateXYZ(ux, uy, uz, sinRY, cosRY, sinRX, cosRX) {
+      const x1 = ux * cosRY + uz * sinRY;
+      const z1 = -ux * sinRY + uz * cosRY;
+      return { x: x1, y: uy * cosRX - z1 * sinRX, z: uy * sinRX + z1 * cosRX };
+    }
+
+    function anyModalOpen() {
+      return ['whyOverlay', 'portfolioOverlay', 'storeOverlay', 'bespokeOverlay', 'officeOverlay', 'countryIntelOverlay']
+        .some((id) => document.getElementById(id)?.classList.contains('open'));
+    }
+
+    function drawGlobe() {
+      globeCtx.clearRect(0, 0, globeSize, globeSize);
+      const sinRY = Math.sin(rotY), cosRY = Math.cos(rotY);
+      const sinRX = Math.sin(rotX), cosRX = Math.cos(rotX);
+      const baseDotR = Math.max(1.05, globeR * 0.0085);
+
+      for (let i = 0; i < LAND_DOTS.length; i++) {
+        const d = LAND_DOTS[i];
+        const p = rotateXYZ(d.ux, d.uy, d.uz, sinRY, cosRY, sinRX, cosRX);
+        if (p.z <= 0.02) continue;
+
+        const px = globeOX + p.x * globeR;
+        const py = globeOY - p.y * globeR;
+        const depth = Math.pow(p.z, 0.72);
+        const dotR = baseDotR * (0.72 + 0.42 * p.z);
+
+        let r, g, b;
+        if (d.highlight) {
+          r = Math.round(255 * 0.45 + d.highlight[0] * 0.55);
+          g = Math.round(132 * 0.45 + d.highlight[1] * 0.55);
+          b = Math.round(64 * 0.45 + d.highlight[2] * 0.55);
+        } else {
+          r = 255;
+          g = Math.round(107 + 51 * depth);
+          b = Math.round(43 + 51 * depth);
+        }
+
+        globeCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${(0.14 + 0.82 * depth).toFixed(3)})`;
+        globeCtx.beginPath();
+        globeCtx.arc(px, py, dotR, 0, Math.PI * 2);
+        globeCtx.fill();
+      }
+
+      const countries = getGlobeCountries();
+      const pulse = 0.5 + 0.5 * Math.sin(beaconPhase);
+      beaconPhase += 0.065;
+
+      for (let i = 0; i < countries.length; i++) {
+        const c = countries[i];
+        const statuses = getCountryStatuses(c);
+        if (!statuses.length) continue;
+
+        const latR = c.lat * Math.PI / 180, lngR = c.lng * Math.PI / 180, cosL = Math.cos(latR);
+        const p = rotateXYZ(cosL * Math.sin(lngR), Math.sin(latR), cosL * Math.cos(lngR), sinRY, cosRY, sinRX, cosRX);
+        if (p.z < 0.08) continue;
+
+        const px = globeOX + p.x * globeR;
+        const py = globeOY - p.y * globeR;
+        const depthScale = 0.65 + 0.35 * p.z;
+        const ringR = Math.max(5.5, globeR * 0.036) * depthScale;
+        const pulseR = ringR * (1.25 + 0.55 * pulse);
+        const primary = statuses[0].rgb;
+
+        const halo = globeCtx.createRadialGradient(px, py, 0, px, py, ringR * 2.8);
+        halo.addColorStop(0, `rgba(${primary[0]}, ${primary[1]}, ${primary[2]}, ${(0.34 * p.z).toFixed(3)})`);
+        halo.addColorStop(1, `rgba(${primary[0]}, ${primary[1]}, ${primary[2]}, 0)`);
+        globeCtx.fillStyle = halo;
+        globeCtx.beginPath();
+        globeCtx.arc(px, py, ringR * 2.8, 0, Math.PI * 2);
+        globeCtx.fill();
+
+        const count = statuses.length;
+        const gap = count > 1 ? 0.14 : 0;
+        const arcSpan = (Math.PI * 2) / count;
+        globeCtx.lineWidth = Math.max(1.5, globeR * 0.011) * depthScale;
+
+        for (let s = 0; s < count; s++) {
+          const rgb = statuses[s].rgb;
+          const a0 = -Math.PI / 2 + s * arcSpan + gap;
+          const a1 = -Math.PI / 2 + (s + 1) * arcSpan - gap;
+          globeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${(0.45 + 0.45 * (1 - pulse)).toFixed(3)})`;
+          globeCtx.beginPath();
+          globeCtx.arc(px, py, pulseR, a0, a1);
+          globeCtx.stroke();
+
+          globeCtx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${(0.85 * p.z).toFixed(3)})`;
+          globeCtx.beginPath();
+          globeCtx.arc(px, py, ringR, a0, a1);
+          globeCtx.stroke();
+        }
+
+        globeCtx.fillStyle = `rgba(${primary[0]}, ${primary[1]}, ${primary[2]}, ${(0.95 * p.z).toFixed(3)})`;
+        globeCtx.beginPath();
+        globeCtx.arc(px, py, Math.max(2.6, globeR * 0.016) * depthScale, 0, Math.PI * 2);
+        globeCtx.fill();
+      }
+    }
+
+    let globeRaf = null;
+    function globeLoop() {
+      globeRaf = null;
+      if (anyModalOpen() || document.hidden) return;
+      if (!dragging) {
+        rotY += velY;
+        rotX = Math.max(-0.62, Math.min(0.62, rotX + velX));
+        velX *= 0.94;
+        velY = velY * 0.97 + 0.002 * 0.03;
+      }
+      drawGlobe();
+      globeRaf = requestAnimationFrame(globeLoop);
+    }
+
+    function ensureGlobeRunning() {
+      if (!globeRaf && !anyModalOpen() && !document.hidden) globeRaf = requestAnimationFrame(globeLoop);
+    }
+
+    const globeModalObserver = new MutationObserver(() => ensureGlobeRunning());
+    ['whyOverlay', 'portfolioOverlay', 'storeOverlay', 'bespokeOverlay', 'officeOverlay', 'countryIntelOverlay']
+      .forEach((id) => { const el = document.getElementById(id); if (el) globeModalObserver.observe(el, { attributes: true, attributeFilter: ['class'] }); });
+    document.addEventListener('visibilitychange', ensureGlobeRunning);
+
+    drawGlobe();
+    ensureGlobeRunning();
+
+    function findHoveredCountry(localX, localY) {
+      const sinRY = Math.sin(rotY), cosRY = Math.cos(rotY);
+      const sinRX = Math.sin(rotX), cosRX = Math.cos(rotX);
+      const countries = getGlobeCountries();
+      const hitR = Math.max(18, globeR * 0.095);
+      let closest = null, bestD = Infinity;
+
+      for (let i = 0; i < countries.length; i++) {
+        const c = countries[i];
+        if (!getCountryStatuses(c).length) continue;
+        const latR = c.lat * Math.PI / 180, lngR = c.lng * Math.PI / 180, cosL = Math.cos(latR);
+        const p = rotateXYZ(cosL * Math.sin(lngR), Math.sin(latR), cosL * Math.cos(lngR), sinRY, cosRY, sinRX, cosRX);
+        if (p.z < 0.08) continue;
+        const d = Math.hypot(globeOX + p.x * globeR - localX, globeOY - p.y * globeR - localY);
+        if (d < hitR && d < bestD) { closest = c; bestD = d; }
+      }
+      return closest;
+    }
+
+    globeCanvas.addEventListener('pointerdown', (e) => {
+      dragging = true; dragPX = e.clientX; dragPY = e.clientY; lastDX = 0; lastDY = 0; dragTravel = 0;
+    });
+
+    globeCanvas.addEventListener('pointermove', (e) => {
+      if (dragging) {
+        const dx = e.clientX - dragPX, dy = e.clientY - dragPY;
+        dragTravel += Math.hypot(dx, dy);
+        lastDX = dx * 0.0085; lastDY = dy * 0.0085;
+        rotY += lastDX;
+        rotX = Math.max(-0.62, Math.min(0.62, rotX + lastDY));
+        dragPX = e.clientX; dragPY = e.clientY;
+      } else {
+        const rect = globeCanvas.getBoundingClientRect();
+        globeCanvas.style.cursor = findHoveredCountry(e.clientX - rect.left, e.clientY - rect.top) ? 'pointer' : 'grab';
+      }
+    });
+
+    function endGlobeDrag() {
+      if (!dragging) return;
+      dragging = false;
+      velY = lastDX * 0.55;
+      velX = lastDY * 0.55;
+    }
+    window.addEventListener('pointerup', endGlobeDrag);
+    globeCanvas.addEventListener('pointercancel', endGlobeDrag);
+
+    function formatIntelTimestamp(ts) {
+      const d = new Date(ts);
+      return `${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    function renderCountryIntel(country) {
+      const entries = getCountryJournal().filter((e) => e.countryId === country.id).sort((a, b) => b.ts - a.ts);
+      const statusBadges = [];
+      if (country.salesTeam) statusBadges.push(`<span class="intel-badge"><span class="intel-dot" style="background:#ffbe0b;"></span>SALES TEAM ACTIVE</span>`);
+      if (country.productsShipped) statusBadges.push(`<span class="intel-badge"><span class="intel-dot" style="background:#38bdf8;"></span>PRODUCTS SHIPPED (${country.shipCount || 0})</span>`);
+      if (country.activeTools) statusBadges.push(`<span class="intel-badge"><span class="intel-dot" style="background:#34d399;"></span>ACTIVE TOOLS RUNNING</span>`);
+
+      const toolsList = (country.tools && country.tools.length) ? country.tools.join(', ') : 'NONE';
+      const leadInfo = country.salesLead ? `LEAD: ${country.salesLead}` : (country.salesTeam ? 'REGIONAL DESK ACTIVE' : 'NO ACTIVE TEAM');
+
+      const journalHtml = entries.length
+        ? entries.map((entry) => {
+            const isRecent = (Date.now() - entry.ts) < H24_MS;
+            const liveHtml = isRecent ? `<span class="live-dot" style="width:7px;height:7px;"></span><span style="color:#b30000;">LIVE</span><span>·</span>` : '';
+            return `<div class="journal-entry"><div class="journal-ts ${isRecent ? 'is-live' : ''}">${liveHtml}<span>${formatIntelTimestamp(entry.ts)}</span></div><p class="journal-text">${entry.text}</p></div>`;
+          }).join('')
+        : '<p class="calc-sub">NO COUNTRY JOURNAL UPDATES POSTED YET.</p>';
+
+      countryIntelScroll.innerHTML = `
+        <div class="store-step-header" style="margin-bottom:14px;">
+          <div class="store-title-wrap">${renderFlagHtml(country, 'store-flag')}<span class="why-tag">${country.name} · COUNTRY INTEL</span></div>
+          <button class="why-close" id="intelClose" type="button">CLOSE ×</button>
+        </div>
+        <div class="intel-badges">${statusBadges.join('')}</div>
+        <div class="intel-stats-grid">
+          <div class="intel-stat-box"><span class="intel-stat-label">SALES TEAM</span><span class="intel-stat-val">${country.salesTeam ? `${country.salesTeamSize || 0} REPS` : 'INACTIVE'}</span><span class="intel-stat-sub">${leadInfo}</span></div>
+          <div class="intel-stat-box"><span class="intel-stat-label">PRODUCTS SHIPPED</span><span class="intel-stat-val">${country.shipCount || 0} UNITS</span><span class="intel-stat-sub">${country.productsShipped ? 'DELIVERED & TRACKED' : 'NO SHIPMENTS YET'}</span></div>
+          <div class="intel-stat-box"><span class="intel-stat-label">ACTIVE TOOLS</span><span class="intel-stat-val">${country.activeTools ? `${(country.tools || []).length} DEPLOYED` : 'NONE'}</span><span class="intel-stat-sub">${toolsList}</span></div>
+        </div>
+        <p class="calc-title" style="margin-bottom:10px;">COUNTRY JOURNAL</p>
+        <div class="journal-feed">${journalHtml}</div>
+      `;
+      document.getElementById('intelClose').onclick = closeCountryIntel;
+    }
+
+    function openCountryIntel(country) {
+      activeIntelCountryId = country.id;
+      renderCountryIntel(country);
+      countryIntelOverlay.classList.add('open');
+      countryIntelOverlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeCountryIntel() {
+      activeIntelCountryId = null;
+      countryIntelOverlay.classList.remove('open');
+      countryIntelOverlay.setAttribute('aria-hidden', 'true');
+    }
+
+    globeCanvas.addEventListener('click', (e) => {
+      if (dragTravel > 8) return;
+      const rect = globeCanvas.getBoundingClientRect();
+      const hit = findHoveredCountry(e.clientX - rect.left, e.clientY - rect.top);
+      if (hit) openCountryIntel(hit);
+    });
+
+    countryIntelOverlay.addEventListener('click', (e) => { if (e.target === countryIntelOverlay) closeCountryIntel(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && countryIntelOverlay.classList.contains('open')) closeCountryIntel(); });
   </script>
 </body>
 </html>
+
 
 
 
