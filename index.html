@@ -205,18 +205,6 @@
       }
     }
 
-    .site-layer h1 {
-      font-size: clamp(3rem, 8vw, 6rem);
-      letter-spacing: 0.14em;
-      color: #000000;
-    }
-
-    .site-layer p {
-      margin-top: 0.75rem;
-      color: #000000;
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-    }
     .grain-overlay {
       position: fixed;
       inset: 0;
@@ -238,15 +226,6 @@
       .blob-3 { width: 60vmax; height: 60vmax; bottom: 10%; left: 12%; }
       .blob-4 { width: 46vmax; height: 46vmax; bottom: 18%; right: 5%; }
       .blob-cursor { width: 44vmax; height: 44vmax; }
-    }
-    .hero-center {
-      transition: opacity 0.35s ease, transform 0.35s ease;
-    }
-
-    .hero-center.hero-hidden {
-      opacity: 0;
-      transform: scale(0.96);
-      pointer-events: none;
     }
 
     .why-overlay {
@@ -1192,10 +1171,6 @@
       </div>
     </nav>
 
-    <div class="hero-center" id="heroCenter">
-      <h1>BXB</h1>
-      <p>Site revealed. Ready for what we build next.</p>
-    </div>
 
     <div class="why-overlay" id="whyOverlay" aria-hidden="true">
       <div class="why-card" id="whyCard"><div class="why-scroll">
@@ -1612,7 +1587,6 @@
     const navWhy = document.getElementById('navWhy');
     const whyOverlay = document.getElementById('whyOverlay');
     const whyClose = document.getElementById('whyClose');
-    const heroCenter = document.getElementById('heroCenter');
     const whyParagraphs = document.querySelectorAll('.why-p');
     const CIPHER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*';
 
@@ -1658,7 +1632,6 @@
       e.preventDefault();
       whyOverlay.classList.add('open');
       whyOverlay.setAttribute('aria-hidden', 'false');
-      heroCenter.classList.add('hero-hidden');
       whyParagraphs.forEach((p, idx) => {
         p._scrambling = false;
         setTimeout(() => scrambleParagraph(p, 950), idx * 70);
@@ -1668,7 +1641,6 @@
     function closeWhy() {
       whyOverlay.classList.remove('open');
       whyOverlay.setAttribute('aria-hidden', 'true');
-      heroCenter.classList.remove('hero-hidden');
     }
 
     navWhy.addEventListener('click', openWhy);
@@ -1795,14 +1767,12 @@
       closeWhy();
       portfolioOverlay.classList.add('open');
       portfolioOverlay.setAttribute('aria-hidden', 'false');
-      heroCenter.classList.add('hero-hidden');
     }
 
     function closePortfolio() {
       portfolioOverlay.classList.remove('open');
       portfolioOverlay.setAttribute('aria-hidden', 'true');
       if (!whyOverlay.classList.contains('open') && !storeOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
-        heroCenter.classList.remove('hero-hidden');
       }
     }
 
@@ -2081,14 +2051,12 @@
       renderStoreView();
       storeOverlay.classList.add('open');
       storeOverlay.setAttribute('aria-hidden', 'false');
-      heroCenter.classList.add('hero-hidden');
     }
 
     function closeStore() {
       storeOverlay.classList.remove('open');
       storeOverlay.setAttribute('aria-hidden', 'true');
       if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
-        heroCenter.classList.remove('hero-hidden');
       }
     }
 
@@ -2365,14 +2333,12 @@
       renderBespokeView();
       bespokeOverlay.classList.add('open');
       bespokeOverlay.setAttribute('aria-hidden', 'false');
-      heroCenter.classList.add('hero-hidden');
     }
 
     function closeBespoke() {
       bespokeOverlay.classList.remove('open');
       bespokeOverlay.setAttribute('aria-hidden', 'true');
       if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !storeOverlay.classList.contains('open')) {
-        heroCenter.classList.remove('hero-hidden');
       }
     }
 
@@ -2403,7 +2369,6 @@
       officeBtns.forEach((btn) => btn.classList.remove('wave-in'));
       officeOverlay.classList.add('open');
       officeOverlay.setAttribute('aria-hidden', 'false');
-      heroCenter.classList.add('hero-hidden');
 
       void officeOverlay.offsetWidth;
       officeBtns.forEach((btn) => btn.classList.add('wave-in'));
@@ -2414,7 +2379,6 @@
       officeOverlay.setAttribute('aria-hidden', 'true');
       officeBtns.forEach((btn) => btn.classList.remove('wave-in'));
       if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !storeOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
-        heroCenter.classList.remove('hero-hidden');
       }
     }
 
@@ -3116,6 +3080,7 @@
   </script>
 </body>
 </html>
+
 
 
 
