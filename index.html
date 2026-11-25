@@ -1276,6 +1276,37 @@
     .admin-check { display: inline-flex; align-items: center; gap: 8px; font-size: 0.72rem; letter-spacing: 0.08em; cursor: pointer; padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,0.18); }
     .admin-check input { accent-color: #FF4500; width: 15px; height: 15px; cursor: pointer; }
     .admin-status-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; font-size: 0.65rem; letter-spacing: 0.08em; opacity: 0.78; }
+    .collab-card { width: min(560px, calc(100vw - 2rem)); }
+    .collab-form { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .collab-textarea {
+      width: 100%; min-height: 118px; padding: 13px 16px; border-radius: 14px;
+      background: rgba(255, 255, 255, 0.34); border: 1px solid rgba(0, 0, 0, 0.16);
+      color: #000000; font-size: 0.82rem; letter-spacing: 0.08em; line-height: 1.55;
+      resize: vertical; outline: none;
+    }
+    .collab-textarea::placeholder { color: rgba(0, 0, 0, 0.45); }
+    .collab-textarea:focus { background: rgba(255, 255, 255, 0.5); border-color: rgba(0, 0, 0, 0.35); }
+    .collab-textarea.input-error {
+      border-color: rgba(255, 42, 42, 0.75);
+      box-shadow: 0 0 16px rgba(255, 42, 42, 0.28);
+      animation: inputShake 0.36s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+    .collab-submit-btn {
+      position: relative; overflow: hidden; width: 100%; height: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 9999px; background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0, 0, 0, 0.16); color: #000000;
+      font-size: 0.78rem; letter-spacing: 0.12em; cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .collab-submit-btn::before {
+      content: ""; position: absolute; inset: 0; border-radius: 9999px; pointer-events: none;
+      opacity: 0.22; mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 160px 160px;
+    }
+    .collab-submit-btn:hover { background: rgba(255, 255, 255, 0.52); transform: translateY(-1px); }
+    .collab-submit-btn span { position: relative; z-index: 1; }
   </style>
 </head>
 <body>
@@ -1367,6 +1398,19 @@
             </div>
           </div>
           <div id="jobsBody"></div>
+        </div>
+      </div>
+
+      <div class="sales-card collab-card" id="collabCard">
+        <div class="sales-scroll">
+          <div class="store-step-header">
+            <div class="store-title-wrap"><span class="why-tag">COLLABORATE</span></div>
+            <div class="store-header-actions">
+              <button class="why-close" id="collabBack" type="button">← BACK</button>
+              <button class="why-close" id="collabClose" type="button">CLOSE ×</button>
+            </div>
+          </div>
+          <div id="collabBody"></div>
         </div>
       </div>
 
@@ -4104,10 +4148,105 @@
 
     countryIntelOverlay.addEventListener('click', (e) => { if (e.target === countryIntelOverlay) closeCountryIntel(); });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && countryIntelOverlay.classList.contains('open')) closeCountryIntel(); });
+    const COLLAB_STORAGE_KEY = 'bxb_collaboration_requests';
+    const collabCard = document.getElementById('collabCard');
+    const collabBody = document.getElementById('collabBody');
+    const collabBack = document.getElementById('collabBack');
+    const collabClose = document.getElementById('collabClose');
+
+    function getCollabRequests() {
+      try { const r = JSON.parse(localStorage.getItem(COLLAB_STORAGE_KEY)); return Array.isArray(r) ? r : []; }
+      catch { return []; }
+    }
+
+    function renderCollabForm() {
+      collabBody.innerHTML = `
+        <form class="collab-form" id="collabForm" novalidate>
+          <p class="project-desc">TELL US WHO YOU ARE AND WHAT WE SHOULD BUILD TOGETHER.</p>
+          <input class="glass-input" id="collabEmail" type="email" placeholder="EMAIL ADDRESS" autocomplete="email" />
+          <textarea class="collab-textarea" id="collabCause" placeholder="CAUSE — WHY DO YOU WANT TO COLLABORATE?"></textarea>
+          <div class="sales-error" id="collabError"></div>
+          <button class="collab-submit-btn" type="submit"><span>SEND / SUBMIT</span></button>
+        </form>`;
+
+      document.getElementById('collabForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const emailEl = document.getElementById('collabEmail');
+        const causeEl = document.getElementById('collabCause');
+        const errEl = document.getElementById('collabError');
+        const email = emailEl.value.trim();
+        const cause = causeEl.value.trim();
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        [emailEl, causeEl].forEach((el) => el.classList.remove('input-error'));
+        errEl.textContent = '';
+
+        if (!emailOk) {
+          errEl.textContent = email ? 'PLEASE ENTER A VALID EMAIL ADDRESS.' : 'PLEASE ENTER YOUR EMAIL ADDRESS.';
+          void emailEl.offsetWidth;
+          emailEl.classList.add('input-error');
+          emailEl.focus();
+          return;
+        }
+        if (!cause) {
+          errEl.textContent = 'PLEASE SHARE YOUR CAUSE FOR COLLABORATING.';
+          void causeEl.offsetWidth;
+          causeEl.classList.add('input-error');
+          causeEl.focus();
+          return;
+        }
+
+        const entry = { id: 'collab-' + Date.now(), email, cause, created_at: new Date().toISOString() };
+        const list = getCollabRequests();
+        list.unshift(entry);
+        localStorage.setItem(COLLAB_STORAGE_KEY, JSON.stringify(list));
+
+        if (typeof sb !== 'undefined' && sb) {
+          try { await sb.from('collaboration_requests').insert({ id: entry.id, email: entry.email, cause: entry.cause }); }
+          catch (err) { console.warn('collaboration_requests fallback to localStorage:', err); }
+        }
+
+        collabBody.innerHTML = `
+          <div class="calc-output-box" style="margin-top:6px;gap:12px;">
+            <p class="calc-big">INQUIRY RECEIVED ✓</p>
+            <p class="calc-sub">WE LOGGED YOUR COLLABORATION CAUSE AND WILL REPLY AT ${email.toUpperCase()}.</p>
+            <div class="admin-row-actions" style="margin-top:4px;">
+              <button class="store-purchase-btn" id="collabAnother" type="button" style="flex:1;">SEND ANOTHER</button>
+              <button class="store-purchase-btn" id="collabReturn" type="button" style="flex:1;">← BACK TO OFFICE</button>
+            </div>
+          </div>`;
+        document.getElementById('collabAnother').onclick = renderCollabForm;
+        document.getElementById('collabReturn').onclick = backFromCollab;
+      };
+    }
+
+    function showCollabCard() {
+      renderCollabForm();
+      officeMenuWrap.style.display = 'none';
+      collabCard.classList.add('active');
+      requestAnimationFrame(() => collabCard.classList.add('visible'));
+    }
+
+    function backFromCollab() {
+      collabCard.classList.remove('visible');
+      setTimeout(() => {
+        collabCard.classList.remove('active');
+        officeMenuWrap.style.display = 'flex';
+        officeBtns.forEach((b) => b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach((b) => b.classList.add('wave-in'));
+      }, 220);
+    }
+
+    document.querySelector('.office-btn[data-role="collaborate"]').addEventListener('click', showCollabCard);
+    collabBack.addEventListener('click', backFromCollab);
+    collabClose.addEventListener('click', closeOffice);
+
     BXB_DB.syncAll();
   </script>
 </body>
 </html>
+
 
 
 
