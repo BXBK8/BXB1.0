@@ -1567,6 +1567,53 @@
       .connect-popover { border-radius: 20px; padding: 7px; gap: 6px; }
       .connect-badge { padding: 7px 11px; font-size: 0.66rem; }
     }
+    /* ─── TWO-FRAME GPU VIEW TRANSITIONS ──────────────────────────── */
+    .view-anim-out {
+      opacity: 0 !important;
+      transform: translateY(-8px) scale(0.985) !important;
+      transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), transform 0.24s cubic-bezier(0.22, 1, 0.36, 1) !important;
+      pointer-events: none !important;
+      will-change: transform, opacity;
+    }
+    .view-anim-in {
+      opacity: 0 !important;
+      transform: translateY(14px) scale(0.975) !important;
+      transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1), transform 0.36s cubic-bezier(0.22, 1, 0.36, 1) !important;
+      will-change: transform, opacity;
+    }
+    .view-anim-in.view-active {
+      opacity: 1 !important;
+      transform: translateY(0) scale(1) !important;
+    }
+
+    #jobsBody, #jobsHeaderWrap {
+      transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1), transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform, opacity;
+    }
+
+    .stagger-in > * {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform, opacity;
+    }
+    .stagger-in.stagger-active > *:nth-child(1) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 0ms; }
+    .stagger-in.stagger-active > *:nth-child(2) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 40ms; }
+    .stagger-in.stagger-active > *:nth-child(3) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 80ms; }
+    .stagger-in.stagger-active > *:nth-child(4) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 120ms; }
+    .stagger-in.stagger-active > *:nth-child(5) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 160ms; }
+    .stagger-in.stagger-active > *:nth-child(6) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 200ms; }
+    .stagger-in.stagger-active > *:nth-child(7) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 240ms; }
+    .stagger-in.stagger-active > *:nth-child(8) { opacity: 1; transform: translateY(0) scale(1); transition-delay: 280ms; }
+
+    .teams-frame {
+      opacity: 0;
+      transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity;
+    }
+    .teams-frame.frame-ready {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -3735,7 +3782,7 @@
     function renderJobsView(){
       jobsHeaderWrap.innerHTML = '<span class="why-tag">BXB JOBS</span>';
       if(jobsView==='menu'){
-        jobsBody.innerHTML=`<div class="office-stack" style="margin-top:8px;">
+        jobsBody.innerHTML=`<div class="office-stack stagger-in" style="margin-top:8px;">
           <button class="office-btn" id="devBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Dev positions</span><span>→</span></button>
           <button class="office-btn" id="salesPosBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Sales positions</span><span>→</span></button>
         </div>`;
@@ -3745,7 +3792,7 @@
       }
       if(jobsView==='dev'){
         jobsHeaderWrap.innerHTML='<span class="why-tag">DEV POSITIONS</span>';
-        jobsBody.innerHTML=`<form class="sales-login-box" id="devAppForm" novalidate style="max-width:520px;">
+        jobsBody.innerHTML=`<form class="sales-login-box stagger-in" id="devAppForm" novalidate style="max-width:520px;">
           <p class="project-desc" style="margin-bottom:4px;">OPEN APPLICATION — WE REVIEW ALL SUBMISSIONS.</p>
           <input class="glass-input" id="devName" type="text" placeholder="FULL NAME" autocomplete="off"/>
           <input class="glass-input" id="devCountry" type="text" placeholder="COUNTRY" autocomplete="off"/>
@@ -3817,7 +3864,7 @@
         }
 
         jobsBody.innerHTML = `
-          <div class="calc-section">
+          <div class="calc-section stagger-in">
             <p class="project-desc" style="line-height:1.75;margin-bottom:6px;">
               POSITION EXPLANATION<br/><br/>
               How your pay works. Every sale you close earns you 17% commission on its price, no matter how many deals you close that month. On top of that, you unlock your monthly base salary when you do two things: close at least 5 paid deals, and make sure those 5 deals add up to at least your country's Minimum Revenue Target. The target exists because every sale must first pay for delivering the service, payment fees, your commission, and the company's profit before any money is left for a salary. We call what remains the Safe Share, which is 30% of every dollar sold. Your target is your country's monthly salary divided by 0.30, plus a small 3% currency buffer if you are paid in a non-USD currency. For example, a rep in Ghana with a $220 salary needs about $756 in total sales across 5 deals, roughly $151 per deal. A rep in the USA with a $4,279 salary needs about $14,263, roughly $2,853 per deal. Salaries differ by country because they are matched to local living costs, and the target scales with them, so everyone faces the same fairness rule: your salary must be paid for by the sales you bring in. All targets are calculated in USD and shown in your local currency using an exchange rate locked on the 1st of each month, so the target will not change on you mid-month. Service prices in the calculator are shown in your own country's prices, so you can see exactly which services and how many deals get you to your target. If you close more than 5 deals, you simply earn more commission. Refunded or unpaid sales do not count.
@@ -4744,11 +4791,18 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
         }
       }
 
+      teamsFrame.classList.remove('frame-ready');
       teamsFrame.onload = () => {
         if (teamsFrame.src === 'about:blank') return;
-        teamsState.classList.add('hidden');
+        requestAnimationFrame(() => {
+          teamsFrame.classList.add('frame-ready');
+          teamsState.classList.add('hidden');
+        });
       };
-      teamsFrame.onerror = () => showTeamsFallback('COULD NOT LOAD BXB TEAMS', url);
+      teamsFrame.onerror = () => {
+        teamsFrame.classList.remove('frame-ready');
+        showTeamsFallback('COULD NOT LOAD BXB TEAMS', url);
+      };
       teamsFrame.src = url;
     }
 
@@ -4764,23 +4818,41 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
       if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
       if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
       if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
-      officeMenuWrap.style.display = 'none';
-      updateTeamsHeaderLabels();
-      teamsCard.classList.add('active');
-      requestAnimationFrame(() => teamsCard.classList.add('visible'));
-      loadTeamsFrame();
+      officeMenuWrap.classList.add('view-anim-out');
+      setTimeout(() => {
+        officeMenuWrap.style.display = 'none';
+        officeMenuWrap.classList.remove('view-anim-out');
+        updateTeamsHeaderLabels();
+        teamsFrame.classList.remove('frame-ready');
+        teamsCard.classList.add('active');
+        teamsCard.classList.add('view-anim-in');
+        void teamsCard.offsetWidth;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            teamsCard.classList.add('visible');
+            teamsCard.classList.remove('view-anim-in');
+            loadTeamsFrame();
+          });
+        });
+      }, 220);
     }
 
     function backFromTeams() {
       teamsCard.classList.remove('visible');
+      teamsCard.classList.add('view-anim-out');
       setTimeout(() => {
-        teamsCard.classList.remove('active');
-        teardownTeamsFrame();
+        hideTeamsWorkspace();
         officeMenuWrap.style.display = 'flex';
+        officeMenuWrap.classList.add('view-anim-in');
         officeBtns.forEach((b) => b.classList.remove('wave-in'));
-        void officeOverlay.offsetWidth;
-        officeBtns.forEach((b) => b.classList.add('wave-in'));
-      }, 220);
+        void officeMenuWrap.offsetWidth;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            officeMenuWrap.classList.remove('view-anim-in');
+            officeBtns.forEach((b) => b.classList.add('wave-in'));
+          });
+        });
+      }, 240);
     }
 
     function syncTeamsLayout() {
@@ -4903,6 +4975,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
