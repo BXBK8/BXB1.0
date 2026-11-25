@@ -167,11 +167,31 @@
       justify-content: space-between;
     }
 
+    .inverse-text {
+      background-color: #FF4500;
+      background-image:
+        radial-gradient(circle at calc(100% - var(--mx, 50%)) calc(100% - var(--my, 50%)), #060201 0%, rgba(6, 2, 1, 0.94) 24%, transparent 50%),
+        radial-gradient(circle at 20% 25%, #060201 0%, rgba(12, 4, 2, 0.88) 26%, transparent 54%),
+        radial-gradient(circle at 80% 75%, #060201 0%, rgba(10, 3, 1, 0.9) 28%, transparent 56%),
+        radial-gradient(circle at 50% 50%, #ff631a 0%, #FF4500 55%, #b32800 100%);
+      background-size: 185% 185%;
+      animation: inverseMesh 12s ease-in-out infinite alternate;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    @keyframes inverseMesh {
+      0%   { background-position: 100% 100%, 0% 0%, 100% 100%, 50% 50%; }
+      50%  { background-position: 0% 60%, 80% 20%, 20% 90%, 50% 50%; }
+      100% { background-position: 20% 0%, 100% 100%, 0% 20%, 50% 50%; }
+    }
+
     .nav-brand {
-      font-weight: 800;
-      font-size: 1.05rem;
+      font-weight: 900;
+      font-size: 1.15rem;
       letter-spacing: 0.16em;
-      color: #ffffff;
       text-decoration: none;
     }
 
@@ -195,14 +215,14 @@
     }
 
     .site-layer h1 {
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 800;
+      font-size: clamp(3.5rem, 10vw, 7.5rem);
+      font-weight: 900;
       letter-spacing: 0.14em;
-      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      line-height: 1;
     }
 
     .site-layer p {
-      margin-top: 0.75rem;
+      margin-top: 0.9rem;
       color: rgba(255, 255, 255, 0.8);
       font-size: 1.1rem;
     }
@@ -239,7 +259,7 @@
 
   <div class="site-layer" id="siteLayer">
     <nav class="glass-nav">
-      <a href="#" class="nav-brand">BXB</a>
+      <a href="#" class="nav-brand inverse-text">BXB</a>
       <div class="nav-links">
         <a href="#">Home</a>
         <a href="#">Work</a>
@@ -249,7 +269,7 @@
     </nav>
 
     <div>
-      <h1>BXB</h1>
+      <h1 class="inverse-text">BXB</h1>
       <p>Site revealed. Ready for what we build next.</p>
     </div>
     <button class="replay-btn" id="replayBtn">Replay Intro</button>
@@ -280,6 +300,8 @@
       currentX += (targetX - currentX) * 0.06;
       currentY += (targetY - currentY) * 0.06;
       cursorBlob.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+      document.documentElement.style.setProperty('--mx', (currentX / window.innerWidth * 100).toFixed(2) + '%');
+      document.documentElement.style.setProperty('--my', (currentY / window.innerHeight * 100).toFixed(2) + '%');
       requestAnimationFrame(animateBg);
     }
     animateBg();
@@ -560,4 +582,3 @@
   </script>
 </body>
 </html>
-
