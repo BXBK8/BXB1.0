@@ -276,6 +276,124 @@
       .blob-4 { width: 46vmax; height: 46vmax; bottom: 18%; right: 5%; }
       .blob-cursor { width: 44vmax; height: 44vmax; }
     }
+    .hero-center {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .hero-center.hero-hidden {
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+    }
+
+    .why-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 96px 16px 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .why-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .why-card {
+      position: relative;
+      width: min(740px, calc(100vw - 2rem));
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+      padding: clamp(22px, 4vw, 38px);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(24px) saturate(1.35);
+      -webkit-backdrop-filter: blur(24px) saturate(1.35);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      text-align: left;
+      color: #000000;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .why-overlay.open .why-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .why-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 160px 160px;
+    }
+
+    .why-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .why-tag {
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      opacity: 0.75;
+    }
+
+    .why-close {
+      background: rgba(255, 255, 255, 0.28);
+      color: #000000;
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .why-close:hover {
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .why-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .why-p {
+      position: relative;
+      font-size: clamp(0.76rem, 1.4vw, 0.94rem);
+      line-height: 1.65;
+      letter-spacing: 0.04em;
+      cursor: default;
+    }
+
+    .why-p .ghost {
+      visibility: hidden;
+      display: block;
+    }
+
+    .why-p .live {
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -292,7 +410,7 @@
   <div class="site-layer" id="siteLayer">
     <nav class="glass-nav">
       <div class="nav-links">
-        <a href="#">WHY ?</a>
+        <a href="#" id="navWhy">WHY ?</a>
         <a href="#">PORTFOLIO</a>
         <a href="#">STORE</a>
         <a href="#">BESPOKE</a>
@@ -301,9 +419,24 @@
       </div>
     </nav>
 
-    <div>
+    <div class="hero-center" id="heroCenter">
       <h1>BXB</h1>
       <p>Site revealed. Ready for what we build next.</p>
+    </div>
+
+    <div class="why-overlay" id="whyOverlay" aria-hidden="true">
+      <div class="why-card" id="whyCard">
+        <div class="why-header">
+          <span class="why-tag">WHY ?</span>
+          <button class="why-close" id="whyClose" type="button">CLOSE ×</button>
+        </div>
+        <div class="why-body">
+          <p class="why-p" data-text="The economy is changing. The world is changing. The Fourth Industrial Revolution is here."><span class="ghost">The economy is changing. The world is changing. The Fourth Industrial Revolution is here.</span><span class="live"></span></p>
+          <p class="why-p" data-text="BXB delivers the technology you need, exactly where you need it. Whether you're a professional, a team, an organisation, or a business, we provide the tools to transform how you work and help you reach your goals faster than you ever thought possible."><span class="ghost">BXB delivers the technology you need, exactly where you need it. Whether you're a professional, a team, an organisation, or a business, we provide the tools to transform how you work and help you reach your goals faster than you ever thought possible.</span><span class="live"></span></p>
+          <p class="why-p" data-text="Robots are here. The ether is here. And we make sure you have them."><span class="ghost">Robots are here. The ether is here. And we make sure you have them.</span><span class="live"></span></p>
+          <p class="why-p" data-text="We build systems that work 24/7/365, on your command."><span class="ghost">We build systems that work 24/7/365, on your command.</span><span class="live"></span></p>
+        </div>
+      </div>
     </div>
     <button class="replay-btn" id="replayBtn">Replay Intro</button>
   </div>
@@ -610,9 +743,81 @@
     }
 
     requestAnimationFrame(render);
+    const navWhy = document.getElementById('navWhy');
+    const whyOverlay = document.getElementById('whyOverlay');
+    const whyClose = document.getElementById('whyClose');
+    const heroCenter = document.getElementById('heroCenter');
+    const whyParagraphs = document.querySelectorAll('.why-p');
+    const CIPHER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*';
+
+    function scrambleParagraph(p, durationMs = 950) {
+      if (p._scrambling) return;
+      p._scrambling = true;
+      const target = p.dataset.text;
+      const liveEl = p.querySelector('.live');
+      const start = performance.now();
+
+      function step(now) {
+        const progress = Math.min(1, (now - start) / durationMs);
+        const lockedCount = Math.floor(progress * target.length);
+        let out = '';
+
+        for (let i = 0; i < target.length; i++) {
+          const ch = target[i];
+          if (i < lockedCount || ch === ' ' || ch === '.' || ch === ',' || ch === "'" || ch === '/') {
+            out += ch;
+          } else {
+            out += CIPHER_CHARS[Math.floor(Math.random() * CIPHER_CHARS.length)];
+          }
+        }
+
+        liveEl.textContent = out;
+        if (progress < 1) {
+          p._raf = requestAnimationFrame(step);
+        } else {
+          liveEl.textContent = target;
+          p._scrambling = false;
+        }
+      }
+
+      cancelAnimationFrame(p._raf);
+      p._raf = requestAnimationFrame(step);
+    }
+
+    function openWhy(e) {
+      e.preventDefault();
+      whyOverlay.classList.add('open');
+      whyOverlay.setAttribute('aria-hidden', 'false');
+      heroCenter.classList.add('hero-hidden');
+      whyParagraphs.forEach((p, idx) => {
+        p._scrambling = false;
+        setTimeout(() => scrambleParagraph(p, 950), idx * 70);
+      });
+    }
+
+    function closeWhy() {
+      whyOverlay.classList.remove('open');
+      whyOverlay.setAttribute('aria-hidden', 'true');
+      heroCenter.classList.remove('hero-hidden');
+    }
+
+    navWhy.addEventListener('click', openWhy);
+    whyClose.addEventListener('click', closeWhy);
+    whyOverlay.addEventListener('click', (e) => {
+      if (e.target === whyOverlay) closeWhy();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && whyOverlay.classList.contains('open')) closeWhy();
+    });
+
+    whyParagraphs.forEach((p) => {
+      p.querySelector('.live').textContent = p.dataset.text;
+      p.addEventListener('mouseenter', () => scrambleParagraph(p, 800));
+    });
   </script>
 </body>
 </html>
+
 
 
 
