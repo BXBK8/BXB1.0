@@ -85,17 +85,94 @@
       100% { transform: translate(10vw, -22vh) scale(1.08); }
     }
 
-    main {
+    .intro-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      transition: opacity 0.8s ease;
+    }
+
+    .intro-layer.done {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #logoCanvas {
+      display: block;
+      cursor: crosshair;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.72);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 69, 0, 0.35);
+      padding: 8px 16px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .site-layer {
       position: relative;
       z-index: 1;
       height: 100vh;
       display: grid;
       place-items: center;
+      text-align: center;
+      padding: 24px;
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    #logoCanvas {
-      display: block;
+    .site-layer.revealed {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .site-layer h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .site-layer p {
+      margin-top: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+    }
+
+    .replay-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      border: 1px solid rgba(255, 69, 0, 0.5);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .replay-btn:hover {
+      background: rgba(255, 69, 0, 0.3);
     }
   </style>
 </head>
@@ -108,18 +185,25 @@
     <div class="blob blob-cursor" id="cursorBlob"></div>
   </div>
 
-  <main>
+  <div class="site-layer" id="siteLayer">
+    <div>
+      <h1>BXB</h1>
+      <p>Site revealed. Ready for what we build next.</p>
+    </div>
+    <button class="replay-btn" id="replayBtn">Replay Intro</button>
+  </div>
+
+  <div class="intro-layer" id="introLayer">
     <canvas id="logoCanvas"></canvas>
-  </main>
+    <div class="hint" id="hint">Click the logo to shatter · <span id="pct">0</span>%</div>
+  </div>
 
   <script>
-    // Dynamic cursor mesh blob
     const cursorBlob = document.getElementById('cursorBlob');
     let targetX = window.innerWidth * 0.5;
     let targetY = window.innerHeight * 0.5;
     let currentX = targetX;
     let currentY = targetY;
-
     let mouseX = -9999;
     let mouseY = -9999;
 
@@ -138,7 +222,6 @@
     }
     animateBg();
 
-    // Exact BXB Folder + Text pixel map (transparent background removed)
     const LOGO_MAP = [
       "..............KKKKKKKKKKK.......................................",
       ".............KDDKDKKDKDDKKSS....................................",
@@ -202,6 +285,12 @@
 
     const canvas = document.getElementById('logoCanvas');
     const ctx = canvas.getContext('2d');
+    const introLayer = document.getElementById('introLayer');
+    const siteLayer = document.getElementById('siteLayer');
+    const hint = document.getElementById('hint');
+    const pctEl = document.getElementById('pct');
+    const replayBtn = document.getElementById('replayBtn');
+
     const rows = LOGO_MAP.length;
     const cols = LOGO_MAP[0].length;
 
@@ -212,24 +301,41 @@
       S: [0, 0, 0]
     };
 
-    const particles = [];
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const ch = LOGO_MAP[r][c];
-        if (ch === '.') continue;
-        const distFromCenter = Math.hypot((c - cols / 2) / cols, (r - rows / 2) / rows);
-        const angle = Math.random() * Math.PI * 2;
-        const scatter = 18 + Math.random() * 42;
-        particles.push({
-          r, c, type: ch,
-          char: Math.random() > 0.5 ? '1' : '0',
-          delay: distFromCenter * 1.45 + Math.random() * 0.65,
-          duration: 0.75 + Math.random() * 0.55,
-          offsetX: Math.cos(angle) * scatter,
-          offsetY: Math.sin(angle) * scatter,
-          flipTimer: Math.random() * 100,
-          flipSpeed: 45 + Math.random() * 70
-        });
+    let particles = [];
+    let clearedCount = 0;
+    let autoCompleting = false;
+    let startTime = performance.now();
+
+    function initParticles() {
+      particles = [];
+      clearedCount = 0;
+      autoCompleting = false;
+      pctEl.textContent = '0';
+      hint.style.opacity = '1';
+      introLayer.classList.remove('done');
+      siteLayer.classList.remove('revealed');
+      startTime = performance.now();
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const ch = LOGO_MAP[r][c];
+          if (ch === '.') continue;
+          const distFromCenter = Math.hypot((c - cols / 2) / cols, (r - rows / 2) / rows);
+          const angle = Math.random() * Math.PI * 2;
+          const scatter = 18 + Math.random() * 42;
+          particles.push({
+            r, c, type: ch,
+            char: Math.random() > 0.5 ? '1' : '0',
+            delay: distFromCenter * 1.35 + Math.random() * 0.55,
+            duration: 0.7 + Math.random() * 0.5,
+            offsetX: Math.cos(angle) * scatter,
+            offsetY: Math.sin(angle) * scatter,
+            flipTimer: Math.random() * 100,
+            flipSpeed: 45 + Math.random() * 70,
+            shattered: false,
+            sx: 0, sy: 0, vx: 0, vy: 0, life: 1
+          });
+        }
       }
     }
 
@@ -238,7 +344,7 @@
 
     function resizeCanvas() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const maxSize = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.82, 560);
+      const maxSize = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.78, 540);
       cellSize = maxSize / cols;
       const w = cols * cellSize;
       const h = rows * cellSize;
@@ -250,9 +356,71 @@
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+    initParticles();
 
-    let startTime = performance.now();
-    canvas.addEventListener('click', () => { startTime = performance.now(); });
+    function triggerAutoComplete() {
+      if (autoCompleting) return;
+      autoCompleting = true;
+      hint.style.opacity = '0';
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        if (!p.shattered) {
+          p.shattered = true;
+          p.sx = (p.c + 0.5) * cellSize;
+          p.sy = (p.r + 0.5) * cellSize;
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1.5 + Math.random() * 4.5;
+          p.vx = Math.cos(angle) * speed;
+          p.vy = Math.sin(angle) * speed - 1.5;
+          p.life = 1;
+        }
+      }
+
+      setTimeout(() => {
+        introLayer.classList.add('done');
+        siteLayer.classList.add('revealed');
+      }, 450);
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (autoCompleting) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      const blastRadius = Math.max(54, cellSize * 9);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        if (p.shattered) continue;
+        const bx = (p.c + 0.5) * cellSize;
+        const by = (p.r + 0.5) * cellSize;
+        const dx = bx - clickX;
+        const dy = by - clickY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < blastRadius) {
+          p.shattered = true;
+          clearedCount++;
+          p.sx = bx;
+          p.sy = by;
+          const force = (1 - dist / blastRadius) * 8 + 2;
+          const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.9;
+          p.vx = Math.cos(angle) * force;
+          p.vy = Math.sin(angle) * force - 2.2;
+          p.life = 1;
+        }
+      }
+
+      const pct = Math.min(100, Math.round((clearedCount / particles.length) * 100));
+      pctEl.textContent = pct;
+
+      if (clearedCount / particles.length >= 0.8) {
+        triggerAutoComplete();
+      }
+    });
+
+    replayBtn.addEventListener('click', initParticles);
 
     function easeOutCubic(t) {
       return 1 - Math.pow(1 - t, 3);
@@ -271,6 +439,23 @@
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
+
+        if (p.shattered) {
+          if (p.life <= 0) continue;
+          p.sx += p.vx;
+          p.sy += p.vy;
+          p.vy += 0.14;
+          p.vx *= 0.98;
+          p.life -= autoCompleting ? 0.032 : 0.024;
+          if (Math.random() < 0.25) p.char = p.char === '0' ? '1' : '0';
+
+          const rgb = COLORS[p.type];
+          const baseAlpha = p.type === 'S' ? 0.35 : 1;
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${Math.max(0, p.life) * baseAlpha})`;
+          ctx.fillText(p.char, p.sx, p.sy);
+          continue;
+        }
+
         const t = Math.max(0, Math.min(1, (elapsed - p.delay) / p.duration));
         if (t <= 0) continue;
 
@@ -278,13 +463,11 @@
         const baseX = (p.c + 0.5) * cellSize;
         const baseY = (p.r + 0.5) * cellSize;
 
-        // Subtle interactive cursor ripple
         const dx = baseX - localMouseX;
         const dy = baseY - localMouseY;
         const dist = Math.hypot(dx, dy);
-        const hoverForce = dist < 65 ? (1 - dist / 65) : 0;
+        const hoverForce = dist < 60 ? (1 - dist / 60) : 0;
 
-        // Flickering 0s and 1s while assembling or when hovered or rare ambient shimmer
         if (t < 0.96 || hoverForce > 0.2 || Math.random() < 0.0025) {
           if (now - p.flipTimer > p.flipSpeed) {
             p.char = p.char === '0' ? '1' : '0';
@@ -299,7 +482,6 @@
         const baseAlpha = p.type === 'S' ? 0.35 : 1;
         const alpha = baseAlpha * Math.min(1, t * 1.6);
 
-        // Soft orange glow during assembly
         if (t < 0.92 && p.type === 'O') {
           ctx.fillStyle = `rgba(255, 175, 90, ${alpha})`;
         } else {
