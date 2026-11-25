@@ -227,64 +227,23 @@
     animateBg();
 
     const LOGO_MAP = [
-      "..............KKKKKKKKKKK.......................................",
-      ".............KDDKDKKDKDDKKSS....................................",
-      "............KDKKOKOOKOKKOKKKS...................................",
-      "............KDKKOKOOKOKKOKKKS...................................",
-      "..........KKDKOOKOKKOKOOKOKKKKKKKKKKKKKKKKKKK...................",
-      "..........KKKOKKOKOOKOKKOKOOKDSKDKKDKDDKDKKDKKKS................",
-      "..........KKDKOOKOKKOKOOKOKKOKDOKOOKOKKOKOOKOKKKS...............",
-      "..........KKDKOOKOKKOKOOKOKKOKDOKOOKOKKOKOOKOKKKS...............",
-      "..........KKKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKOKDDKSSS.............",
-      "..........KKDKDDKDKKDKDDKDKKDKDDKDDKDKKOKOOKOKKKSSS.............",
-      "......KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKOKKOKDDKSSS.............",
-      "......KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKOKKOKDDKSSS.............",
-      ".....KDDKDKKDKDDKDKKDKDDKDKKDKDDKDDKDKKKKOOKOKKKSSS.............",
-      ".....KKKOKOOKOKKOKOOKOKKOKOOKODKOKKOKDDKDKKOKDDKSSS.............",
-      ".....KDDKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKKKOOKOKKKSSS.............",
-      ".....KDDKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKKKOOKOKKKSSS.............",
-      "......KKDKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKKKKOKDDKSSS.............",
-      "......KKKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKDKDDKOKKKSSS.............",
-      "......KKKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKDKDDKOKKKSSS.............",
-      "......KKDKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKKKKOKDDKSSS.............",
-      "........KDKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKKKKOKKKSSS.............",
-      "........KKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKDKKDKDDKSSS.............",
-      "........KKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKDKKDKDDKSSS.............",
-      "........KDKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKKKKOKKKSSS.............",
-      ".........KDDKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKKKDDKSSS.............",
-      ".........KKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKDDKDKKKSSS.............",
-      ".........KKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKDDKDKKKSSS.............",
-      ".........KDDKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKKKDDKSSS.............",
-      "..........KKDKOOKOKKOKOOKOKKOKDOKOOKOKKOKOOKKKKKSSS.............",
-      "..........KKKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKDKDDKSSS.............",
-      "..........KKKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKDKDDKSSS.............",
-      "..........KKDKDDKDKKDKDDKDKKDKDDKDDKDKKDKDDKKKKKSSS.............",
-      "............KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKSSSS.............",
-      "..............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS...............",
-      "..............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS...............",
-      "................................................................",
-      "................................................................",
-      "................................................................",
-      "................................................................",
-      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOKKKKKKKOOOOOSKOOOOO.....SKKOOOOOKKOOOOOKKKKKKKOOOOO...",
-      "..SKKOOOOO....SKKOOOOOSKOOOOOK..KKKKKOOOOOKKOOOOO....SKKOOOOO...",
-      "..SKKOOOOO....SKKOOOOO.KKKKOOOOOKKOOOOOK.SKKOOOOO....SKKOOOOO...",
-      "..SKKOOOOO....SKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOO....SKKOOOOO...",
-      "..SKKOOOOOKKKKKKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOOKKKKKKKOOOOO...",
-      "..SKKOOOOOOOOOOOOOOO.....KKKKOOOOOOOO....SKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOOOOOOOOOOO.....KKKKOOOOOOOO....SKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOKKKKKKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOOKKKKKKKOOOOO...",
-      "..SKKOOOOO....SKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOO....SKKOOOOO...",
-      "..SKKOOOOO....SKKOOOOO.KKKKOOOOOKKOOOOOK.SKKOOOOO....SKKOOOOO...",
-      "..SKKOOOOO....SKKOOOOOSKOOOOOK..KKKKKOOOOOKKOOOOO....SKKOOOOO...",
-      "..SKKOOOOOKKKKKKKOOOOOSKOOOOO.....SKKOOOOOKKOOOOOKKKKKKKOOOOO...",
-      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
-      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
-      "...KKKKKKKKKKKKKKK.....KKKKS.......KKKKK..KKKKKKKKKKKKKKK......."
+      ".KKKKKKKKKKKKKK....KKKKK.......KKKK..SKKKKKKKKKKKKK.....",
+      "SKKKOOOOOOOOOOOOO.SKKKOOOO...SSKKOOOOOKKOOOOOOOOOOOOOO..",
+      "SKKKOOOOOOOOOOOOO.SKKKOOOO...SSKKOOOOOKKOOOOOOOOOOOOOO..",
+      "SKKKOOOOKKKKKKKOOOOOKKOOOO...SSKKOOOOOKKOOOOOKKKKKKOOOOO",
+      "SKKKOOOO...SKKKOOOOOKKOOOO...SSKKOOOOOKKOOOOO..SSKKOOOOO",
+      "SKKKOOOO...SKKKOOOOOKKKKOOOOOKKOOOOSSSKKOOOOO..SSKKOOOOO",
+      "SKKKOOOO...SKKKOOOOOSSKKOOOOOKKOOOOSSSKKOOOOO..SSKKOOOOO",
+      "SKKKOOOOKKKKKKKOOOOOSSKKOOOOOKKOOOOSSSKKOOOOOKKKKKKOOOOO",
+      "SKKKOOOOOOOOOOOOO.....SSKKOOOOOOO...SSKKOOOOOOOOOOOOOO..",
+      "SKKKOOOOOOOOOOOOO.....KKKKOOOOOOO...SSKKOOOOOOOOOOOOOO..",
+      "SKKKOOOO...SKKKOOOOOSSKKOOOOOKKOOOOSSSKKOOOOO..SSKKOOOOO",
+      "SKKKOOOO...SKKKOOOOOSSKKOOOOOKKOOOOSSSKKOOOOO..SSKKOOOOO",
+      "SKKKOOOO...SKKKOOOOOKKOOOO..KKKKKOOOOOKKOOOOO..SSKKOOOOO",
+      "SKKKOOOO...SKKKOOOOOKKOOOO...SSKKOOOOOKKOOOOO..SSKKOOOOO",
+      "SKKKOOOOOOOOOOOOO.SKKKOOOO...SSKKOOOOOKKOOOOOOOOOOOOOO..",
+      "SKKKOOOOOOOOOOOOO.SKKKOOOO...SSKKOOOOOKKOOOOOOOOOOOOOO..",
+      "SKKKOOOOOOOOOOOOO.SKKKOOOO...SSKKOOOOOKKOOOOOOOOOOOOOO.."
     ];
 
     const canvas = document.getElementById('logoCanvas');
@@ -300,7 +259,6 @@
 
     const COLORS = {
       O: [255, 92, 20],
-      D: [140, 34, 0],
       K: [12, 5, 3],
       S: [0, 0, 0]
     };
@@ -310,7 +268,7 @@
     let autoCompleting = false;
     let startTime = performance.now();
 
-    let cellSize = 8;
+    let cellSize = 10;
     let originX = 0;
     let originY = 0;
     let vw = window.innerWidth;
@@ -325,7 +283,7 @@
       canvas.height = Math.round(vh * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const maxSize = Math.min(vw * 0.82, vh * 0.78, 540);
+      const maxSize = Math.min(vw * 0.85, 640);
       cellSize = maxSize / cols;
       originX = (vw - cols * cellSize) / 2;
       originY = (vh - rows * cellSize) / 2;
@@ -405,7 +363,7 @@
       if (autoCompleting) return;
       const clickX = e.clientX;
       const clickY = e.clientY;
-      const baseRadius = Math.max(58, cellSize * 9.5);
+      const baseRadius = Math.max(58, cellSize * 8);
       const burstSeed = Math.random() * 10;
       const biasAngle = Math.random() * Math.PI * 2;
 
@@ -463,7 +421,7 @@
       ctx.clearRect(0, 0, vw, vh);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = `700 ${Math.max(7, cellSize * 1.05)}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      ctx.font = `700 ${Math.max(8, cellSize * 1.05)}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
 
       let activeFalling = 0;
 
