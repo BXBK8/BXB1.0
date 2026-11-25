@@ -1078,6 +1078,17 @@
     .sales-save-btn:hover {
       background: rgba(255, 255, 255, 0.54);
     }
+    .glass-input.input-error {
+      border-color: rgba(255, 42, 42, 0.75);
+      box-shadow: 0 0 16px rgba(255, 42, 42, 0.28);
+      animation: inputShake 0.36s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    @keyframes inputShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
   </style>
 </head>
 <body>
@@ -2332,9 +2343,9 @@
       if (!activeSalesRegionId) {
         salesHeaderWrap.innerHTML = '<span class="why-tag">SALES LEAD ACCESS</span>';
         salesBody.innerHTML = `
-          <form class="sales-login-box" id="salesLoginForm">
+          <form class="sales-login-box" id="salesLoginForm" novalidate>
             <p class="project-desc">ENTER YOUR ASSIGNED COUNTRY/REGION SECRET ID TO EDIT PRICING.</p>
-            <input class="glass-input" id="salesSecretInput" type="text" placeholder="SECRET SALES LEAD ID" autocomplete="off" required />
+            <input class="glass-input" id="salesSecretInput" type="text" placeholder="SECRET SALES LEAD ID" autocomplete="off" />
             <div class="sales-error" id="salesError"></div>
             <button class="store-purchase-btn" type="submit">ACCESS DASHBOARD</button>
           </form>
@@ -2342,11 +2353,23 @@
         const form = document.getElementById('salesLoginForm');
         form.addEventListener('submit', (e) => {
           e.preventDefault();
-          const val = document.getElementById('salesSecretInput').value.trim().toUpperCase();
+          const inputEl = document.getElementById('salesSecretInput');
+          const errEl = document.getElementById('salesError');
+          const val = inputEl.value.trim().toUpperCase();
+          inputEl.classList.remove('input-error');
+          void inputEl.offsetWidth;
+          if (!val) {
+            errEl.textContent = 'PLEASE ENTER YOUR SECRET SALES LEAD ID.';
+            inputEl.classList.add('input-error');
+            inputEl.focus();
+            return;
+          }
           const regions = getBespokeRegions();
-          const match = regions.find((r) => (r.secretId || '').toUpperCase() === val && val.length > 0);
+          const match = regions.find((r) => (r.secretId || '').toUpperCase() === val);
           if (!match) {
-            document.getElementById('salesError').textContent = 'INVALID SECRET ID. ACCESS DENIED.';
+            errEl.textContent = 'INVALID SECRET ID. ACCESS DENIED.';
+            inputEl.classList.add('input-error');
+            inputEl.focus();
             return;
           }
           activeSalesRegionId = match.id;
@@ -2427,6 +2450,7 @@
   </script>
 </body>
 </html>
+
 
 
 
