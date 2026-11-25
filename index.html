@@ -953,6 +953,131 @@
       position: relative;
       z-index: 1;
     }
+    .sales-card {
+      position: relative;
+      width: min(760px, calc(100vw - 2rem));
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(24px) saturate(1.35);
+      -webkit-backdrop-filter: blur(24px) saturate(1.35);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      text-align: left;
+      color: #000000;
+      display: none;
+      opacity: 0;
+      transform: translateY(14px) scale(0.97);
+      transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .sales-card.active {
+      display: block;
+    }
+
+    .sales-card.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .sales-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 160px 160px;
+    }
+
+    .sales-scroll {
+      position: relative;
+      z-index: 1;
+      max-height: calc(100vh - 110px);
+      overflow-y: auto;
+      padding: clamp(20px, 3.5vw, 34px);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+    }
+
+    .sales-login-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 440px;
+      margin: 8px 0 4px;
+    }
+
+    .glass-input {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.34);
+      border: 1px solid rgba(0, 0, 0, 0.16);
+      color: #000000;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      outline: none;
+    }
+
+    .glass-input::placeholder {
+      color: rgba(0, 0, 0, 0.45);
+    }
+
+    .glass-input:focus {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(0, 0, 0, 0.35);
+    }
+
+    .sales-error {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: #9e0000;
+      min-height: 16px;
+    }
+
+    .sales-item-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+    }
+
+    .sales-price-edit {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .sales-price-edit .glass-input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+    }
+
+    .sales-save-btn {
+      height: 40px;
+      padding: 0 18px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.32);
+      border: 1px solid rgba(0, 0, 0, 0.16);
+      color: #000000;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease;
+    }
+
+    .sales-save-btn:hover {
+      background: rgba(255, 255, 255, 0.54);
+    }
   </style>
 </head>
 <body>
@@ -998,7 +1123,7 @@
       </div></div>
     </div>
                 <div class="office-overlay" id="officeOverlay" aria-hidden="true">
-      <div class="office-wrap">
+      <div class="office-wrap" id="officeMenuWrap">
         <div class="office-top">
           <span class="why-tag">OFFICE</span>
           <button class="why-close" id="officeClose" type="button">CLOSE ×</button>
@@ -1009,6 +1134,21 @@
           <button class="office-btn" type="button" data-role="jobs" style="animation-delay: 150ms"><span>BXB Jobs</span><span>→</span></button>
           <button class="office-btn" type="button" data-role="teams" style="animation-delay: 225ms"><span>BXB Teams</span><span>→</span></button>
           <button class="office-btn" type="button" data-role="collaborate" style="animation-delay: 300ms"><span>I want to collaborate</span><span>→</span></button>
+        </div>
+      </div>
+
+      <div class="sales-card" id="salesLeadCard">
+        <div class="sales-scroll">
+          <div class="store-step-header">
+            <div class="store-title-wrap" id="salesHeaderWrap">
+              <span class="why-tag">SALES LEAD ACCESS</span>
+            </div>
+            <div class="store-header-actions">
+              <button class="why-close" id="salesBack" type="button">← BACK</button>
+              <button class="why-close" id="salesClose" type="button">CLOSE ×</button>
+            </div>
+          </div>
+          <div id="salesBody"></div>
         </div>
       </div>
     </div>
@@ -1562,6 +1702,7 @@
       {
         id: 'ghana',
         name: 'GHANA',
+        secretId: 'BXB-GH-2026',
         flagUrl: '',
         flagText: 'GH',
         apps: [
@@ -1588,6 +1729,7 @@
       {
         id: 'mena',
         name: 'MENA',
+        secretId: 'BXB-MN-2026',
         flagUrl: '',
         flagText: 'MN',
         apps: [
@@ -1846,6 +1988,7 @@
       {
         id: 'ghana',
         name: 'GHANA',
+        secretId: 'BXB-GH-2026',
         flagUrl: '',
         flagText: 'GH',
         categoryLabel: 'SERVICES',
@@ -1871,6 +2014,7 @@
       {
         id: 'mena',
         name: 'MENA',
+        secretId: 'BXB-MN-2026',
         flagUrl: '',
         flagText: 'MN',
         categoryLabel: 'SOLUTIONS',
@@ -2129,6 +2273,8 @@
     const officeBtns = document.querySelectorAll('.office-btn');
 
     function openOffice(e) {
+      salesLeadCard.classList.remove('active', 'visible');
+      officeMenuWrap.style.display = 'flex';
       e.preventDefault();
       closeWhy();
       closePortfolio();
@@ -2161,9 +2307,127 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && officeOverlay.classList.contains('open')) closeOffice();
     });
+    function generateSalesLeadSecretId(regionId) {
+      const regions = getBespokeRegions();
+      const existing = new Set(regions.filter((r) => r.id !== regionId && r.secretId).map((r) => r.secretId));
+      const code = (regionId || 'RG').slice(0, 2).toUpperCase();
+      let candidate = '';
+      do {
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+        candidate = `BXB-${code}-${rand}`;
+      } while (existing.has(candidate));
+      updateBespokeRegion(regionId, { secretId: candidate });
+      return candidate;
+    }
+
+    const officeMenuWrap = document.getElementById('officeMenuWrap');
+    const salesLeadCard = document.getElementById('salesLeadCard');
+    const salesHeaderWrap = document.getElementById('salesHeaderWrap');
+    const salesBody = document.getElementById('salesBody');
+    const salesBack = document.getElementById('salesBack');
+    const salesClose = document.getElementById('salesClose');
+    let activeSalesRegionId = null;
+
+    function renderSalesLeadView() {
+      if (!activeSalesRegionId) {
+        salesHeaderWrap.innerHTML = '<span class="why-tag">SALES LEAD ACCESS</span>';
+        salesBody.innerHTML = `
+          <form class="sales-login-box" id="salesLoginForm">
+            <p class="project-desc">ENTER YOUR ASSIGNED COUNTRY/REGION SECRET ID TO EDIT PRICING.</p>
+            <input class="glass-input" id="salesSecretInput" type="text" placeholder="SECRET SALES LEAD ID" autocomplete="off" required />
+            <div class="sales-error" id="salesError"></div>
+            <button class="store-purchase-btn" type="submit">ACCESS DASHBOARD</button>
+          </form>
+        `;
+        const form = document.getElementById('salesLoginForm');
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const val = document.getElementById('salesSecretInput').value.trim().toUpperCase();
+          const regions = getBespokeRegions();
+          const match = regions.find((r) => (r.secretId || '').toUpperCase() === val && val.length > 0);
+          if (!match) {
+            document.getElementById('salesError').textContent = 'INVALID SECRET ID. ACCESS DENIED.';
+            return;
+          }
+          activeSalesRegionId = match.id;
+          renderSalesLeadView();
+        });
+        return;
+      }
+
+      const region = getBespokeRegions().find((r) => r.id === activeSalesRegionId);
+      if (!region) {
+        activeSalesRegionId = null;
+        renderSalesLeadView();
+        return;
+      }
+
+      const label = (region.categoryLabel || 'SERVICES').toUpperCase();
+      salesHeaderWrap.innerHTML = `${renderFlagHtml(region, 'store-flag')}<span class="why-tag">${region.name} · PRICE CONTROL (${label})</span>`;
+
+      const items = region.items || [];
+      if (!items.length) {
+        salesBody.innerHTML = '<p class="project-desc">NO ITEMS ASSIGNED TO THIS REGION.</p>';
+        return;
+      }
+
+      salesBody.innerHTML = `
+        <div class="portfolio-grid">
+          ${items.map((item) => `
+            <div class="sales-item-row">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <h3 class="project-title">${item.name}</h3>
+                <span class="tech-badge">${(item.categoryLabel || label).toUpperCase()}</span>
+              </div>
+              <p class="project-desc">${item.description || ''}</p>
+              <div class="sales-price-edit">
+                <input class="glass-input sales-price-input" type="text" value="${item.price || ''}" data-item-id="${item.id}" aria-label="Price for ${item.name}" />
+                <button class="sales-save-btn" type="button" data-item-id="${item.id}">SAVE PRICE</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    salesBody.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sales-save-btn');
+      if (!btn || !activeSalesRegionId) return;
+      const itemId = btn.dataset.itemId;
+      const input = salesBody.querySelector(`.sales-price-input[data-item-id="${itemId}"]`);
+      if (!input) return;
+      updateBespokeItem(activeSalesRegionId, itemId, { price: input.value.trim().toUpperCase() });
+      btn.textContent = 'SAVED ✓';
+      setTimeout(() => { btn.textContent = 'SAVE PRICE'; }, 1600);
+    });
+
+    function showSalesLeadCard() {
+      activeSalesRegionId = null;
+      renderSalesLeadView();
+      officeMenuWrap.style.display = 'none';
+      salesLeadCard.classList.add('active');
+      requestAnimationFrame(() => salesLeadCard.classList.add('visible'));
+    }
+
+    function backToOfficeMenu() {
+      salesLeadCard.classList.remove('visible');
+      setTimeout(() => {
+        salesLeadCard.classList.remove('active');
+        activeSalesRegionId = null;
+        officeMenuWrap.style.display = 'flex';
+        officeBtns.forEach((b) => b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach((b) => b.classList.add('wave-in'));
+      }, 220);
+    }
+
+    document.querySelector('.office-btn[data-role="sales-lead"]').addEventListener('click', showSalesLeadCard);
+    salesBack.addEventListener('click', backToOfficeMenu);
+    salesClose.addEventListener('click', closeOffice);
   </script>
 </body>
 </html>
+
 
 
 
