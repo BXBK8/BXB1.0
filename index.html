@@ -565,6 +565,104 @@
       75%  { transform: scale(2.4); opacity: 0; }
       100% { transform: scale(2.4); opacity: 0; }
     }
+    .store-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 96px 16px 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .store-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .store-card {
+      position: relative;
+      width: min(960px, calc(100vw - 2rem));
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(24px) saturate(1.35);
+      -webkit-backdrop-filter: blur(24px) saturate(1.35);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      text-align: left;
+      color: #000000;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .store-overlay.open .store-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .store-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 160px 160px;
+    }
+
+    .store-scroll {
+      position: relative;
+      z-index: 1;
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+      padding: clamp(20px, 3.5vw, 34px);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+    }
+
+    .store-scroll::-webkit-scrollbar { width: 5px; }
+    .store-scroll::-webkit-scrollbar-track { background: transparent; }
+    .store-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.25); border-radius: 9999px; }
+
+    .store-price {
+      font-size: 0.92rem;
+      letter-spacing: 0.1em;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .store-purchase-btn {
+      width: 100%;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      color: #000000;
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .store-purchase-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .store-purchase-btn.purchased {
+      background: rgba(255, 255, 255, 0.65);
+    }
   </style>
 </head>
 <body>
@@ -583,7 +681,7 @@
       <div class="nav-links">
         <a href="#" id="navWhy">WHY ?</a>
         <a href="#" id="navPortfolio">PORTFOLIO</a>
-        <a href="#">STORE</a>
+        <a href="#" id="navStore">STORE</a>
         <a href="#">BESPOKE</a>
         <a href="#">OFFICE</a>
         <a href="#">CONNECT</a>
@@ -609,6 +707,18 @@
         </div>
       </div></div>
     </div>
+        <div class="store-overlay" id="storeOverlay" aria-hidden="true">
+      <div class="store-card" id="storeCard">
+        <div class="store-scroll">
+          <div class="why-header">
+            <span class="why-tag">STORE</span>
+            <button class="why-close" id="storeClose" type="button">CLOSE ×</button>
+          </div>
+          <div class="portfolio-grid" id="storeGrid"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="portfolio-overlay" id="portfolioOverlay" aria-hidden="true">
       <div class="portfolio-card" id="portfolioCard">
         <div class="portfolio-scroll">
@@ -956,6 +1066,7 @@
     }
 
     function openWhy(e) {
+      if (typeof closeStore === 'function') closeStore();
       if (typeof closePortfolio === 'function') closePortfolio();
       e.preventDefault();
       whyOverlay.classList.add('open');
@@ -1090,6 +1201,7 @@
     const portfolioClose = document.getElementById('portfolioClose');
 
     function openPortfolio(e) {
+      if (typeof closeStore === 'function') closeStore();
       e.preventDefault();
       closeWhy();
       portfolioOverlay.classList.add('open');
@@ -1100,7 +1212,7 @@
     function closePortfolio() {
       portfolioOverlay.classList.remove('open');
       portfolioOverlay.setAttribute('aria-hidden', 'true');
-      if (!whyOverlay.classList.contains('open')) {
+      if (!whyOverlay.classList.contains('open') && !storeOverlay.classList.contains('open')) {
         heroCenter.classList.remove('hero-hidden');
       }
     }
@@ -1113,9 +1225,145 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && portfolioOverlay.classList.contains('open')) closePortfolio();
     });
+    const STORE_STORAGE_KEY = 'bxb_store_items';
+    const DEFAULT_STORE_ITEMS = [
+      {
+        id: 'bxb-automate',
+        title: 'BXB AUTOMATE',
+        description: 'AUTONOMOUS 24/7/365 WORKFLOW ENGINE FOR TEAMS AND SOLO OPERATORS.',
+        price: '$29 / MONTH',
+        logoUrl: '',
+        logoText: 'BA',
+        checkoutUrl: ''
+      },
+      {
+        id: 'bxb-pulse',
+        title: 'BXB PULSE',
+        description: 'REAL-TIME SYSTEM TELEMETRY, ALERTS, AND INSTANT COMMAND ROUTING.',
+        price: '$49 / MONTH',
+        logoUrl: '',
+        logoText: 'BP',
+        checkoutUrl: ''
+      },
+      {
+        id: 'bxb-vault',
+        title: 'BXB VAULT',
+        description: 'ENCRYPTED ETHER STORAGE AND ZERO-LATENCY API SYNC FOR ORGANISATIONS.',
+        price: '$79 / MONTH',
+        logoUrl: '',
+        logoText: 'BV',
+        checkoutUrl: ''
+      }
+    ];
+
+    function getStoreItems() {
+      try {
+        const raw = localStorage.getItem(STORE_STORAGE_KEY);
+        if (!raw) {
+          localStorage.setItem(STORE_STORAGE_KEY, JSON.stringify(DEFAULT_STORE_ITEMS));
+          return [...DEFAULT_STORE_ITEMS];
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [...DEFAULT_STORE_ITEMS];
+      } catch {
+        return [...DEFAULT_STORE_ITEMS];
+      }
+    }
+
+    function saveStoreItems(items) {
+      localStorage.setItem(STORE_STORAGE_KEY, JSON.stringify(items));
+      renderStore();
+    }
+
+    function addStoreItem(item) {
+      const items = getStoreItems();
+      const newItem = { id: item.id || 'app-' + Date.now(), ...item };
+      items.push(newItem);
+      saveStoreItems(items);
+      return newItem;
+    }
+
+    function updateStoreItem(id, updates) {
+      const items = getStoreItems().map((it) => (it.id === id ? { ...it, ...updates } : it));
+      saveStoreItems(items);
+    }
+
+    function deleteStoreItem(id) {
+      const items = getStoreItems().filter((it) => it.id !== id);
+      saveStoreItems(items);
+    }
+
+    const storeGrid = document.getElementById('storeGrid');
+    function renderStore() {
+      const items = getStoreItems();
+      storeGrid.innerHTML = items.map((item) => {
+        const logoHtml = item.logoUrl
+          ? `<img src="${item.logoUrl}" alt="${item.title}" />`
+          : `<span>${item.logoText || (item.title || 'BX').slice(0, 2)}</span>`;
+        return `
+          <article class="project-card">
+            <div class="project-head">
+              <div class="project-logo">${logoHtml}</div>
+              <h3 class="project-title">${item.title}</h3>
+            </div>
+            <p class="project-desc">${item.description || ''}</p>
+            <div class="store-price">${item.price || ''}</div>
+            <button class="store-purchase-btn" type="button" data-id="${item.id}" data-url="${item.checkoutUrl || ''}">PURCHASE</button>
+          </article>
+        `;
+      }).join('');
+    }
+    renderStore();
+
+    storeGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.store-purchase-btn');
+      if (!btn) return;
+      const url = btn.dataset.url;
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      btn.classList.add('purchased');
+      btn.textContent = 'ADDED TO ORDER ✓';
+      setTimeout(() => {
+        btn.classList.remove('purchased');
+        btn.textContent = 'PURCHASE';
+      }, 2000);
+    });
+
+    const navStore = document.getElementById('navStore');
+    const storeOverlay = document.getElementById('storeOverlay');
+    const storeClose = document.getElementById('storeClose');
+
+    function openStore(e) {
+      e.preventDefault();
+      closeWhy();
+      closePortfolio();
+      storeOverlay.classList.add('open');
+      storeOverlay.setAttribute('aria-hidden', 'false');
+      heroCenter.classList.add('hero-hidden');
+    }
+
+    function closeStore() {
+      storeOverlay.classList.remove('open');
+      storeOverlay.setAttribute('aria-hidden', 'true');
+      if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open')) {
+        heroCenter.classList.remove('hero-hidden');
+      }
+    }
+
+    navStore.addEventListener('click', openStore);
+    storeClose.addEventListener('click', closeStore);
+    storeOverlay.addEventListener('click', (e) => {
+      if (e.target === storeOverlay) closeStore();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && storeOverlay.classList.contains('open')) closeStore();
+    });
   </script>
 </body>
 </html>
+
 
 
 
