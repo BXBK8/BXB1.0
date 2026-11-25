@@ -4846,9 +4846,9 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
     function renderConnectBadges() {
       const links = getConnectLinks();
       connectPopover.innerHTML = `
-        <a class="connect-badge" href="${esc(links.discord)}" target="_blank" rel="noopener noreferrer">${DISCORD_SVG}<span>DISCORD</span><span>↗</span></a>
-        <a class="connect-badge" href="${esc(links.linkedin)}" target="_blank" rel="noopener noreferrer">${LINKEDIN_SVG}<span>LINKEDIN</span><span>↗</span></a>
-        <a class="connect-badge" href="${esc(links.github)}" target="_blank" rel="noopener noreferrer">${GITHUB_SVG}<span>GITHUB</span><span>↗</span></a>
+        <a class="connect-badge" href="${esc(links.discord)}" target="_blank" rel="noopener noreferrer">${DISCORD_SVG}<span>DISCORD</span></a>
+        <a class="connect-badge" href="${esc(links.linkedin)}" target="_blank" rel="noopener noreferrer">${LINKEDIN_SVG}<span>LINKEDIN</span></a>
+        <a class="connect-badge" href="${esc(links.github)}" target="_blank" rel="noopener noreferrer">${GITHUB_SVG}<span>GITHUB</span></a>
       `;
     }
     renderConnectBadges();
@@ -4903,6 +4903,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
