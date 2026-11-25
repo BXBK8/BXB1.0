@@ -3673,10 +3673,25 @@
           <button class="admin-tab ${jobsCalcMode==='lead'?'active':''}" data-cmode="lead">SALES LEAD</button>
         </div>`;
 
-        const regionOptions=salaries.map((s,i)=>`<option value="${i}">${s.name} (${s.currency_code})</option>`).join('');
-        const salaryBandOptions=`<option value="min">LOW (MIN)</option><option value="max">HIGH (MAX)</option>`;
+        const regionOpts = salaries.map((s, i) => ({ value: String(i), label: `${s.name} (${s.currency_code})`.toUpperCase() }));
+        const bandOpts = [{ value: 'min', label: 'LOW (MIN)' }, { value: 'max', label: 'HIGH (MAX)' }];
 
-        jobsBody.innerHTML=`
+        function buildGlassDd(id, opts, initVal) {
+          const cur = opts.find((o) => o.value === initVal) || opts[0];
+          return `
+            <div class="glass-dd" data-dd="${id}">
+              <input type="hidden" id="${id}" value="${cur ? cur.value : ''}" />
+              <button type="button" class="glass-dd-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="glass-dd-val">${cur ? cur.label : ''}</span>
+                <span class="glass-dd-chev">▾</span>
+              </button>
+              <div class="glass-dd-menu" role="listbox">
+                ${opts.map((o) => `<button type="button" class="glass-dd-opt ${cur && o.value === cur.value ? 'selected' : ''}" role="option" aria-selected="${cur && o.value === cur.value ? 'true' : 'false'}" data-val="${o.value}"><span>${o.label}</span><span>${cur && o.value === cur.value ? '✓' : ''}</span></button>`).join('')}
+              </div>
+            </div>`;
+        }
+
+        jobsBody.innerHTML = `
           <div class="calc-section">
             <p class="project-desc" style="line-height:1.75;margin-bottom:6px;">
               POSITION EXPLANATION<br/><br/>
@@ -3685,11 +3700,11 @@
             ${modeBar}
             <hr style="border:none;border-top:1px solid rgba(0,0,0,0.1);margin:4px 0;"/>
             <p class="calc-title">SALES & EARNINGS CALCULATOR</p>
-            <div class="calc-row">
-              <div><p class="calc-title">REGION</p><select class="calc-select" id="calcRegion">${regionOptions}</select></div>
-              <div><p class="calc-title">SALARY BAND</p><select class="calc-select" id="calcBand">${salaryBandOptions}</select></div>
+            <div class="calc-row" style="gap:14px;">
+              <div><p class="calc-title" style="margin-bottom:6px;">REGION</p>${buildGlassDd('calcRegion', regionOpts, '0')}</div>
+              <div><p class="calc-title" style="margin-bottom:6px;">SALARY BAND</p>${buildGlassDd('calcBand', bandOpts, 'min')}</div>
             </div>
-            <div id="calcOutput"></div>
+            <div id="calcOutput" class="calc-output-stack"></div>
           </div>`;
 
         // Mode tab switching
@@ -3817,8 +3832,13 @@
               <p class="calc-title" style="margin-top:8px;">SALARY BAND</p>
               <p class="calc-big">${fmt(salLoc,sal.currency_code)} / MONTH <span class="calc-sub">(${fmt(salUSD,'USD')})</span></p>
             </div>
-            <p class="calc-title">DEAL SIMULATOR</p>
-            ${dealRows}
+            <div class="calc-sim-card">
+              <div class="calc-sim-head">
+                <p class="calc-title" style="margin:0;">DEAL SIMULATOR</p>
+                <span class="calc-sub">${catalog.length} ${catalog.length === 1 ? 'SERVICE' : 'SERVICES'}</span>
+              </div>
+              ${dealRows}
+            </div>
             <div class="calc-output-box">
               <p class="calc-title">DEAL COUNT <span style="float:right;">${paidDeals} / ${cfg.deals_required}</span></p>
               <div class="calc-bar-wrap"><div class="calc-bar-fill" style="width:${dealPct}%"></div></div>
@@ -3834,8 +3854,10 @@
             ${suggestions}
             ${leadPanel}
             ${adminPanel}
-            <div>
-              <p class="collapsible-trigger" id="formulaTrigger">▸ HOW IS THIS CALCULATED?</p>
+            <div class="calc-formula-card">
+              <button type="button" class="collapsible-trigger" id="formulaTrigger" aria-expanded="false">
+                <span>▸ HOW IS THIS CALCULATED?</span>
+              </button>
               <div class="formula-box" id="formulaBox">
                 PRICE_USD → converted at locked FX rate<br/>
                 COMMISSION = PRICE_USD × ${(cfg.commission_rate*100).toFixed(0)}%<br/>
@@ -3848,10 +3870,12 @@
             </div>
           `;
 
-          document.getElementById('formulaTrigger').onclick=()=>{
-            const fb=document.getElementById('formulaBox');
-            fb.classList.toggle('open');
-            document.getElementById('formulaTrigger').textContent=(fb.classList.contains('open')?'▾':'▸')+' HOW IS THIS CALCULATED?';
+          document.getElementById('formulaTrigger').onclick = () => {
+            const trig = document.getElementById('formulaTrigger');
+            const fb = document.getElementById('formulaBox');
+            const open = fb.classList.toggle('open');
+            trig.setAttribute('aria-expanded', open ? 'true' : 'false');
+            trig.innerHTML = `<span>${open ? '▾' : '▸'} HOW IS THIS CALCULATED?</span>`;
           };
 
           // Deal controls
@@ -3897,8 +3921,64 @@
           });
         }
 
-        document.getElementById('calcRegion').onchange=computeCalc;
-        document.getElementById('calcBand').onchange=computeCalc;
+        jobsBody.querySelectorAll('.glass-dd').forEach((dd) => {
+          const trig = dd.querySelector('.glass-dd-trigger');
+          const valSpan = dd.querySelector('.glass-dd-val');
+          const hidden = dd.querySelector('input[type="hidden"]');
+          const opts = dd.querySelectorAll('.glass-dd-opt');
+
+          function closeDd() {
+            dd.classList.remove('open');
+            trig.setAttribute('aria-expanded', 'false');
+          }
+
+          trig.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const willOpen = !dd.classList.contains('open');
+            jobsBody.querySelectorAll('.glass-dd.open').forEach((other) => {
+              other.classList.remove('open');
+              other.querySelector('.glass-dd-trigger').setAttribute('aria-expanded', 'false');
+            });
+            if (willOpen) {
+              dd.classList.add('open');
+              trig.setAttribute('aria-expanded', 'true');
+            }
+          });
+
+          opts.forEach((opt) => {
+            opt.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              hidden.value = opt.dataset.val;
+              valSpan.textContent = opt.firstElementChild.textContent;
+              opts.forEach((o) => {
+                const sel = o === opt;
+                o.classList.toggle('selected', sel);
+                o.setAttribute('aria-selected', sel ? 'true' : 'false');
+                o.lastElementChild.textContent = sel ? '✓' : '';
+              });
+              closeDd();
+              computeCalc();
+            });
+          });
+        });
+
+        if (!window._glassDdBound) {
+          window._glassDdBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.glass-dd.open').forEach((dd) => {
+              dd.classList.remove('open');
+              dd.querySelector('.glass-dd-trigger').setAttribute('aria-expanded', 'false');
+            });
+          });
+          document.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape') {
+              document.querySelectorAll('.glass-dd.open').forEach((dd) => {
+                dd.classList.remove('open');
+                dd.querySelector('.glass-dd-trigger').setAttribute('aria-expanded', 'false');
+              });
+            }
+          });
+        }c;
         window._dealStates={}; window._dealQtys={};
         computeCalc();
       }
@@ -4617,6 +4697,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
