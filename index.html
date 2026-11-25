@@ -1309,20 +1309,56 @@
     .collab-submit-btn span { position: relative; z-index: 1; }
     .teams-card {
       width: min(1140px, calc(100vw - 2rem));
-      transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+      transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.25s ease, height 0.25s ease, border-radius 0.25s ease;
     }
-    .teams-card.is-fullscreen { width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; }
+    .teams-card.is-fullscreen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 100vw;
+      max-height: 100vh;
+      max-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      z-index: 9999;
+      transform: none !important;
+    }
+    .teams-card.is-fullscreen::before { border-radius: 0; }
     .teams-shell {
       position: relative; z-index: 1; display: flex; flex-direction: column;
-      height: min(82vh, 760px); padding: clamp(14px, 2.2vw, 22px); gap: 12px;
+      height: min(82vh, 760px); height: min(82dvh, 760px);
+      overflow: hidden; padding: clamp(14px, 2.2vw, 22px); gap: 12px;
     }
-    .teams-card.is-fullscreen .teams-shell { height: 100vh; padding: 16px 20px; }
+    .teams-card.is-fullscreen .teams-shell {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      gap: 0;
+      overflow: hidden;
+    }
     .teams-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; flex-shrink: 0; }
+    .teams-card.is-fullscreen .teams-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    }
     .teams-stage {
-      position: relative; flex: 1; min-height: 0; border-radius: 16px; overflow: hidden;
+      position: relative; flex: 1 1 auto; display: flex; flex-direction: column;
+      width: 100%; height: 100%; min-height: 0;
+      border-radius: 16px; overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(9, 3, 2, 0.22);
     }
-    .teams-frame { width: 100%; height: 100%; border: none; display: block; background: transparent; }
+    .teams-card.is-fullscreen .teams-stage {
+      border-radius: 0;
+      border: none;
+    }
+    .teams-frame {
+      flex: 1 1 auto; width: 100%; height: 100%; min-height: 0;
+      border: none; display: block; background: transparent;
+    }
     .teams-state {
       position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;
@@ -4387,10 +4423,28 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
       }, 220);
     }
 
+    function syncTeamsLayout() {
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 280);
+    }
+
+    function setTeamsFullscreen(enable) {
+      teamsCard.classList.toggle('is-fullscreen', enable);
+      teamsFullscreen.textContent = enable ? 'EXIT FULL' : 'FULLSCREEN';
+      syncTeamsLayout();
+    }
+
     teamsFullscreen.addEventListener('click', () => {
-      const fs = teamsCard.classList.toggle('is-fullscreen');
-      teamsFullscreen.textContent = fs ? 'EXIT FULL' : 'FULLSCREEN';
+      setTeamsFullscreen(!teamsCard.classList.contains('is-fullscreen'));
     });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && teamsCard.classList.contains('is-fullscreen')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        setTeamsFullscreen(false);
+      }
+    }, true);
 
     teamsSetupBtn.addEventListener('click', () => {
       if (teamsState.classList.contains('hidden')) showTeamsFallback('BXB TEAMS · ISOLATION & BUILD INFO', getTeamsUrl());
@@ -4405,6 +4459,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
