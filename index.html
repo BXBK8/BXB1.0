@@ -1499,6 +1499,74 @@
       border-radius: 0; background: rgba(0, 0, 0, 0.05);
       border-top: 1px solid rgba(0, 0, 0, 0.08); padding: 14px 18px;
     }
+    .connect-popover {
+      position: fixed;
+      top: 90px;
+      left: 50%;
+      z-index: 7;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px;
+      max-width: calc(100vw - 2rem);
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(22px) saturate(1.35);
+      -webkit-backdrop-filter: blur(22px) saturate(1.35);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .connect-popover.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .connect-badge {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.26);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      color: #000000;
+      text-decoration: none;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(-10px) scale(0.92);
+      transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .connect-badge::before {
+      content: ""; position: absolute; inset: 0; border-radius: 9999px; pointer-events: none;
+      opacity: 0.22; mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncG type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncB type='linear' slope='3.5' intercept='-1.7'/%3E%3CfeFuncA type='linear' slope='3.5' intercept='-1.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 160px 160px;
+    }
+    .connect-popover.open .connect-badge { opacity: 1; transform: translateY(0) scale(1); }
+    .connect-popover.open .connect-badge:nth-child(1) { transition-delay: 0ms; }
+    .connect-popover.open .connect-badge:nth-child(2) { transition-delay: 60ms; }
+    .connect-popover.open .connect-badge:nth-child(3) { transition-delay: 120ms; }
+    .connect-badge:hover {
+      background: rgba(255, 255, 255, 0.48);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 22px rgba(255, 69, 0, 0.24);
+    }
+    .connect-badge svg, .connect-badge span { position: relative; z-index: 1; }
+    .connect-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+    @media (max-width: 520px) {
+      .connect-popover { border-radius: 20px; padding: 7px; gap: 6px; }
+      .connect-badge { padding: 7px 11px; font-size: 0.66rem; }
+    }
   </style>
 </head>
 <body>
@@ -1520,9 +1588,11 @@
         <a href="#" id="navStore">STORE</a>
         <a href="#" id="navBespoke">BESPOKE</a>
         <a href="#" id="navOffice">OFFICE</a>
-        <a href="#">CONNECT</a>
+        <a href="#" id="navConnect" aria-expanded="false">CONNECT</a>
       </div>
     </nav>
+
+    <div class="connect-popover" id="connectPopover" aria-hidden="true"></div>
 
     <div class="globe-stage">
       <canvas id="globeCanvas"></canvas>
@@ -2021,6 +2091,7 @@
     }
 
     function openWhy(e) {
+      if (typeof closeConnect === 'function') closeConnect();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
@@ -2158,6 +2229,7 @@
     const portfolioClose = document.getElementById('portfolioClose');
 
     function openPortfolio(e) {
+      if (typeof closeConnect === 'function') closeConnect();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
@@ -2439,6 +2511,7 @@
     const storeClose = document.getElementById('storeClose');
 
     function openStore(e) {
+      if (typeof closeConnect === 'function') closeConnect();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
@@ -2723,6 +2796,7 @@
     const bespokeClose = document.getElementById('bespokeClose');
 
     function openBespoke(e) {
+      if (typeof closeConnect === 'function') closeConnect();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
       if (typeof closeOffice === 'function') closeOffice();
@@ -2760,6 +2834,7 @@
     const officeBtns = document.querySelectorAll('.office-btn');
 
     function openOffice(e) {
+      if (typeof closeConnect === 'function') closeConnect();
       if (typeof hideTeamsWorkspace === 'function') hideTeamsWorkspace();
       if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
       if (typeof closeCountryIntel === 'function') closeCountryIntel();
@@ -2902,6 +2977,14 @@
             saveCountryJournal(cjRes.data.map((j) => ({
               id: j.id, countryId: j.country_id, text: j.text, ts: new Date(j.created_at).getTime()
             })));
+          }
+          const { data: clData } = await sb.from('connect_links').select('*').eq('id', 1).maybeSingle();
+          if (clData && typeof saveConnectLinks === 'function') {
+            saveConnectLinks({
+              discord: clData.discord_url || DEFAULT_CONNECT_LINKS.discord,
+              linkedin: clData.linkedin_url || DEFAULT_CONNECT_LINKS.linkedin,
+              github: clData.github_url || DEFAULT_CONNECT_LINKS.github
+            });
           }
         } catch (err) { console.warn('Supabase sync fallback:', err); }
       },
@@ -3312,6 +3395,18 @@
               </div>`).join('') : '<p class="calc-sub">NO DEV APPLICATIONS SUBMITTED YET.</p>'}
           </div>`;
       }
+      if (activeAdminTab === 'connect') {
+        const links = getConnectLinks();
+        return `
+          <form class="admin-form-card" id="admConnectForm" novalidate>
+            <p class="calc-title">CONNECT BADGE LINKS</p>
+            <div><p class="calc-title">DISCORD URL</p><input class="glass-input" id="admConnDiscord" type="url" value="${esc(links.discord)}" placeholder="https://discord.gg/..." style="text-transform:none;" /></div>
+            <div><p class="calc-title">LINKEDIN URL</p><input class="glass-input" id="admConnLinkedin" type="url" value="${esc(links.linkedin)}" placeholder="https://linkedin.com/company/..." style="text-transform:none;" /></div>
+            <div><p class="calc-title">GITHUB URL</p><input class="glass-input" id="admConnGithub" type="url" value="${esc(links.github)}" placeholder="https://github.com/BXBK8" style="text-transform:none;" /></div>
+            <div class="sales-error" id="admConnMsg"></div>
+            <button class="store-purchase-btn" type="submit">SAVE CONNECT LINKS</button>
+          </form>`;
+      }
       if (activeAdminTab === 'settings') {
         return `
           <form class="sales-login-box" id="adminSettingsForm" novalidate>
@@ -3487,6 +3582,36 @@
       }
       const refDev = document.getElementById('admRefreshDev');
       if (refDev) refDev.onclick = async () => { await hydrateAdminData(); renderAdminView(); };
+      const admConnForm = document.getElementById('admConnectForm');
+      if (admConnForm) {
+        admConnForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const dEl = document.getElementById('admConnDiscord');
+          const lEl = document.getElementById('admConnLinkedin');
+          const gEl = document.getElementById('admConnGithub');
+          const msg = document.getElementById('admConnMsg');
+          [dEl, lEl, gEl].forEach((el) => el.classList.remove('input-error'));
+          msg.style.color = '#9e0000';
+          msg.textContent = '';
+
+          const d = dEl.value.trim(), l = lEl.value.trim(), g = gEl.value.trim();
+          const validUrl = (u) => /^https?:\/\/.+/i.test(u);
+          if (!validUrl(d)) { msg.textContent = 'ENTER A VALID DISCORD URL (HTTPS://...).'; void dEl.offsetWidth; dEl.classList.add('input-error'); dEl.focus(); return; }
+          if (!validUrl(l)) { msg.textContent = 'ENTER A VALID LINKEDIN URL (HTTPS://...).'; void lEl.offsetWidth; lEl.classList.add('input-error'); lEl.focus(); return; }
+          if (!validUrl(g)) { msg.textContent = 'ENTER A VALID GITHUB URL (HTTPS://...).'; void gEl.offsetWidth; gEl.classList.add('input-error'); gEl.focus(); return; }
+
+          try {
+            if (sb && sessionAdminId) {
+              await BXB_DB.rpc('admin_update_connect_links', { p_admin_id: sessionAdminId, p_discord_url: d, p_linkedin_url: l, p_github_url: g });
+            }
+            saveConnectLinks({ discord: d, linkedin: l, github: g });
+            msg.style.color = '#000000';
+            msg.textContent = 'CONNECT LINKS UPDATED ✓';
+          } catch {
+            msg.textContent = 'FAILED TO SAVE CONNECT LINKS.';
+          }
+        };
+      }
       const settingsForm = document.getElementById('adminSettingsForm');
       if (settingsForm) {
         settingsForm.addEventListener('submit', async (e) => {
@@ -3517,7 +3642,7 @@
       }
       adminLogout.style.display = 'inline-block';
       adminHeaderWrap.innerHTML = '<span class="why-tag">ADMIN DASHBOARD</span>';
-      const tabs = [{ id: 'portfolio', label: 'PORTFOLIO' }, { id: 'store', label: 'STORE' }, { id: 'bespoke', label: 'BESPOKE & IDS' }, { id: 'globe', label: 'GLOBE & JOURNAL' }, { id: 'calculator', label: 'CALCULATOR & FX' }, { id: 'dev-apps', label: 'DEV APPS' }, { id: 'settings', label: 'SETTINGS' }];
+      const tabs = [{ id: 'portfolio', label: 'PORTFOLIO' }, { id: 'store', label: 'STORE' }, { id: 'bespoke', label: 'BESPOKE & IDS' }, { id: 'globe', label: 'GLOBE & JOURNAL' }, { id: 'calculator', label: 'CALCULATOR & FX' }, { id: 'dev-apps', label: 'DEV APPS' }, { id: 'connect', label: 'CONNECT' }, { id: 'settings', label: 'SETTINGS' }];
       adminBody.innerHTML = `<div class="admin-status-bar"><span>STATUS: UNLOCKED (${sb ? 'SUPABASE LIVE' : 'LOCAL MODE'})</span></div><div class="admin-tabs">${tabs.map((t) => `<button class="admin-tab ${activeAdminTab === t.id ? 'active' : ''}" type="button" data-tab="${t.id}">${t.label}</button>`).join('')}</div><div id="adminTabPanel">${renderAdminTabContent()}</div>`;
       bindAdminForms();
     }
@@ -4693,10 +4818,92 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
     teamsBack.addEventListener('click', backFromTeams);
     teamsClose.addEventListener('click', closeOffice);
 
+    const CONNECT_LINKS_KEY = 'bxb_connect_links';
+    const DEFAULT_CONNECT_LINKS = {
+      discord: 'https://discord.com',
+      linkedin: 'https://linkedin.com',
+      github: 'https://github.com/BXBK8'
+    };
+
+    function getConnectLinks() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(CONNECT_LINKS_KEY));
+        return (parsed && typeof parsed === 'object') ? { ...DEFAULT_CONNECT_LINKS, ...parsed } : { ...DEFAULT_CONNECT_LINKS };
+      } catch { return { ...DEFAULT_CONNECT_LINKS }; }
+    }
+
+    function saveConnectLinks(links) {
+      localStorage.setItem(CONNECT_LINKS_KEY, JSON.stringify({ ...DEFAULT_CONNECT_LINKS, ...links }));
+      renderConnectBadges();
+    }
+
+    const DISCORD_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>';
+    const LINKEDIN_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>';
+
+    const navConnect = document.getElementById('navConnect');
+    const connectPopover = document.getElementById('connectPopover');
+
+    function renderConnectBadges() {
+      const links = getConnectLinks();
+      connectPopover.innerHTML = `
+        <a class="connect-badge" href="${esc(links.discord)}" target="_blank" rel="noopener noreferrer">${DISCORD_SVG}<span>DISCORD</span><span>↗</span></a>
+        <a class="connect-badge" href="${esc(links.linkedin)}" target="_blank" rel="noopener noreferrer">${LINKEDIN_SVG}<span>LINKEDIN</span><span>↗</span></a>
+        <a class="connect-badge" href="${esc(links.github)}" target="_blank" rel="noopener noreferrer">${GITHUB_SVG}<span>GITHUB</span><span>↗</span></a>
+      `;
+    }
+    renderConnectBadges();
+
+    function positionConnectPopover() {
+      const nav = document.querySelector('.glass-nav');
+      if (!nav || !navConnect) return;
+      const navRect = nav.getBoundingClientRect();
+      const linkRect = navConnect.getBoundingClientRect();
+      connectPopover.style.top = (navRect.bottom + 10) + 'px';
+      const popW = connectPopover.offsetWidth || 320;
+      const center = linkRect.left + linkRect.width / 2;
+      const left = Math.max(16, Math.min(window.innerWidth - popW - 16, center - popW / 2));
+      connectPopover.style.left = left + 'px';
+    }
+
+    function openConnect() {
+      closeWhy(); closePortfolio(); closeStore(); closeBespoke(); closeOffice();
+      if (typeof closeCountryIntel === 'function') closeCountryIntel();
+      positionConnectPopover();
+      connectPopover.classList.add('open');
+      connectPopover.setAttribute('aria-hidden', 'false');
+      navConnect.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeConnect() {
+      connectPopover.classList.remove('open');
+      connectPopover.setAttribute('aria-hidden', 'true');
+      navConnect.setAttribute('aria-expanded', 'false');
+    }
+
+    navConnect.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (connectPopover.classList.contains('open')) closeConnect();
+      else openConnect();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (connectPopover.classList.contains('open') && !connectPopover.contains(e.target) && e.target !== navConnect) {
+        closeConnect();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (connectPopover.classList.contains('open')) positionConnectPopover();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && connectPopover.classList.contains('open')) closeConnect();
+    });
+
     BXB_DB.syncAll();
   </script>
 </body>
 </html>
+
 
 
 
