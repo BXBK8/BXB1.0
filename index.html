@@ -761,6 +761,25 @@
       margin-top: 3px;
       letter-spacing: 0.08em;
     }
+    #storeGrid, #storeTitleWrap {
+      transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .store-exit {
+      opacity: 0 !important;
+      transform: scale(0.97) translateY(-6px) !important;
+      pointer-events: none;
+    }
+
+    .store-card-anim {
+      opacity: 0;
+      animation: storeCardIn 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes storeCardIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -1385,6 +1404,7 @@
     ];
 
     let activeStoreId = null;
+    let storeTransitioning = false;
 
     function getStores() {
       try {
@@ -1465,10 +1485,10 @@
       if (!activeStoreId) {
         storeBack.style.display = 'none';
         storeTitleWrap.innerHTML = '<span class="why-tag">STORE · SELECT REGION</span>';
-        storeGrid.innerHTML = stores.map((s) => {
+        storeGrid.innerHTML = stores.map((s, idx) => {
           const count = (s.apps || []).length;
           return `
-            <button class="region-card" type="button" data-store-id="${s.id}">
+            <button class="region-card store-card-anim" style="animation-delay: ${idx * 45}ms" type="button" data-store-id="${s.id}">
               <div class="region-left">
                 ${renderFlagHtml(s, 'region-flag-lg')}
                 <div>
@@ -1499,12 +1519,12 @@
         return;
       }
 
-      storeGrid.innerHTML = apps.map((app) => {
+      storeGrid.innerHTML = apps.map((app, idx) => {
         const logoHtml = app.logoUrl
           ? `<img src="${app.logoUrl}" alt="${app.name}" />`
           : `<span>${app.logoText || (app.name || 'BX').slice(0, 2)}</span>`;
         return `
-          <article class="project-card">
+          <article class="project-card store-card-anim" style="animation-delay: ${idx * 55}ms">
             <div class="project-head">
               <div class="project-logo">${logoHtml}</div>
               <h3 class="project-title">${app.name}</h3>
@@ -1518,11 +1538,28 @@
     }
     renderStoreView();
 
+    function transitionStoreStep(nextStoreId) {
+      if (storeTransitioning) return;
+      storeTransitioning = true;
+      storeGrid.classList.add('store-exit');
+      storeTitleWrap.classList.add('store-exit');
+
+      setTimeout(() => {
+        activeStoreId = nextStoreId;
+        storeGrid.classList.remove('store-exit');
+        storeTitleWrap.classList.remove('store-exit');
+        renderStoreView();
+
+        setTimeout(() => {
+          storeTransitioning = false;
+        }, 320);
+      }, 220);
+    }
+
     storeGrid.addEventListener('click', (e) => {
       const regionBtn = e.target.closest('.region-card');
       if (regionBtn) {
-        activeStoreId = regionBtn.dataset.storeId;
-        renderStoreView();
+        transitionStoreStep(regionBtn.dataset.storeId);
         return;
       }
       const purchaseBtn = e.target.closest('.store-purchase-btn');
@@ -1540,16 +1577,16 @@
       }, 2000);
     });
 
-    storeBack.addEventListener('click', () => {
-      activeStoreId = null;
-      renderStoreView();
-    });
+    storeBack.addEventListener('click', () => transitionStoreStep(null));
 
     const navStore = document.getElementById('navStore');
     const storeOverlay = document.getElementById('storeOverlay');
     const storeClose = document.getElementById('storeClose');
 
     function openStore(e) {
+      storeTransitioning = false;
+      storeGrid.classList.remove('store-exit');
+      storeTitleWrap.classList.remove('store-exit');
       e.preventDefault();
       closeWhy();
       closePortfolio();
@@ -1579,6 +1616,7 @@
   </script>
 </body>
 </html>
+
 
 
 
