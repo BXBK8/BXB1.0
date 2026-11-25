@@ -91,14 +91,11 @@
       height: 100vh;
       display: grid;
       place-items: center;
-      text-align: center;
     }
 
-    h1 {
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    #logoCanvas {
+      display: block;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -112,28 +109,210 @@
   </div>
 
   <main>
-    <h1>BXB</h1>
+    <canvas id="logoCanvas"></canvas>
   </main>
 
   <script>
+    // Dynamic cursor mesh blob
     const cursorBlob = document.getElementById('cursorBlob');
     let targetX = window.innerWidth * 0.5;
     let targetY = window.innerHeight * 0.5;
     let currentX = targetX;
     let currentY = targetY;
 
+    let mouseX = -9999;
+    let mouseY = -9999;
+
     window.addEventListener('pointermove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
       targetX = e.clientX + window.innerWidth * 0.15;
       targetY = e.clientY + window.innerHeight * 0.15;
     });
 
-    function animate() {
+    function animateBg() {
       currentX += (targetX - currentX) * 0.06;
       currentY += (targetY - currentY) * 0.06;
       cursorBlob.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animateBg);
     }
-    animate();
+    animateBg();
+
+    // Exact BXB Folder + Text pixel map (transparent background removed)
+    const LOGO_MAP = [
+      "..............KKKKKKKKKKK.......................................",
+      ".............KDDKDKKDKDDKKSS....................................",
+      "............KDKKOKOOKOKKOKKKS...................................",
+      "............KDKKOKOOKOKKOKKKS...................................",
+      "..........KKDKOOKOKKOKOOKOKKKKKKKKKKKKKKKKKKK...................",
+      "..........KKKOKKOKOOKOKKOKOOKDSKDKKDKDDKDKKDKKKS................",
+      "..........KKDKOOKOKKOKOOKOKKOKDOKOOKOKKOKOOKOKKKS...............",
+      "..........KKDKOOKOKKOKOOKOKKOKDOKOOKOKKOKOOKOKKKS...............",
+      "..........KKKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKOKDDKSSS.............",
+      "..........KKDKDDKDKKDKDDKDKKDKDDKDDKDKKOKOOKOKKKSSS.............",
+      "......KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKOKKOKDDKSSS.............",
+      "......KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKOKKOKDDKSSS.............",
+      ".....KDDKDKKDKDDKDKKDKDDKDKKDKDDKDDKDKKKKOOKOKKKSSS.............",
+      ".....KKKOKOOKOKKOKOOKOKKOKOOKODKOKKOKDDKDKKOKDDKSSS.............",
+      ".....KDDKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKKKOOKOKKKSSS.............",
+      ".....KDDKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKKKOOKOKKKSSS.............",
+      "......KKDKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKKKKOKDDKSSS.............",
+      "......KKKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKDKDDKOKKKSSS.............",
+      "......KKKOKKOKOOKOKKOKOOKOKKOKDOKOOKOKKDKDDKOKKKSSS.............",
+      "......KKDKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKKKKOKDDKSSS.............",
+      "........KDKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKKKKOKKKSSS.............",
+      "........KKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKDKKDKDDKSSS.............",
+      "........KKOOKOKKOKOOKOKKOKOOKODKOKKOKOOKDKKDKDDKSSS.............",
+      "........KDKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKKKKOKKKSSS.............",
+      ".........KDDKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKKKDDKSSS.............",
+      ".........KKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKDDKDKKKSSS.............",
+      ".........KKKOKOOKOKKOKOOKOKKOKDOKOOKOKKOKDDKDKKKSSS.............",
+      ".........KDDKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKKKDDKSSS.............",
+      "..........KKDKOOKOKKOKOOKOKKOKDOKOOKOKKOKOOKKKKKSSS.............",
+      "..........KKKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKDKDDKSSS.............",
+      "..........KKKOKKOKOOKOKKOKOOKODKOKKOKOOKOKKDKDDKSSS.............",
+      "..........KKDKDDKDKKDKDDKDKKDKDDKDDKDKKDKDDKKKKKSSS.............",
+      "............KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKSSSS.............",
+      "..............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS...............",
+      "..............SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS...............",
+      "................................................................",
+      "................................................................",
+      "................................................................",
+      "................................................................",
+      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOKKKKKKKOOOOOSKOOOOO.....SKKOOOOOKKOOOOOKKKKKKKOOOOO...",
+      "..SKKOOOOO....SKKOOOOOSKOOOOOK..KKKKKOOOOOKKOOOOO....SKKOOOOO...",
+      "..SKKOOOOO....SKKOOOOO.KKKKOOOOOKKOOOOOK.SKKOOOOO....SKKOOOOO...",
+      "..SKKOOOOO....SKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOO....SKKOOOOO...",
+      "..SKKOOOOOKKKKKKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOOKKKKKKKOOOOO...",
+      "..SKKOOOOOOOOOOOOOOO.....KKKKOOOOOOOO....SKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOOOOOOOOOOO.....KKKKOOOOOOOO....SKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOKKKKKKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOOKKKKKKKOOOOO...",
+      "..SKKOOOOO....SKKOOOOO..SKKOOOOOKKOOOOO..SKKOOOOO....SKKOOOOO...",
+      "..SKKOOOOO....SKKOOOOO.KKKKOOOOOKKOOOOOK.SKKOOOOO....SKKOOOOO...",
+      "..SKKOOOOO....SKKOOOOOSKOOOOOK..KKKKKOOOOOKKOOOOO....SKKOOOOO...",
+      "..SKKOOOOOKKKKKKKOOOOOSKOOOOO.....SKKOOOOOKKOOOOOKKKKKKKOOOOO...",
+      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
+      "..SKKOOOOOOOOOOOOOOO..SKOOOOO.....SKKOOOOOKKOOOOOOOOOOOOOOO.....",
+      "...KKKKKKKKKKKKKKK.....KKKKS.......KKKKK..KKKKKKKKKKKKKKK......."
+    ];
+
+    const canvas = document.getElementById('logoCanvas');
+    const ctx = canvas.getContext('2d');
+    const rows = LOGO_MAP.length;
+    const cols = LOGO_MAP[0].length;
+
+    const COLORS = {
+      O: [255, 92, 20],
+      D: [140, 34, 0],
+      K: [12, 5, 3],
+      S: [0, 0, 0]
+    };
+
+    const particles = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const ch = LOGO_MAP[r][c];
+        if (ch === '.') continue;
+        const distFromCenter = Math.hypot((c - cols / 2) / cols, (r - rows / 2) / rows);
+        const angle = Math.random() * Math.PI * 2;
+        const scatter = 18 + Math.random() * 42;
+        particles.push({
+          r, c, type: ch,
+          char: Math.random() > 0.5 ? '1' : '0',
+          delay: distFromCenter * 1.45 + Math.random() * 0.65,
+          duration: 0.75 + Math.random() * 0.55,
+          offsetX: Math.cos(angle) * scatter,
+          offsetY: Math.sin(angle) * scatter,
+          flipTimer: Math.random() * 100,
+          flipSpeed: 45 + Math.random() * 70
+        });
+      }
+    }
+
+    let cellSize = 8;
+    let dpr = 1;
+
+    function resizeCanvas() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const maxSize = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.82, 560);
+      cellSize = maxSize / cols;
+      const w = cols * cellSize;
+      const h = rows * cellSize;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let startTime = performance.now();
+    canvas.addEventListener('click', () => { startTime = performance.now(); });
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function render(now) {
+      const elapsed = (now - startTime) / 1000;
+      const rect = canvas.getBoundingClientRect();
+      const localMouseX = mouseX - rect.left;
+      const localMouseY = mouseY - rect.top;
+
+      ctx.clearRect(0, 0, cols * cellSize, rows * cellSize);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `700 ${Math.max(7, cellSize * 1.05)}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const t = Math.max(0, Math.min(1, (elapsed - p.delay) / p.duration));
+        if (t <= 0) continue;
+
+        const eased = easeOutCubic(t);
+        const baseX = (p.c + 0.5) * cellSize;
+        const baseY = (p.r + 0.5) * cellSize;
+
+        // Subtle interactive cursor ripple
+        const dx = baseX - localMouseX;
+        const dy = baseY - localMouseY;
+        const dist = Math.hypot(dx, dy);
+        const hoverForce = dist < 65 ? (1 - dist / 65) : 0;
+
+        // Flickering 0s and 1s while assembling or when hovered or rare ambient shimmer
+        if (t < 0.96 || hoverForce > 0.2 || Math.random() < 0.0025) {
+          if (now - p.flipTimer > p.flipSpeed) {
+            p.char = p.char === '0' ? '1' : '0';
+            p.flipTimer = now;
+          }
+        }
+
+        const x = baseX + p.offsetX * (1 - eased) + (hoverForce > 0 ? (dx / (dist || 1)) * hoverForce * 5 : 0);
+        const y = baseY + p.offsetY * (1 - eased) + (hoverForce > 0 ? (dy / (dist || 1)) * hoverForce * 5 : 0);
+
+        const rgb = COLORS[p.type];
+        const baseAlpha = p.type === 'S' ? 0.35 : 1;
+        const alpha = baseAlpha * Math.min(1, t * 1.6);
+
+        // Soft orange glow during assembly
+        if (t < 0.92 && p.type === 'O') {
+          ctx.fillStyle = `rgba(255, 175, 90, ${alpha})`;
+        } else {
+          ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+        }
+
+        ctx.fillText(p.char, x, y);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
   </script>
 </body>
 </html>
