@@ -1340,10 +1340,54 @@
       gap: 0;
       overflow: hidden;
     }
-    .teams-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; flex-shrink: 0; }
+    .teams-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 10px;
+      flex-shrink: 0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .teams-header .store-header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .teams-header .why-close {
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
     .teams-card.is-fullscreen .teams-header {
       padding: 10px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    @media (max-width: 480px) {
+      .teams-shell { padding: 12px; gap: 8px; }
+      .teams-card.is-fullscreen .teams-header { padding: 8px 10px; gap: 6px; }
+      .teams-header .store-title-wrap { flex-shrink: 0; }
+      .teams-header .store-header-actions {
+        gap: 5px;
+        flex-wrap: wrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .teams-header .store-header-actions::-webkit-scrollbar { display: none; }
+      .teams-header .why-close {
+        padding: 5px 8px;
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        border-radius: 999px;
+      }
     }
     .teams-stage {
       position: relative; flex: 1 1 auto; display: flex; flex-direction: column;
@@ -4343,12 +4387,20 @@
       return (localStorage.getItem(TEAMS_URL_KEY) || DEFAULT_TEAMS_URL).trim() || DEFAULT_TEAMS_URL;
     }
 
+    function updateTeamsHeaderLabels() {
+      const mobile = window.innerWidth <= 480;
+      const fs = teamsCard.classList.contains('is-fullscreen');
+      teamsFullscreen.textContent = fs ? (mobile ? 'EXIT' : 'EXIT FULL') : (mobile ? 'FULL' : 'FULLSCREEN');
+      teamsPopout.textContent = mobile ? 'OPEN ↗' : 'POP OUT ↗';
+      teamsClose.textContent = window.innerWidth <= 360 ? '×' : 'CLOSE ×';
+    }
+
     function teardownTeamsFrame() {
       teamsFrame.onload = null;
       teamsFrame.onerror = null;
       teamsFrame.src = 'about:blank';
       teamsCard.classList.remove('is-fullscreen');
-      teamsFullscreen.textContent = 'FULLSCREEN';
+      updateTeamsHeaderLabels();
     }
 
     function showTeamsFallback(reason, currentUrl) {
@@ -4430,9 +4482,12 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
 
     function setTeamsFullscreen(enable) {
       teamsCard.classList.toggle('is-fullscreen', enable);
-      teamsFullscreen.textContent = enable ? 'EXIT FULL' : 'FULLSCREEN';
+      updateTeamsHeaderLabels();
       syncTeamsLayout();
     }
+
+    window.addEventListener('resize', updateTeamsHeaderLabels);
+    updateTeamsHeaderLabels();
 
     teamsFullscreen.addEventListener('click', () => {
       setTeamsFullscreen(!teamsCard.classList.contains('is-fullscreen'));
@@ -4459,6 +4514,7 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
   </script>
 </body>
 </html>
+
 
 
 
