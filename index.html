@@ -146,6 +146,51 @@
       pointer-events: auto;
     }
 
+    .glass-nav {
+      position: fixed;
+      top: 20px;
+      left: 24px;
+      right: 24px;
+      height: 60px;
+      padding: 0 28px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px) saturate(1.3);
+      -webkit-backdrop-filter: blur(20px) saturate(1.3);
+      border: none;
+      box-shadow: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.16em;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+
     .site-layer h1 {
       font-size: clamp(3rem, 8vw, 6rem);
       font-weight: 800;
@@ -190,6 +235,16 @@
   </div>
 
   <div class="site-layer" id="siteLayer">
+    <nav class="glass-nav">
+      <a href="#" class="nav-brand">BXB</a>
+      <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Work</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+    </nav>
+
     <div>
       <h1>BXB</h1>
       <p>Site revealed. Ready for what we build next.</p>
