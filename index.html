@@ -1595,78 +1595,48 @@
     .teams-frame.frame-ready {
       opacity: 1;
     }
-    /* ─── PHYSICAL SPRING MOTION KEYFRAMES ─── */
-    @keyframes cardSpringIn {
-      0% {
-        opacity: 0;
-        transform: translateY(34px) scale(0.94);
-        filter: blur(4px);
-      }
-      65% {
-        opacity: 1;
-        transform: translateY(-4px) scale(1.008);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
+    /* ─── SILKY FLUID VIEW TRANSITIONS ────────────────────────────── */
+    .jobs-card .sales-scroll {
+      transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
     }
-
-    @keyframes cardSpringOut {
-      0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(28px) scale(0.95);
-        filter: blur(4px);
-      }
+    #jobsBody, #jobsHeaderWrap {
+      transition: opacity 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1), filter 260ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform, opacity, filter;
     }
-
+    .jobs-exit {
+      opacity: 0 !important;
+      transform: scale(0.975) translateY(-8px) !important;
+      filter: blur(4px);
+      pointer-events: none;
+    }
+    .jobs-enter {
+      animation: jobsSpringIn 460ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
     @keyframes jobsSpringIn {
-      0% {
-        opacity: 0;
-        transform: translateY(24px) scale(0.95);
-        filter: blur(3px);
-      }
-      65% {
-        opacity: 1;
-        transform: translateY(-3px) scale(1.006);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
+      from { opacity: 0; transform: translateY(12px) scale(0.98); filter: blur(4px); }
+      to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
     }
 
-    @keyframes jobsSpringOut {
-      0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-16px) scale(0.96);
-        filter: blur(3px);
-      }
+    .office-wrap {
+      transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1), transform 300ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform, opacity, filter;
+    }
+    .office-wrap.fade-out {
+      opacity: 0 !important;
+      transform: translateY(-10px) scale(0.975) !important;
+      filter: blur(4px);
+      pointer-events: none;
     }
 
-    @keyframes officeMenuExit {
-      0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-      100% { opacity: 0; transform: translateY(-16px) scale(0.96); filter: blur(3px); }
+    .sales-card {
+      filter: blur(0);
+      transition: opacity 0.36s cubic-bezier(0.16, 1, 0.3, 1), transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), filter 0.36s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    @keyframes officeMenuEnter {
-      0% { opacity: 0; transform: translateY(-16px) scale(0.96); filter: blur(3px); }
-      65% { opacity: 1; transform: translateY(3px) scale(1.006); filter: blur(0); }
-      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    .sales-card.card-exit {
+      opacity: 0 !important;
+      transform: translateY(14px) scale(0.97) !important;
+      filter: blur(4px) !important;
+      pointer-events: none;
     }
 
     .teams-frame {
@@ -2969,36 +2939,1278 @@
     }
 
     function closeOffice() {
-      const activeCard = [
-        (typeof teamsCard !== 'undefined' ? teamsCard : null),
-        (typeof jobsCard !== 'undefined' ? jobsCard : null),
-        (typeof collabCard !== 'undefined' ? collabCard : null),
-        (typeof adminCard !== 'undefined' ? adminCard : null),
-        (typeof salesLeadCard !== 'undefined' ? salesLeadCard : null)
-      ].find((el) => el && el.classList.contains('active'));
-
-      if (activeCard) {
-        activeCard.style.animation = 'cardSpringOut 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards';
-      }
+      if (typeof hideTeamsWorkspace === 'function') hideTeamsWorkspace();
+      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
+      if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
+      if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
+      if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible');
+      if (typeof officeMenuWrap !== 'undefined') officeMenuWrap.style.display = 'flex';
       officeOverlay.classList.remove('open');
       officeOverlay.setAttribute('aria-hidden', 'true');
       officeBtns.forEach((btn) => btn.classList.remove('wave-in'));
-
-      setTimeout(() => {
-        if (typeof hideTeamsWorkspace === 'function') hideTeamsWorkspace();
-        if (typeof collabCard !== 'undefined') { collabCard.style.animation = ''; collabCard.classList.remove('active', 'visible'); }
-        if (typeof jobsCard !== 'undefined') { jobsCard.style.animation = ''; jobsCard.classList.remove('active', 'visible'); }
-        if (typeof adminCard !== 'undefined') { adminCard.style.animation = ''; adminCard.classList.remove('active', 'visible'); }
-        if (typeof salesLeadCard !== 'undefined') { salesLeadCard.style.animation = ''; salesLeadCard.classList.remove('active', 'visible'); }
-        if (typeof officeMenuWrap !== 'undefined') {
-          officeMenuWrap.style.display = 'flex';
-          officeMenuWrap.style.animation = '';
-        }
-      }, 230);
-    }
-      } else {
-        backFromJobs();
+      if (typeof teardownTeamsFrame === 'function') teardownTeamsFrame();
+      if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !storeOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
       }
+    }
+
+    navOffice.addEventListener('click', openOffice);
+    officeClose.addEventListener('click', closeOffice);
+    officeOverlay.addEventListener('click', (e) => {
+      if (e.target === officeOverlay) closeOffice();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && officeOverlay.classList.contains('open')) closeOffice();
+    });
+
+    const BXB_SUPABASE_URL = 'https://mwmwcklsetuwdowtrhkt.supabase.co';
+    const BXB_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13bXdja2xzZXR1d2Rvd3RyaGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2Mjg1MzYsImV4cCI6MjExMTIwNDUzNn0.zt87DnDvkvc7mZfQdRgwB47KCMMHdfSXZZIx65ucJTw';
+    const sb = (window.supabase && BXB_SUPABASE_URL.startsWith('http') && BXB_SUPABASE_ANON_KEY)
+      ? window.supabase.createClient(BXB_SUPABASE_URL, BXB_SUPABASE_ANON_KEY)
+      : null;
+
+    let sessionAdminId = '';
+
+    const BXB_DB = {
+      async rpc(fn, params = {}) {
+        if (!sb) return { offline: true, data: null, error: null };
+        const { data, error } = await sb.rpc(fn, params);
+        if (error) throw error;
+        return { offline: false, data, error: null };
+      },
+      async syncAll() {
+        if (!sb) return;
+        try {
+          const [pRes, srRes, saRes, brRes, biRes, csRes, rsRes, fxRes, gcRes, cjRes] = await Promise.all([
+            sb.from('portfolio_projects').select('*').order('sort_order').order('created_at'),
+            sb.from('store_regions').select('*').order('sort_order').order('created_at'),
+            sb.from('store_apps').select('*').order('sort_order').order('created_at'),
+            sb.from('bespoke_regions_public').select('*').order('sort_order').order('created_at'),
+            sb.from('bespoke_items').select('*').order('sort_order').order('created_at'),
+            sb.from('calculator_settings').select('*').eq('id', 1).maybeSingle(),
+            sb.from('region_salaries').select('*').order('sort_order'),
+            sb.from('fx_rates_locked').select('*'),
+            sb.from('globe_countries').select('*'),
+            sb.from('country_journal').select('*').order('created_at', { ascending: false })
+          ]);
+          if (pRes.data && pRes.data.length) {
+            localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(pRes.data.map((r) => ({
+              id: r.id, title: r.title, description: r.description, logoUrl: r.logo_url,
+              logoText: r.logo_text, techs: Array.isArray(r.techs) ? r.techs : [], githubUrl: r.github_url, liveUrl: r.live_url
+            }))));
+            renderPortfolio();
+          }
+          if (srRes.data && srRes.data.length) {
+            const appsByReg = {};
+            (saRes.data || []).forEach((a) => {
+              (appsByReg[a.region_id] = appsByReg[a.region_id] || []).push({
+                id: a.id, name: a.name, logoUrl: a.logo_url, logoText: a.logo_text,
+                description: a.description, pricePerMonth: a.price_per_month, checkoutUrl: a.checkout_url, status: a.status
+              });
+            });
+            localStorage.setItem(STORES_STORAGE_KEY, JSON.stringify(srRes.data.map((r) => ({
+              id: r.id, name: r.name, flagUrl: r.flag_url, flagText: r.flag_text, apps: appsByReg[r.id] || []
+            }))));
+            renderStoreView();
+          }
+          if (brRes.data && brRes.data.length) {
+            const prevRegs = getBespokeRegions();
+            const itemsByReg = {};
+            (biRes.data || []).forEach((it) => {
+              (itemsByReg[it.region_id] = itemsByReg[it.region_id] || []).push({
+                id: it.id, name: it.name, price: it.price, description: it.description, categoryLabel: it.category_label, actionUrl: it.action_url
+              });
+            });
+            localStorage.setItem(BESPOKE_STORAGE_KEY, JSON.stringify(brRes.data.map((r) => ({
+              id: r.id, name: r.name, flagUrl: r.flag_url, flagText: r.flag_text, categoryLabel: r.category_label,
+              secretId: (prevRegs.find((e) => e.id === r.id) || {}).secretId || '', items: itemsByReg[r.id] || []
+            }))));
+            renderBespokeView();
+          }
+          if (csRes.data) {
+            localStorage.setItem(CALC_SETTINGS_KEY, JSON.stringify({
+              commission_rate: Number(csRes.data.commission_rate), delivery_cost_pct: Number(csRes.data.delivery_cost_pct),
+              payment_fee_pct: Number(csRes.data.payment_fee_pct), profit_target_pct: Number(csRes.data.profit_target_pct),
+              fx_buffer_pct: Number(csRes.data.fx_buffer_pct), deals_required: Number(csRes.data.deals_required), prices_in: csRes.data.prices_in || 'USD'
+            }));
+          }
+          if (rsRes.data && rsRes.data.length) {
+            localStorage.setItem(REGION_SALARIES_KEY, JSON.stringify(rsRes.data.map((s) => ({
+              id: s.id, name: s.name, currency_code: s.currency_code, is_usd: s.is_usd,
+              salary_min_usd: Number(s.salary_min_usd), salary_max_usd: Number(s.salary_max_usd),
+              bespoke_region_id: s.bespoke_region_id, store_region_id: s.store_region_id
+            }))));
+          }
+          if (fxRes.data && fxRes.data.length) {
+            localStorage.setItem(FX_RATES_KEY, JSON.stringify(fxRes.data.map((f) => ({
+              currency_code: f.currency_code, rate_to_usd: Number(f.rate_to_usd), locked_on: f.locked_on
+            }))));
+          }
+          if (gcRes.data && gcRes.data.length && typeof saveGlobeCountries === 'function') {
+            saveGlobeCountries(gcRes.data.map((gc) => ({
+              id: gc.id, name: gc.name, flagText: gc.flag_text, flagUrl: gc.flag_url, lat: Number(gc.lat), lng: Number(gc.lng),
+              salesTeam: gc.sales_team_active, salesTeamSize: gc.sales_team_size, salesLead: gc.sales_lead,
+              productsShipped: gc.products_shipped, shipCount: gc.ship_count, activeTools: gc.active_tools,
+              tools: Array.isArray(gc.tools) ? gc.tools : []
+            })));
+          }
+          if (cjRes.data && typeof saveCountryJournal === 'function') {
+            saveCountryJournal(cjRes.data.map((j) => ({
+              id: j.id, countryId: j.country_id, text: j.text, ts: new Date(j.created_at).getTime()
+            })));
+          }
+          const { data: clData } = await sb.from('connect_links').select('*').eq('id', 1).maybeSingle();
+          if (clData && typeof saveConnectLinks === 'function') {
+            saveConnectLinks({
+              discord: clData.discord_url || DEFAULT_CONNECT_LINKS.discord,
+              linkedin: clData.linkedin_url || DEFAULT_CONNECT_LINKS.linkedin,
+              github: clData.github_url || DEFAULT_CONNECT_LINKS.github
+            });
+          }
+        } catch (err) { console.warn('Supabase sync fallback:', err); }
+      },
+      async submitDevApp(app) {
+        if (!sb) return;
+        try { await sb.from('dev_applications').insert({ id: app.id, name: app.name, country: app.country, github_link: app.github, email: app.email }); } catch (e) { console.warn(e); }
+      }
+    };
+    window.BXB_DB = BXB_DB;
+
+    async function generateSalesLeadSecretId(regionId) {
+      if (sb && sessionAdminId) {
+        try {
+          const { data } = await BXB_DB.rpc('admin_generate_sales_lead_secret', { p_admin_id: sessionAdminId, p_region_id: regionId });
+          if (data) { updateBespokeRegion(regionId, { secretId: data }); return data; }
+        } catch (e) { console.warn(e); }
+      }
+      const regions = getBespokeRegions();
+      const existing = new Set(regions.filter((r) => r.id !== regionId && r.secretId).map((r) => r.secretId));
+      const code = (regionId || 'RG').slice(0, 2).toUpperCase();
+      let candidate = '';
+      do { candidate = 'BXB-' + code + '-' + Math.random().toString(36).substring(2, 6).toUpperCase(); } while (existing.has(candidate));
+      updateBespokeRegion(regionId, { secretId: candidate });
+      return candidate;
+    }
+
+    const officeMenuWrap = document.getElementById('officeMenuWrap');
+    const salesLeadCard = document.getElementById('salesLeadCard');
+    const salesHeaderWrap = document.getElementById('salesHeaderWrap');
+    const salesBody = document.getElementById('salesBody');
+    const salesBack = document.getElementById('salesBack');
+    const salesClose = document.getElementById('salesClose');
+    let activeSalesRegionId = null, activeSalesSecret = '', activeSalesRegionCache = null;
+
+    function renderSalesLeadView() {
+      if (!activeSalesRegionId) {
+        salesHeaderWrap.innerHTML = '<span class="why-tag">SALES LEAD ACCESS</span>';
+        salesBody.innerHTML = `
+          <form class="sales-login-box" id="salesLoginForm" novalidate>
+            <p class="project-desc">ENTER YOUR ASSIGNED COUNTRY/REGION SECRET ID TO EDIT PRICING.</p>
+            <input class="glass-input" id="salesSecretInput" type="text" placeholder="SECRET SALES LEAD ID" autocomplete="off" />
+            <div class="sales-error" id="salesError"></div>
+            <button class="store-purchase-btn" type="submit">ACCESS DASHBOARD</button>
+          </form>`;
+        document.getElementById('salesLoginForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const inputEl = document.getElementById('salesSecretInput'), errEl = document.getElementById('salesError');
+          const val = inputEl.value.trim().toUpperCase();
+          inputEl.classList.remove('input-error'); void inputEl.offsetWidth;
+          if (!val) { errEl.textContent = 'PLEASE ENTER YOUR SECRET SALES LEAD ID.'; inputEl.classList.add('input-error'); inputEl.focus(); return; }
+          let match = null;
+          if (sb) {
+            try {
+              const { data } = await BXB_DB.rpc('sales_lead_login', { p_secret_id: val });
+              if (data) match = { id: data.id, name: data.name, flagUrl: data.flag_url, flagText: data.flag_text, categoryLabel: data.category_label, items: (data.items || []).map((it) => ({ id: it.id, name: it.name, price: it.price, description: it.description, categoryLabel: it.category_label, actionUrl: it.action_url })) };
+            } catch (err) { console.warn(err); }
+          }
+          if (!match) match = getBespokeRegions().find((r) => (r.secretId || '').toUpperCase() === val);
+          if (!match) { errEl.textContent = 'INVALID SECRET ID. ACCESS DENIED.'; inputEl.classList.add('input-error'); inputEl.focus(); return; }
+          try { sessionStorage.setItem('bxb_sales_lead_logged_region', match.id); } catch {}
+          activeSalesRegionId = match.id; activeSalesSecret = val; activeSalesRegionCache = match;
+          renderSalesLeadView();
+        });
+        return;
+      }
+      const region = activeSalesRegionCache || getBespokeRegions().find((r) => r.id === activeSalesRegionId);
+      if (!region) { activeSalesRegionId = null; renderSalesLeadView(); return; }
+      const label = (region.categoryLabel || 'SERVICES').toUpperCase();
+      salesHeaderWrap.innerHTML = `${renderFlagHtml(region, 'store-flag')}<span class="why-tag">${region.name} · PRICE CONTROL (${label})</span>`;
+      const items = region.items || [];
+      salesBody.innerHTML = items.length ? `<div class="portfolio-grid">${items.map((item) => `
+        <div class="sales-item-row">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><h3 class="project-title">${item.name}</h3><span class="tech-badge">${(item.categoryLabel || label).toUpperCase()}</span></div>
+          <p class="project-desc">${item.description || ''}</p>
+          <div class="sales-price-edit"><input class="glass-input sales-price-input" type="text" value="${item.price || ''}" data-item-id="${item.id}" /><button class="sales-save-btn" type="button" data-item-id="${item.id}">SAVE PRICE</button></div>
+        </div>`).join('')}</div>` : '<p class="project-desc">NO ITEMS ASSIGNED TO THIS REGION.</p>';
+    }
+
+    salesBody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.sales-save-btn');
+      if (!btn || !activeSalesRegionId) return;
+      const itemId = btn.dataset.itemId, input = salesBody.querySelector(`.sales-price-input[data-item-id="${itemId}"]`);
+      if (!input) return;
+      const newPrice = input.value.trim().toUpperCase();
+      if (sb && activeSalesSecret) { try { await BXB_DB.rpc('sales_lead_update_bespoke_price', { p_secret_id: activeSalesSecret, p_item_id: itemId, p_price: newPrice }); } catch (err) { console.warn(err); } }
+      updateBespokeItem(activeSalesRegionId, itemId, { price: newPrice });
+      if (activeSalesRegionCache) activeSalesRegionCache.items = (activeSalesRegionCache.items || []).map((it) => (it.id === itemId ? { ...it, price: newPrice } : it));
+      btn.textContent = 'SAVED ✓'; setTimeout(() => { btn.textContent = 'SAVE PRICE'; }, 1600);
+    });
+
+    function showSalesLeadCard() { activeSalesRegionId = null; activeSalesSecret = ''; activeSalesRegionCache = null; renderSalesLeadView(); officeMenuWrap.style.display = 'none'; salesLeadCard.classList.add('active'); requestAnimationFrame(() => salesLeadCard.classList.add('visible')); }
+    function backToOfficeMenu() { salesLeadCard.classList.remove('visible'); setTimeout(() => { salesLeadCard.classList.remove('active'); activeSalesRegionId = null; officeMenuWrap.style.display = 'flex'; officeBtns.forEach((b) => b.classList.remove('wave-in')); void officeOverlay.offsetWidth; officeBtns.forEach((b) => b.classList.add('wave-in')); }, 220); }
+    document.querySelector('.office-btn[data-role="sales-lead"]').addEventListener('click', showSalesLeadCard);
+    salesBack.addEventListener('click', backToOfficeMenu);
+    salesClose.addEventListener('click', closeOffice);
+
+    const ADMIN_ID_KEY = 'bxb_admin_id';
+    const DEFAULT_ADMIN_ID = 'azerty28';
+
+    const BXB_AUTH = {
+      getAdminId() { return localStorage.getItem(ADMIN_ID_KEY) || DEFAULT_ADMIN_ID; },
+      async validateAdminId(inputId) {
+        const clean = inputId.trim();
+        if (!clean) return false;
+        if (sb) {
+          try {
+            const { data } = await BXB_DB.rpc('verify_admin_id', { p_admin_id: clean });
+            if (data === true) { localStorage.setItem(ADMIN_ID_KEY, clean.toUpperCase()); return true; }
+            if (data === false) return false;
+          } catch (err) { console.warn('RPC verify fallback:', err); }
+        }
+        return clean.toUpperCase() === this.getAdminId().toUpperCase();
+      },
+      async updateAdminId(newId) {
+        const clean = newId.trim().toUpperCase();
+        if (!clean) return false;
+        if (sb && sessionAdminId) await BXB_DB.rpc('admin_update_admin_id', { p_admin_id: sessionAdminId, p_new_admin_id: clean });
+        sessionAdminId = clean;
+        localStorage.setItem(ADMIN_ID_KEY, clean);
+        return true;
+      }
+    };
+
+    const adminHeaderWrap = document.getElementById('adminHeaderWrap');
+    const adminBody = document.getElementById('adminBody');
+    const adminBack = document.getElementById('adminBack');
+    const adminLogout = document.getElementById('adminLogout');
+    const adminClose = document.getElementById('adminClose');
+    let adminUnlocked = false, activeAdminTab = 'portfolio', adminStoreRegId = null, adminBespokeRegId = null, adminGlobeCountryId = null, adminCalcBand = 'min', adminDevAppsCache = null;
+
+    function esc(v) { return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    async function hydrateAdminData() {
+      if (!sb || !sessionAdminId) return;
+      try {
+        const [bRes, dRes] = await Promise.all([
+          BXB_DB.rpc('admin_get_bespoke_regions', { p_admin_id: sessionAdminId }),
+          BXB_DB.rpc('admin_get_dev_applications', { p_admin_id: sessionAdminId })
+        ]);
+        if (Array.isArray(bRes.data)) {
+          const existing = getBespokeRegions();
+          localStorage.setItem(BESPOKE_STORAGE_KEY, JSON.stringify(bRes.data.map((r) => {
+            const cur = existing.find((x) => x.id === r.id);
+            return { id: r.id, name: r.name, flagUrl: r.flag_url, flagText: r.flag_text, categoryLabel: r.category_label, secretId: r.sales_lead_secret_id || '', items: cur ? cur.items : [] };
+          })));
+        }
+        if (Array.isArray(dRes.data)) adminDevAppsCache = dRes.data;
+      } catch (err) { console.warn(err); }
+    }
+
+    function renderAdminTabContent() {
+      if (activeAdminTab === 'portfolio') {
+        const items = getPortfolioItems();
+        return `
+          <form class="admin-form-card" id="admPortAddForm">
+            <p class="calc-title">+ ADD / UPDATE PORTFOLIO PROJECT</p>
+            <input type="hidden" id="admPortEditId" value="" />
+            <div class="admin-grid-2">
+              <input class="glass-input" id="admPortTitle" placeholder="PROJECT TITLE" required />
+              <input class="glass-input" id="admPortLogoText" placeholder="LOGO INITIALS (E.G. BC)" />
+              <input class="glass-input" id="admPortLogoUrl" placeholder="LOGO URL (OPTIONAL)" />
+              <input class="glass-input" id="admPortTechs" placeholder="TECHS (COMMA SEPARATED)" />
+              <input class="glass-input" id="admPortGithub" placeholder="GITHUB URL" />
+              <input class="glass-input" id="admPortLive" placeholder="LIVE URL" />
+            </div>
+            <textarea class="admin-textarea" id="admPortDesc" placeholder="PROJECT DESCRIPTION"></textarea>
+            <div class="admin-row-actions">
+              <button class="store-purchase-btn" type="submit" style="flex:1;" id="admPortSubmitBtn">SAVE PROJECT</button>
+              <button class="admin-mini-btn" type="button" id="admPortCancelEdit" style="display:none;">CANCEL EDIT</button>
+            </div>
+          </form>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${items.map((it, idx) => `
+              <div class="sales-item-row">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <h3 class="project-title">${idx + 1}. ${esc(it.title)}</h3>
+                  <div class="admin-row-actions">
+                    <button class="admin-mini-btn port-up" data-idx="${idx}" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                    <button class="admin-mini-btn port-down" data-idx="${idx}" ${idx === items.length - 1 ? 'disabled' : ''}>↓</button>
+                    <button class="admin-mini-btn port-edit" data-id="${esc(it.id)}">EDIT</button>
+                    <button class="admin-mini-btn danger port-del" data-id="${esc(it.id)}">DELETE</button>
+                  </div>
+                </div>
+                <p class="project-desc">${esc(it.description)}</p>
+                <div class="project-techs">${(it.techs || []).map((t) => `<span class="tech-badge">${esc(t)}</span>`).join('')}</div>
+              </div>`).join('')}
+          </div>`;
+      }
+      if (activeAdminTab === 'store') {
+        const stores = getStores();
+        if (!adminStoreRegId || !stores.find((s) => s.id === adminStoreRegId)) adminStoreRegId = stores[0]?.id || null;
+        const activeReg = stores.find((s) => s.id === adminStoreRegId);
+        return `
+          <form class="admin-form-card" id="admStoreRegForm">
+            <p class="calc-title">STORE REGIONS (${stores.length})</p>
+            <input type="hidden" id="admStoreRegEditId" value="" />
+            <div class="admin-grid-2">
+              <input class="glass-input" id="admStoreRegName" placeholder="REGION NAME (E.G. GHANA)" required />
+              <input class="glass-input" id="admStoreRegFlagText" placeholder="FLAG CODE (E.G. GH)" />
+              <input class="glass-input" id="admStoreRegFlagUrl" placeholder="FLAG IMAGE URL (OPTIONAL)" />
+            </div>
+            <div class="admin-row-actions">
+              <button class="sales-save-btn" type="submit">+ ADD / SAVE REGION</button>
+              <button class="admin-mini-btn" type="button" id="admStoreRegCancel" style="display:none;">CANCEL</button>
+            </div>
+            <div class="admin-row-actions" style="margin-top:6px;">
+              ${stores.map((s) => `
+                <span class="admin-tab ${s.id === adminStoreRegId ? 'active' : ''}" style="display:inline-flex;align-items:center;gap:6px;">
+                  <span class="store-reg-select" data-id="${esc(s.id)}" style="cursor:pointer;">${esc(s.name)} (${(s.apps || []).length})</span>
+                  <button type="button" class="admin-mini-btn store-reg-edit" data-id="${esc(s.id)}" style="padding:2px 7px;">✎</button>
+                  <button type="button" class="admin-mini-btn danger store-reg-del" data-id="${esc(s.id)}" style="padding:2px 7px;">×</button>
+                </span>`).join('')}
+            </div>
+          </form>
+          ${activeReg ? `
+            <form class="admin-form-card" id="admStoreAppForm">
+              <p class="calc-title">${esc(activeReg.name)} · APPS MANAGER</p>
+              <input type="hidden" id="admStoreAppEditId" value="" />
+              <div class="admin-grid-2">
+                <input class="glass-input" id="admStoreAppName" placeholder="APP NAME" required />
+                <input class="glass-input" id="admStoreAppPrice" placeholder="MONTHLY PRICE (E.G. $29 / MONTH)" required />
+                <input class="glass-input" id="admStoreAppLogoText" placeholder="LOGO CODE (E.G. BA)" />
+                <input class="glass-input" id="admStoreAppLogoUrl" placeholder="LOGO URL (OPTIONAL)" />
+                <input class="glass-input" id="admStoreAppUrl" placeholder="PURCHASE LINK / STATUS" />
+              </div>
+              <textarea class="admin-textarea" id="admStoreAppDesc" placeholder="APP DESCRIPTION"></textarea>
+              <div class="admin-row-actions">
+                <button class="sales-save-btn" type="submit">+ ADD / SAVE APP</button>
+                <button class="admin-mini-btn" type="button" id="admStoreAppCancel" style="display:none;">CANCEL</button>
+              </div>
+            </form>
+            <div class="portfolio-grid">
+              ${(activeReg.apps || []).map((a) => `
+                <div class="sales-item-row">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h3 class="project-title">${esc(a.name)}</h3><span class="store-price">${esc(a.pricePerMonth)}</span></div>
+                  <p class="project-desc">${esc(a.description)}</p>
+                  <div class="admin-row-actions"><button class="admin-mini-btn store-app-edit" data-id="${esc(a.id)}">EDIT</button><button class="admin-mini-btn danger store-app-del" data-id="${esc(a.id)}">DELETE</button></div>
+                </div>`).join('') || '<p class="calc-sub">NO APPS IN THIS REGION YET.</p>'}
+            </div>` : '<p class="calc-sub">CREATE A STORE REGION ABOVE.</p>'}`;
+      }
+      if (activeAdminTab === 'bespoke') {
+        const regs = getBespokeRegions();
+        if (!adminBespokeRegId || !regs.find((r) => r.id === adminBespokeRegId)) adminBespokeRegId = regs[0]?.id || null;
+        const activeReg = regs.find((r) => r.id === adminBespokeRegId);
+        return `
+          <form class="admin-form-card" id="admBespRegForm">
+            <p class="calc-title">BESPOKE REGIONS & SALES LEAD SECRET IDS</p>
+            <input type="hidden" id="admBespRegEditId" value="" />
+            <div class="admin-grid-2">
+              <input class="glass-input" id="admBespRegName" placeholder="REGION NAME (E.G. GHANA)" required />
+              <input class="glass-input" id="admBespRegFlagText" placeholder="FLAG CODE (E.G. GH)" />
+              <input class="glass-input" id="admBespRegFlagUrl" placeholder="FLAG URL (OPTIONAL)" />
+              <input class="glass-input" id="admBespRegCat" placeholder="CATEGORY LABEL (SERVICES / SOLUTIONS)" />
+            </div>
+            <div class="admin-row-actions">
+              <button class="sales-save-btn" type="submit">+ ADD / SAVE REGION</button>
+              <button class="admin-mini-btn" type="button" id="admBespRegCancel" style="display:none;">CANCEL</button>
+            </div>
+            <div class="portfolio-grid" style="margin-top:8px;">
+              ${regs.map((r) => `
+                <div class="sales-item-row" style="border-color:${r.id === adminBespokeRegId ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.28)'};">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                    <div class="region-left besp-reg-select" data-id="${esc(r.id)}" style="cursor:pointer;">${renderFlagHtml(r, 'store-flag')}<h3 class="project-title">${esc(r.name)} (${esc(r.categoryLabel || 'SERVICES')})</h3></div>
+                    <div class="admin-row-actions"><button class="admin-mini-btn besp-reg-edit" data-id="${esc(r.id)}">EDIT</button><button class="admin-mini-btn danger besp-reg-del" data-id="${esc(r.id)}">×</button></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                    <span class="store-price">${esc(r.secretId || 'UNASSIGNED')}</span>
+                    <button class="sales-save-btn admin-gen-sid" type="button" data-region-id="${esc(r.id)}">${r.secretId ? 'REGENERATE ID' : 'GENERATE ID'}</button>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </form>
+          ${activeReg ? `
+            <form class="admin-form-card" id="admBespItemForm">
+              <p class="calc-title">${esc(activeReg.name)} · OFFERINGS (${(activeReg.items || []).length})</p>
+              <input type="hidden" id="admBespItemEditId" value="" />
+              <div class="admin-grid-2">
+                <input class="glass-input" id="admBespItemName" placeholder="OFFERING NAME" required />
+                <input class="glass-input" id="admBespItemPrice" placeholder="PRICE (E.G. $1,500)" required />
+                <input class="glass-input" id="admBespItemCat" placeholder="BADGE LABEL (OPTIONAL)" />
+                <input class="glass-input" id="admBespItemUrl" placeholder="ACTION URL (OPTIONAL)" />
+              </div>
+              <textarea class="admin-textarea" id="admBespItemDesc" placeholder="OFFERING DESCRIPTION"></textarea>
+              <div class="admin-row-actions">
+                <button class="sales-save-btn" type="submit">+ ADD / SAVE OFFERING</button>
+                <button class="admin-mini-btn" type="button" id="admBespItemCancel" style="display:none;">CANCEL</button>
+              </div>
+            </form>
+            <div class="portfolio-grid">
+              ${(activeReg.items || []).map((it) => `
+                <div class="sales-item-row">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h3 class="project-title">${esc(it.name)}</h3><span class="store-price">${esc(it.price)}</span></div>
+                  <p class="project-desc">${esc(it.description)}</p>
+                  <div class="admin-row-actions"><button class="admin-mini-btn besp-item-edit" data-id="${esc(it.id)}">EDIT</button><button class="admin-mini-btn danger besp-item-del" data-id="${esc(it.id)}">DELETE</button></div>
+                </div>`).join('') || '<p class="calc-sub">NO OFFERINGS IN THIS REGION YET.</p>'}
+            </div>` : ''}`;
+      }
+      if (activeAdminTab === 'globe') {
+        const countries = getGlobeCountries();
+        if (!adminGlobeCountryId || !countries.find((c) => c.id === adminGlobeCountryId)) adminGlobeCountryId = countries[0]?.id || null;
+        const activeC = countries.find((c) => c.id === adminGlobeCountryId);
+        const entries = activeC ? getCountryJournal().filter((j) => j.countryId === activeC.id).sort((a, b) => b.ts - a.ts) : [];
+        return `
+          <form class="admin-form-card" id="admGlobeAddForm">
+            <p class="calc-title">+ ADD / SELECT GLOBE COUNTRY</p>
+            <div class="admin-grid-2">
+              <input class="glass-input" id="admGlobeNewName" placeholder="COUNTRY NAME" required />
+              <input class="glass-input" id="admGlobeNewFlag" placeholder="FLAG CODE (E.G. TN)" required />
+              <input class="glass-input" id="admGlobeNewLat" type="number" step="any" placeholder="LATITUDE (E.G. 33.8)" required />
+              <input class="glass-input" id="admGlobeNewLng" type="number" step="any" placeholder="LONGITUDE (E.G. 9.5)" required />
+            </div>
+            <button class="sales-save-btn" type="submit" style="align-self:flex-start;">+ ADD COUNTRY TO GLOBE</button>
+            <div class="admin-row-actions" style="margin-top:6px;">
+              ${countries.map((c) => `<button type="button" class="admin-tab globe-country-select ${c.id === adminGlobeCountryId ? 'active' : ''}" data-id="${esc(c.id)}">${esc(c.name)}</button>`).join('')}
+            </div>
+          </form>
+          ${activeC ? `
+            <form class="admin-form-card" id="admGlobeEditForm">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><p class="calc-title">${esc(activeC.name)} · ACTIVITY & STATS</p><button type="button" class="admin-mini-btn danger globe-country-del" data-id="${esc(activeC.id)}">DELETE COUNTRY</button></div>
+              <div class="admin-row-actions">
+                <label class="admin-check"><input type="checkbox" id="admGlobeSalesActive" ${activeC.salesTeam ? 'checked' : ''} /> SALES TEAM ACTIVE</label>
+                <label class="admin-check"><input type="checkbox" id="admGlobeShipActive" ${activeC.productsShipped ? 'checked' : ''} /> PRODUCTS SHIPPED</label>
+                <label class="admin-check"><input type="checkbox" id="admGlobeToolsActive" ${activeC.activeTools ? 'checked' : ''} /> ACTIVE TOOLS</label>
+              </div>
+              <div class="admin-grid-2">
+                <input class="glass-input" id="admGlobeSalesSize" type="number" value="${activeC.salesTeamSize || 0}" placeholder="SALES TEAM SIZE" />
+                <input class="glass-input" id="admGlobeSalesLead" value="${esc(activeC.salesLead || '')}" placeholder="SALES LEAD NAME" />
+                <input class="glass-input" id="admGlobeShipCount" type="number" value="${activeC.shipCount || 0}" placeholder="SHIPPED COUNT" />
+                <input class="glass-input" id="admGlobeToolsList" value="${esc((activeC.tools || []).join(', '))}" placeholder="TOOLS (COMMA SEPARATED)" />
+              </div>
+              <button class="sales-save-btn" type="submit" style="align-self:flex-start;">SAVE COUNTRY STATS</button>
+            </form>
+            <form class="admin-form-card" id="admJournalForm">
+              <p class="calc-title">${esc(activeC.name)} · COUNTRY JOURNAL (&lt; 24H = PULSING RED LIVE BULB)</p>
+              <textarea class="admin-textarea" id="admJournalText" placeholder="POST NEW COUNTRY UPDATE..." required></textarea>
+              <button class="sales-save-btn" type="submit" style="align-self:flex-start;">POST JOURNAL ENTRY</button>
+            </form>
+            <div class="journal-feed">
+              ${entries.map((e) => {
+                const isRecent = (Date.now() - e.ts) < H24_MS;
+                return `<div class="journal-entry"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><div class="journal-ts ${isRecent ? 'is-live' : ''}">${isRecent ? '<span class="live-dot" style="width:7px;height:7px;"></span><span style="color:#b30000;">LIVE</span><span>·</span>' : ''}<span>${formatIntelTimestamp(e.ts)}</span></div><button class="admin-mini-btn danger journal-del" data-id="${esc(e.id)}">DELETE</button></div><p class="journal-text">${esc(e.text)}</p></div>`;
+              }).join('') || '<p class="calc-sub">NO JOURNAL ENTRIES FOR THIS COUNTRY YET.</p>'}
+            </div>` : ''}`;
+      }
+      if (activeAdminTab === 'calculator') {
+        const cfg = getCalcSettings(), salaries = getRegionSalaries(), rates = getFxRates();
+        return `
+          <form class="admin-form-card" id="admCalcCfgForm">
+            <p class="calc-title">CALCULATOR PARAMETERS</p>
+            <div class="admin-grid-2">
+              <div><p class="calc-title">COMMISSION RATE (DEC)</p><input class="glass-input" id="cfgComm" type="number" step="0.01" value="${cfg.commission_rate}" /></div>
+              <div><p class="calc-title">SAFE SHARE / DELIVERY (DEC)</p><input class="glass-input" id="cfgDeliv" type="number" step="0.01" value="${cfg.delivery_cost_pct}" /></div>
+              <div><p class="calc-title">PAYMENT FEE PCT (DEC)</p><input class="glass-input" id="cfgFee" type="number" step="0.01" value="${cfg.payment_fee_pct}" /></div>
+              <div><p class="calc-title">PROFIT TARGET PCT (DEC)</p><input class="glass-input" id="cfgProfit" type="number" step="0.01" value="${cfg.profit_target_pct}" /></div>
+              <div><p class="calc-title">FX BUFFER PCT (DEC)</p><input class="glass-input" id="cfgFxBuf" type="number" step="0.01" value="${cfg.fx_buffer_pct}" /></div>
+              <div><p class="calc-title">DEALS REQUIRED</p><input class="glass-input" id="cfgDeals" type="number" step="1" value="${cfg.deals_required}" /></div>
+            </div>
+            <button class="sales-save-btn" type="submit" style="align-self:flex-start;">SAVE CALCULATOR SETTINGS</button>
+          </form>
+          <form class="admin-form-card" id="admSalaryForm">
+            <p class="calc-title">REGION SALARIES</p>
+            <input type="hidden" id="admSalEditId" value="" />
+            <div class="admin-grid-2">
+              <input class="glass-input" id="admSalName" placeholder="COUNTRY NAME" required />
+              <input class="glass-input" id="admSalCurr" placeholder="CURRENCY (E.G. GHS)" required />
+              <input class="glass-input" id="admSalMin" type="number" step="1" placeholder="MIN SALARY (USD)" required />
+              <input class="glass-input" id="admSalMax" type="number" step="1" placeholder="MAX SALARY (USD)" required />
+              <input class="glass-input" id="admSalBesp" placeholder="BESPOKE REGION ID" />
+              <input class="glass-input" id="admSalStore" placeholder="STORE REGION ID" />
+            </div>
+            <label class="admin-check" style="align-self:flex-start;"><input type="checkbox" id="admSalIsUsd" /> PAID IN USD (NO FX BUFFER)</label>
+            <button class="sales-save-btn" type="submit" style="align-self:flex-start;">+ ADD / SAVE REGION SALARY</button>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+              ${salaries.map((s) => {
+                const su = adminCalcBand === 'max' ? s.salary_max_usd : s.salary_min_usd;
+                const mt = calcMRT(su, cfg, s.is_usd ? 0 : cfg.fx_buffer_pct);
+                return `<div class="deal-row"><span style="flex:1;font-size:0.75rem;">${esc(s.name)} (${esc(s.currency_code)})</span><span class="calc-sub">MIN ${fmt(s.salary_min_usd, 'USD')} · MAX ${fmt(s.salary_max_usd, 'USD')}</span><span class="calc-sub">MRT ${fmt(mt, 'USD')}</span><button type="button" class="admin-mini-btn sal-edit" data-id="${esc(s.id)}">EDIT</button><button type="button" class="admin-mini-btn danger sal-del" data-id="${esc(s.id)}">×</button></div>`;
+              }).join('')}
+            </div>
+          </form>
+          <form class="admin-form-card" id="admFxForm">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <p class="calc-title">LOCKED FX RATES & TEAM EXPORT</p>
+              <div class="admin-row-actions"><button type="button" class="admin-mini-btn" id="admToggleBand">BAND: ${adminCalcBand.toUpperCase()}</button><button type="button" class="admin-mini-btn" id="admExportCsv">EXPORT CSV</button></div>
+            </div>
+            <div class="admin-grid-2">
+              <input class="glass-input" id="admFxCode" placeholder="CURRENCY CODE (E.G. EUR)" required />
+              <input class="glass-input" id="admFxRate" type="number" step="0.0001" placeholder="RATE TO USD" required />
+              <input class="glass-input" id="admFxDate" type="date" value="${new Date().toISOString().slice(0, 10)}" />
+            </div>
+            <button class="sales-save-btn" type="submit" style="align-self:flex-start;">LOCK / OVERRIDE FX RATE</button>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+              ${rates.map((r) => `<div class="deal-row"><span style="min-width:56px;font-size:0.78rem;">${esc(r.currency_code)}</span><span class="calc-sub" style="flex:1;">1 ${esc(r.currency_code)} = $${r.rate_to_usd} USD · LOCKED ${esc(r.locked_on)}</span><button type="button" class="admin-mini-btn danger fx-del" data-code="${esc(r.currency_code)}">DELETE</button></div>`).join('')}
+            </div>
+          </form>`;
+      }
+      if (activeAdminTab === 'dev-apps') {
+        const apps = Array.isArray(adminDevAppsCache) ? adminDevAppsCache : getDevApps();
+        return `
+          <div class="admin-form-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><p class="calc-title">SUBMITTED DEV APPLICATIONS (${apps.length})</p><button type="button" class="admin-mini-btn" id="admRefreshDev">REFRESH</button></div>
+            ${apps.length ? apps.map((a) => `
+              <div class="sales-item-row">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;"><h3 class="project-title">${esc(a.name)} · ${esc(a.country)}</h3><button type="button" class="admin-mini-btn danger dev-del" data-id="${esc(a.id)}">DELETE</button></div>
+                <p class="project-desc">EMAIL: ${esc(a.email)}</p>
+                <p class="project-desc">GITHUB: <a href="${esc(a.github_link || a.github)}" target="_blank" rel="noopener noreferrer" style="color:#000;">${esc(a.github_link || a.github)}</a></p>
+                <p class="calc-sub">SUBMITTED ${formatIntelTimestamp(a.created_at || a.submitted || Date.now())}</p>
+              </div>`).join('') : '<p class="calc-sub">NO DEV APPLICATIONS SUBMITTED YET.</p>'}
+          </div>`;
+      }
+      if (activeAdminTab === 'connect') {
+        const links = getConnectLinks();
+        return `
+          <form class="admin-form-card" id="admConnectForm" novalidate>
+            <p class="calc-title">CONNECT BADGE LINKS</p>
+            <div><p class="calc-title">DISCORD URL</p><input class="glass-input" id="admConnDiscord" type="url" value="${esc(links.discord)}" placeholder="https://discord.gg/..." style="text-transform:none;" /></div>
+            <div><p class="calc-title">LINKEDIN URL</p><input class="glass-input" id="admConnLinkedin" type="url" value="${esc(links.linkedin)}" placeholder="https://linkedin.com/company/..." style="text-transform:none;" /></div>
+            <div><p class="calc-title">GITHUB URL</p><input class="glass-input" id="admConnGithub" type="url" value="${esc(links.github)}" placeholder="https://github.com/BXBK8" style="text-transform:none;" /></div>
+            <div class="sales-error" id="admConnMsg"></div>
+            <button class="store-purchase-btn" type="submit">SAVE CONNECT LINKS</button>
+          </form>`;
+      }
+      if (activeAdminTab === 'settings') {
+        return `
+          <form class="sales-login-box" id="adminSettingsForm" novalidate>
+            <p class="project-desc">SUPABASE: <strong>${sb ? 'CONNECTED' : 'OFFLINE (LOCALSTORAGE)'}</strong></p>
+            <p class="project-desc">CURRENT ADMIN ID: <strong>${esc(sessionAdminId || BXB_AUTH.getAdminId())}</strong></p>
+            <input class="glass-input" id="newAdminIdInput" type="text" placeholder="NEW MASTER ADMIN ID" autocomplete="off" />
+            <div class="sales-error" id="adminSettingsMsg"></div>
+            <button class="store-purchase-btn" type="submit">UPDATE ADMIN ID</button>
+          </form>`;
+      }
+      return '';
+    }
+
+    function bindAdminForms() {
+      const portForm = document.getElementById('admPortAddForm');
+      if (portForm) {
+        document.getElementById('admPortCancelEdit').onclick = () => renderAdminView();
+        portForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('admPortEditId').value, id = editId || 'proj-' + Date.now();
+          const title = document.getElementById('admPortTitle').value.trim().toUpperCase();
+          const logoText = document.getElementById('admPortLogoText').value.trim().toUpperCase(), logoUrl = document.getElementById('admPortLogoUrl').value.trim();
+          const techs = document.getElementById('admPortTechs').value.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean);
+          const githubUrl = document.getElementById('admPortGithub').value.trim(), liveUrl = document.getElementById('admPortLive').value.trim();
+          const description = document.getElementById('admPortDesc').value.trim().toUpperCase();
+          if (!title) return;
+          const items = getPortfolioItems(), sortOrder = editId ? (items.findIndex((x) => x.id === editId) + 1) : (items.length + 1);
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_portfolio_project', { p_admin_id: sessionAdminId, p_id: id, p_title: title, p_description: description, p_logo_url: logoUrl, p_logo_text: logoText, p_techs: techs, p_github_url: githubUrl, p_live_url: liveUrl, p_sort_order: sortOrder });
+          if (editId) updatePortfolioItem(editId, { title, description, logoUrl, logoText, techs, githubUrl, liveUrl });
+          else addPortfolioItem({ id, title, description, logoUrl, logoText, techs, githubUrl, liveUrl });
+          renderAdminView();
+        };
+      }
+      const storeRegForm = document.getElementById('admStoreRegForm');
+      if (storeRegForm) {
+        document.getElementById('admStoreRegCancel').onclick = () => renderAdminView();
+        storeRegForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('admStoreRegEditId').value, name = document.getElementById('admStoreRegName').value.trim().toUpperCase();
+          const flagText = document.getElementById('admStoreRegFlagText').value.trim().toUpperCase(), flagUrl = document.getElementById('admStoreRegFlagUrl').value.trim();
+          if (!name) return;
+          const id = editId || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_store_region', { p_admin_id: sessionAdminId, p_id: id, p_name: name, p_flag_url: flagUrl, p_flag_text: flagText, p_sort_order: 0 });
+          if (editId) updateStore(editId, { name, flagUrl, flagText }); else { addStore({ id, name, flagUrl, flagText, apps: [] }); adminStoreRegId = id; }
+          renderAdminView();
+        };
+      }
+      const storeAppForm = document.getElementById('admStoreAppForm');
+      if (storeAppForm && adminStoreRegId) {
+        document.getElementById('admStoreAppCancel').onclick = () => renderAdminView();
+        storeAppForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('admStoreAppEditId').value, id = editId || 'app-' + Date.now();
+          const name = document.getElementById('admStoreAppName').value.trim().toUpperCase(), pricePerMonth = document.getElementById('admStoreAppPrice').value.trim().toUpperCase();
+          const logoText = document.getElementById('admStoreAppLogoText').value.trim().toUpperCase(), logoUrl = document.getElementById('admStoreAppLogoUrl').value.trim();
+          const checkoutUrl = document.getElementById('admStoreAppUrl').value.trim(), description = document.getElementById('admStoreAppDesc').value.trim().toUpperCase();
+          if (!name) return;
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_store_app', { p_admin_id: sessionAdminId, p_id: id, p_region_id: adminStoreRegId, p_name: name, p_logo_url: logoUrl, p_logo_text: logoText, p_description: description, p_price_per_month: pricePerMonth, p_checkout_url: checkoutUrl, p_status: 'AVAILABLE', p_sort_order: 0 });
+          if (editId) updateAppInStore(adminStoreRegId, editId, { name, pricePerMonth, logoText, logoUrl, checkoutUrl, description });
+          else addAppToStore(adminStoreRegId, { id, name, pricePerMonth, logoText, logoUrl, checkoutUrl, description });
+          renderAdminView();
+        };
+      }
+      const bespRegForm = document.getElementById('admBespRegForm');
+      if (bespRegForm) {
+        document.getElementById('admBespRegCancel').onclick = () => renderAdminView();
+        bespRegForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('admBespRegEditId').value, name = document.getElementById('admBespRegName').value.trim().toUpperCase();
+          const flagText = document.getElementById('admBespRegFlagText').value.trim().toUpperCase(), flagUrl = document.getElementById('admBespRegFlagUrl').value.trim();
+          const categoryLabel = document.getElementById('admBespRegCat').value.trim().toUpperCase() || 'SERVICES';
+          if (!name) return;
+          const id = editId || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_bespoke_region', { p_admin_id: sessionAdminId, p_id: id, p_name: name, p_flag_url: flagUrl, p_flag_text: flagText, p_category_label: categoryLabel, p_sort_order: 0 });
+          if (editId) updateBespokeRegion(editId, { name, flagUrl, flagText, categoryLabel }); else { addBespokeRegion({ id, name, flagUrl, flagText, categoryLabel, items: [] }); adminBespokeRegId = id; }
+          renderAdminView();
+        };
+      }
+      const bespItemForm = document.getElementById('admBespItemForm');
+      if (bespItemForm && adminBespokeRegId) {
+        document.getElementById('admBespItemCancel').onclick = () => renderAdminView();
+        bespItemForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('admBespItemEditId').value, id = editId || 'item-' + Date.now();
+          const name = document.getElementById('admBespItemName').value.trim().toUpperCase(), price = document.getElementById('admBespItemPrice').value.trim().toUpperCase();
+          const categoryLabel = document.getElementById('admBespItemCat').value.trim().toUpperCase(), actionUrl = document.getElementById('admBespItemUrl').value.trim();
+          const description = document.getElementById('admBespItemDesc').value.trim().toUpperCase();
+          if (!name) return;
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_bespoke_item', { p_admin_id: sessionAdminId, p_id: id, p_region_id: adminBespokeRegId, p_name: name, p_price: price, p_description: description, p_category_label: categoryLabel, p_action_url: actionUrl, p_sort_order: 0 });
+          if (editId) updateBespokeItem(adminBespokeRegId, editId, { name, price, categoryLabel, actionUrl, description });
+          else addBespokeItem(adminBespokeRegId, { id, name, price, categoryLabel, actionUrl, description });
+          renderAdminView();
+        };
+      }
+      const globeAddForm = document.getElementById('admGlobeAddForm');
+      if (globeAddForm) {
+        globeAddForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const name = document.getElementById('admGlobeNewName').value.trim().toUpperCase(), flagText = document.getElementById('admGlobeNewFlag').value.trim().toUpperCase();
+          const lat = parseFloat(document.getElementById('admGlobeNewLat').value) || 0, lng = parseFloat(document.getElementById('admGlobeNewLng').value) || 0;
+          if (!name) return;
+          const id = flagText.toLowerCase() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), list = getGlobeCountries();
+          if (!list.find((c) => c.id === id)) {
+            list.push({ id, name, flagText, flagUrl: '', lat, lng, salesTeam: false, salesTeamSize: 0, salesLead: '', productsShipped: false, shipCount: 0, activeTools: false, tools: [] });
+            if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_globe_country', { p_admin_id: sessionAdminId, p_id: id, p_name: name, p_flag_text: flagText, p_flag_url: '', p_lat: lat, p_lng: lng, p_sales_team_active: false, p_sales_team_size: 0, p_sales_lead: '', p_products_shipped: false, p_ship_count: 0, p_active_tools: false, p_tools: [] });
+            saveGlobeCountries(list);
+          }
+          adminGlobeCountryId = id; renderAdminView();
+        };
+      }
+      const globeEditForm = document.getElementById('admGlobeEditForm');
+      if (globeEditForm && adminGlobeCountryId) {
+        globeEditForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const c = getGlobeCountries().find((x) => x.id === adminGlobeCountryId); if (!c) return;
+          const salesTeam = document.getElementById('admGlobeSalesActive').checked, productsShipped = document.getElementById('admGlobeShipActive').checked, activeTools = document.getElementById('admGlobeToolsActive').checked;
+          const salesTeamSize = parseInt(document.getElementById('admGlobeSalesSize').value, 10) || 0, salesLead = document.getElementById('admGlobeSalesLead').value.trim().toUpperCase();
+          const shipCount = parseInt(document.getElementById('admGlobeShipCount').value, 10) || 0, tools = document.getElementById('admGlobeToolsList').value.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean);
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_globe_country', { p_admin_id: sessionAdminId, p_id: c.id, p_name: c.name, p_flag_text: c.flagText || '', p_flag_url: c.flagUrl || '', p_lat: c.lat, p_lng: c.lng, p_sales_team_active: salesTeam, p_sales_team_size: salesTeamSize, p_sales_lead: salesLead, p_products_shipped: productsShipped, p_ship_count: shipCount, p_active_tools: activeTools, p_tools: tools });
+          updateCountryGlobeStats(c.id, { salesTeam, salesTeamSize, salesLead, productsShipped, shipCount, activeTools, tools }); renderAdminView();
+        };
+      }
+      const journalForm = document.getElementById('admJournalForm');
+      if (journalForm && adminGlobeCountryId) {
+        journalForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const text = document.getElementById('admJournalText').value.trim().toUpperCase(); if (!text) return;
+          const entry = addCountryJournalEntry(adminGlobeCountryId, text);
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_add_country_journal_entry', { p_admin_id: sessionAdminId, p_id: entry.id, p_country_id: adminGlobeCountryId, p_text: text });
+          renderAdminView();
+        };
+      }
+      const calcCfgForm = document.getElementById('admCalcCfgForm');
+      if (calcCfgForm) {
+        calcCfgForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const next = { commission_rate: parseFloat(document.getElementById('cfgComm').value) || 0.17, delivery_cost_pct: parseFloat(document.getElementById('cfgDeliv').value) || 0.30, payment_fee_pct: parseFloat(document.getElementById('cfgFee').value) || 0.03, profit_target_pct: parseFloat(document.getElementById('cfgProfit').value) || 0.20, fx_buffer_pct: parseFloat(document.getElementById('cfgFxBuf').value) || 0.03, deals_required: parseInt(document.getElementById('cfgDeals').value, 10) || 5, prices_in: 'USD' };
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_update_calculator_settings', { p_admin_id: sessionAdminId, p_commission_rate: next.commission_rate, p_delivery_cost_pct: next.delivery_cost_pct, p_payment_fee_pct: next.payment_fee_pct, p_profit_target_pct: next.profit_target_pct, p_fx_buffer_pct: next.fx_buffer_pct, p_deals_required: next.deals_required });
+          localStorage.setItem(CALC_SETTINGS_KEY, JSON.stringify(next)); renderAdminView();
+        };
+      }
+      const salForm = document.getElementById('admSalaryForm');
+      if (salForm) {
+        salForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('admSalEditId').value, name = document.getElementById('admSalName').value.trim(), currency_code = document.getElementById('admSalCurr').value.trim().toUpperCase();
+          const salary_min_usd = parseFloat(document.getElementById('admSalMin').value) || 0, salary_max_usd = parseFloat(document.getElementById('admSalMax').value) || salary_min_usd;
+          const bespoke_region_id = document.getElementById('admSalBesp').value.trim().toLowerCase(), store_region_id = document.getElementById('admSalStore').value.trim().toLowerCase(), is_usd = document.getElementById('admSalIsUsd').checked;
+          if (!name || !currency_code) return;
+          const id = editId || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_region_salary', { p_admin_id: sessionAdminId, p_id: id, p_name: name, p_currency_code: currency_code, p_is_usd: is_usd, p_salary_min_usd: salary_min_usd, p_salary_max_usd: salary_max_usd, p_bespoke_region_id: bespoke_region_id, p_store_region_id: store_region_id, p_sort_order: 0 });
+          const list = getRegionSalaries(), idx = list.findIndex((s) => s.id === id), obj = { id, name, currency_code, is_usd, salary_min_usd, salary_max_usd, bespoke_region_id, store_region_id };
+          if (idx >= 0) list[idx] = obj; else list.push(obj);
+          localStorage.setItem(REGION_SALARIES_KEY, JSON.stringify(list)); renderAdminView();
+        };
+      }
+      const fxForm = document.getElementById('admFxForm');
+      if (fxForm) {
+        document.getElementById('admToggleBand').onclick = () => { adminCalcBand = adminCalcBand === 'min' ? 'max' : 'min'; renderAdminView(); };
+        document.getElementById('admExportCsv').onclick = () => {
+          const cfg = getCalcSettings(), rowsCsv = [['REGION', 'CURRENCY', 'SALARY USD', 'MRT USD', 'AVG DEAL USD'], ...getRegionSalaries().map((s) => { const su = adminCalcBand === 'max' ? s.salary_max_usd : s.salary_min_usd, mt = calcMRT(su, cfg, s.is_usd ? 0 : cfg.fx_buffer_pct); return [s.name, s.currency_code, su.toFixed(0), mt.toFixed(0), (mt / cfg.deals_required).toFixed(0)]; })];
+          const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rowsCsv.map((r) => r.join(',')).join('\n')); a.download = 'bxb_admin_team_targets.csv'; a.click();
+        };
+        fxForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const code = document.getElementById('admFxCode').value.trim().toUpperCase(), rate = parseFloat(document.getElementById('admFxRate').value) || 1, locked_on = document.getElementById('admFxDate').value || new Date().toISOString().slice(0, 10);
+          if (!code) return;
+          if (sb && sessionAdminId) await BXB_DB.rpc('admin_upsert_fx_rate', { p_admin_id: sessionAdminId, p_currency_code: code, p_rate_to_usd: rate, p_locked_on: locked_on });
+          const rates = getFxRates(), idx = rates.findIndex((r) => r.currency_code === code);
+          if (idx >= 0) rates[idx] = { currency_code: code, rate_to_usd: rate, locked_on }; else rates.push({ currency_code: code, rate_to_usd: rate, locked_on });
+          localStorage.setItem(FX_RATES_KEY, JSON.stringify(rates)); renderAdminView();
+        };
+      }
+      const refDev = document.getElementById('admRefreshDev');
+      if (refDev) refDev.onclick = async () => { await hydrateAdminData(); renderAdminView(); };
+      const admConnForm = document.getElementById('admConnectForm');
+      if (admConnForm) {
+        admConnForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const dEl = document.getElementById('admConnDiscord');
+          const lEl = document.getElementById('admConnLinkedin');
+          const gEl = document.getElementById('admConnGithub');
+          const msg = document.getElementById('admConnMsg');
+          [dEl, lEl, gEl].forEach((el) => el.classList.remove('input-error'));
+          msg.style.color = '#9e0000';
+          msg.textContent = '';
+
+          const d = dEl.value.trim(), l = lEl.value.trim(), g = gEl.value.trim();
+          const validUrl = (u) => /^https?:\/\/.+/i.test(u);
+          if (!validUrl(d)) { msg.textContent = 'ENTER A VALID DISCORD URL (HTTPS://...).'; void dEl.offsetWidth; dEl.classList.add('input-error'); dEl.focus(); return; }
+          if (!validUrl(l)) { msg.textContent = 'ENTER A VALID LINKEDIN URL (HTTPS://...).'; void lEl.offsetWidth; lEl.classList.add('input-error'); lEl.focus(); return; }
+          if (!validUrl(g)) { msg.textContent = 'ENTER A VALID GITHUB URL (HTTPS://...).'; void gEl.offsetWidth; gEl.classList.add('input-error'); gEl.focus(); return; }
+
+          try {
+            if (sb && sessionAdminId) {
+              await BXB_DB.rpc('admin_update_connect_links', { p_admin_id: sessionAdminId, p_discord_url: d, p_linkedin_url: l, p_github_url: g });
+            }
+            saveConnectLinks({ discord: d, linkedin: l, github: g });
+            msg.style.color = '#000000';
+            msg.textContent = 'CONNECT LINKS UPDATED ✓';
+          } catch {
+            msg.textContent = 'FAILED TO SAVE CONNECT LINKS.';
+          }
+        };
+      }
+      const settingsForm = document.getElementById('adminSettingsForm');
+      if (settingsForm) {
+        settingsForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const inp = document.getElementById('newAdminIdInput'), msg = document.getElementById('adminSettingsMsg');
+          inp.classList.remove('input-error'); void inp.offsetWidth;
+          if (!inp.value.trim()) { msg.style.color = '#9e0000'; msg.textContent = 'PLEASE ENTER A NEW ADMIN ID.'; inp.classList.add('input-error'); return; }
+          try { await BXB_AUTH.updateAdminId(inp.value); renderAdminView(); const nm = document.getElementById('adminSettingsMsg'); if (nm) { nm.style.color = '#000000'; nm.textContent = 'ADMIN ID UPDATED ✓'; } }
+          catch { msg.style.color = '#9e0000'; msg.textContent = 'FAILED TO UPDATE ADMIN ID.'; }
+        });
+      }
+    }
+
+    function renderAdminView() {
+      if (!adminUnlocked) {
+        adminLogout.style.display = 'none';
+        adminHeaderWrap.innerHTML = '<span class="why-tag">ADMIN ACCESS</span>';
+        adminBody.innerHTML = `<form class="sales-login-box" id="adminLoginForm" novalidate><p class="project-desc">ENTER YOUR MASTER ADMIN ID TO UNLOCK BXB CONTROL.</p><input class="glass-input" id="adminIdInput" type="password" placeholder="ADMIN ID" autocomplete="off" /><div class="sales-error" id="adminError"></div><button class="store-purchase-btn" type="submit">ACCESS ADMIN</button></form>`;
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const inputEl = document.getElementById('adminIdInput'), errEl = document.getElementById('adminError'), val = inputEl.value.trim();
+          inputEl.classList.remove('input-error'); void inputEl.offsetWidth;
+          if (!val) { errEl.textContent = 'PLEASE ENTER YOUR ADMIN ID.'; inputEl.classList.add('input-error'); inputEl.focus(); return; }
+          if (!(await BXB_AUTH.validateAdminId(val))) { errEl.textContent = 'INVALID ADMIN ID. ACCESS DENIED.'; inputEl.classList.add('input-error'); inputEl.focus(); return; }
+          sessionAdminId = val.toUpperCase(); adminUnlocked = true; activeAdminTab = 'portfolio'; await hydrateAdminData(); renderAdminView();
+        });
+        return;
+      }
+      adminLogout.style.display = 'inline-block';
+      adminHeaderWrap.innerHTML = '<span class="why-tag">ADMIN DASHBOARD</span>';
+      const tabs = [{ id: 'portfolio', label: 'PORTFOLIO' }, { id: 'store', label: 'STORE' }, { id: 'bespoke', label: 'BESPOKE & IDS' }, { id: 'globe', label: 'GLOBE & JOURNAL' }, { id: 'calculator', label: 'CALCULATOR & FX' }, { id: 'dev-apps', label: 'DEV APPS' }, { id: 'connect', label: 'CONNECT' }, { id: 'settings', label: 'SETTINGS' }];
+      adminBody.innerHTML = `<div class="admin-status-bar"><span>STATUS: UNLOCKED (${sb ? 'SUPABASE LIVE' : 'LOCAL MODE'})</span></div><div class="admin-tabs">${tabs.map((t) => `<button class="admin-tab ${activeAdminTab === t.id ? 'active' : ''}" type="button" data-tab="${t.id}">${t.label}</button>`).join('')}</div><div id="adminTabPanel">${renderAdminTabContent()}</div>`;
+      bindAdminForms();
+    }
+
+    adminBody.addEventListener('click', async (e) => {
+      const tabBtn = e.target.closest('.admin-tab[data-tab]');
+      if (tabBtn) { activeAdminTab = tabBtn.dataset.tab; if (activeAdminTab === 'dev-apps' || activeAdminTab === 'bespoke') await hydrateAdminData(); renderAdminView(); return; }
+      const pUp = e.target.closest('.port-up'), pDown = e.target.closest('.port-down');
+      if (pUp || pDown) { const idx = parseInt((pUp || pDown).dataset.idx, 10), items = getPortfolioItems(), swap = pUp ? idx - 1 : idx + 1; if (swap >= 0 && swap < items.length) { [items[idx], items[swap]] = [items[swap], items[idx]]; savePortfolioItems(items); if (sb && sessionAdminId) await BXB_DB.rpc('admin_reorder_portfolio_projects', { p_admin_id: sessionAdminId, p_ids: items.map((x) => x.id) }); renderAdminView(); } return; }
+      const pEdit = e.target.closest('.port-edit');
+      if (pEdit) { const it = getPortfolioItems().find((x) => x.id === pEdit.dataset.id); if (it) { document.getElementById('admPortEditId').value = it.id; document.getElementById('admPortTitle').value = it.title || ''; document.getElementById('admPortLogoText').value = it.logoText || ''; document.getElementById('admPortLogoUrl').value = it.logoUrl || ''; document.getElementById('admPortTechs').value = (it.techs || []).join(', '); document.getElementById('admPortGithub').value = it.githubUrl || ''; document.getElementById('admPortLive').value = it.liveUrl || ''; document.getElementById('admPortDesc').value = it.description || ''; document.getElementById('admPortCancelEdit').style.display = 'inline-block'; } return; }
+      const pDel = e.target.closest('.port-del');
+      if (pDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_portfolio_project', { p_admin_id: sessionAdminId, p_id: pDel.dataset.id }); deletePortfolioItem(pDel.dataset.id); renderAdminView(); return; }
+      const sRegSel = e.target.closest('.store-reg-select'); if (sRegSel) { adminStoreRegId = sRegSel.dataset.id; renderAdminView(); return; }
+      const sRegEdit = e.target.closest('.store-reg-edit'); if (sRegEdit) { const r = getStores().find((x) => x.id === sRegEdit.dataset.id); if (r) { document.getElementById('admStoreRegEditId').value = r.id; document.getElementById('admStoreRegName').value = r.name || ''; document.getElementById('admStoreRegFlagText').value = r.flagText || ''; document.getElementById('admStoreRegFlagUrl').value = r.flagUrl || ''; document.getElementById('admStoreRegCancel').style.display = 'inline-block'; } return; }
+      const sRegDel = e.target.closest('.store-reg-del'); if (sRegDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_store_region', { p_admin_id: sessionAdminId, p_id: sRegDel.dataset.id }); deleteStore(sRegDel.dataset.id); renderAdminView(); return; }
+      const sAppEdit = e.target.closest('.store-app-edit'); if (sAppEdit && adminStoreRegId) { const r = getStores().find((x) => x.id === adminStoreRegId), a = r && (r.apps || []).find((x) => x.id === sAppEdit.dataset.id); if (a) { document.getElementById('admStoreAppEditId').value = a.id; document.getElementById('admStoreAppName').value = a.name || ''; document.getElementById('admStoreAppPrice').value = a.pricePerMonth || ''; document.getElementById('admStoreAppLogoText').value = a.logoText || ''; document.getElementById('admStoreAppLogoUrl').value = a.logoUrl || ''; document.getElementById('admStoreAppUrl').value = a.checkoutUrl || ''; document.getElementById('admStoreAppDesc').value = a.description || ''; document.getElementById('admStoreAppCancel').style.display = 'inline-block'; } return; }
+      const sAppDel = e.target.closest('.store-app-del'); if (sAppDel && adminStoreRegId) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_store_app', { p_admin_id: sessionAdminId, p_id: sAppDel.dataset.id }); deleteAppFromStore(adminStoreRegId, sAppDel.dataset.id); renderAdminView(); return; }
+      const bRegSel = e.target.closest('.besp-reg-select'); if (bRegSel) { adminBespokeRegId = bRegSel.dataset.id; renderAdminView(); return; }
+      const bRegEdit = e.target.closest('.besp-reg-edit'); if (bRegEdit) { const r = getBespokeRegions().find((x) => x.id === bRegEdit.dataset.id); if (r) { document.getElementById('admBespRegEditId').value = r.id; document.getElementById('admBespRegName').value = r.name || ''; document.getElementById('admBespRegFlagText').value = r.flagText || ''; document.getElementById('admBespRegFlagUrl').value = r.flagUrl || ''; document.getElementById('admBespRegCat').value = r.categoryLabel || 'SERVICES'; document.getElementById('admBespRegCancel').style.display = 'inline-block'; } return; }
+      const bRegDel = e.target.closest('.besp-reg-del'); if (bRegDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_bespoke_region', { p_admin_id: sessionAdminId, p_id: bRegDel.dataset.id }); deleteBespokeRegion(bRegDel.dataset.id); renderAdminView(); return; }
+      const genBtn = e.target.closest('.admin-gen-sid'); if (genBtn) { await generateSalesLeadSecretId(genBtn.dataset.regionId); renderAdminView(); return; }
+      const bItemEdit = e.target.closest('.besp-item-edit'); if (bItemEdit && adminBespokeRegId) { const r = getBespokeRegions().find((x) => x.id === adminBespokeRegId), it = r && (r.items || []).find((x) => x.id === bItemEdit.dataset.id); if (it) { document.getElementById('admBespItemEditId').value = it.id; document.getElementById('admBespItemName').value = it.name || ''; document.getElementById('admBespItemPrice').value = it.price || ''; document.getElementById('admBespItemCat').value = it.categoryLabel || ''; document.getElementById('admBespItemUrl').value = it.actionUrl || ''; document.getElementById('admBespItemDesc').value = it.description || ''; document.getElementById('admBespItemCancel').style.display = 'inline-block'; } return; }
+      const bItemDel = e.target.closest('.besp-item-del'); if (bItemDel && adminBespokeRegId) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_bespoke_item', { p_admin_id: sessionAdminId, p_id: bItemDel.dataset.id }); deleteBespokeItem(adminBespokeRegId, bItemDel.dataset.id); renderAdminView(); return; }
+      const gSel = e.target.closest('.globe-country-select'); if (gSel) { adminGlobeCountryId = gSel.dataset.id; renderAdminView(); return; }
+      const gDel = e.target.closest('.globe-country-del'); if (gDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_globe_country', { p_admin_id: sessionAdminId, p_id: gDel.dataset.id }); saveGlobeCountries(getGlobeCountries().filter((c) => c.id !== gDel.dataset.id)); if (adminGlobeCountryId === gDel.dataset.id) adminGlobeCountryId = null; renderAdminView(); return; }
+      const jDel = e.target.closest('.journal-del'); if (jDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_country_journal_entry', { p_admin_id: sessionAdminId, p_id: jDel.dataset.id }); deleteCountryJournalEntry(jDel.dataset.id); renderAdminView(); return; }
+      const salEdit = e.target.closest('.sal-edit'); if (salEdit) { const s = getRegionSalaries().find((x) => x.id === salEdit.dataset.id); if (s) { document.getElementById('admSalEditId').value = s.id; document.getElementById('admSalName').value = s.name; document.getElementById('admSalCurr').value = s.currency_code; document.getElementById('admSalMin').value = s.salary_min_usd; document.getElementById('admSalMax').value = s.salary_max_usd; document.getElementById('admSalBesp').value = s.bespoke_region_id || ''; document.getElementById('admSalStore').value = s.store_region_id || ''; document.getElementById('admSalIsUsd').checked = !!s.is_usd; } return; }
+      const salDel = e.target.closest('.sal-del'); if (salDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_region_salary', { p_admin_id: sessionAdminId, p_id: salDel.dataset.id }); localStorage.setItem(REGION_SALARIES_KEY, JSON.stringify(getRegionSalaries().filter((x) => x.id !== salDel.dataset.id))); renderAdminView(); return; }
+      const fxDel = e.target.closest('.fx-del'); if (fxDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_fx_rate', { p_admin_id: sessionAdminId, p_currency_code: fxDel.dataset.code }); localStorage.setItem(FX_RATES_KEY, JSON.stringify(getFxRates().filter((x) => x.currency_code !== fxDel.dataset.code))); renderAdminView(); return; }
+      const dDel = e.target.closest('.dev-del'); if (dDel) { if (sb && sessionAdminId) await BXB_DB.rpc('admin_delete_dev_application', { p_admin_id: sessionAdminId, p_id: dDel.dataset.id }); if (Array.isArray(adminDevAppsCache)) adminDevAppsCache = adminDevAppsCache.filter((x) => x.id !== dDel.dataset.id); localStorage.setItem(DEV_APPS_KEY, JSON.stringify(getDevApps().filter((x) => x.id !== dDel.dataset.id))); renderAdminView(); }
+    });
+
+    function showAdminCard() { adminUnlocked = false; sessionAdminId = ''; renderAdminView(); officeMenuWrap.style.display = 'none'; adminCard.classList.add('active'); requestAnimationFrame(() => adminCard.classList.add('visible')); }
+    function lockAdminSession() { adminUnlocked = false; sessionAdminId = ''; adminDevAppsCache = null; renderAdminView(); }
+    function backFromAdmin() { adminCard.classList.remove('visible'); setTimeout(() => { adminCard.classList.remove('active'); adminUnlocked = false; sessionAdminId = ''; officeMenuWrap.style.display = 'flex'; officeBtns.forEach((b) => b.classList.remove('wave-in')); void officeOverlay.offsetWidth; officeBtns.forEach((b) => b.classList.add('wave-in')); }, 220); }
+
+    document.querySelector('.office-btn[data-role="admin"]').addEventListener('click', showAdminCard);
+    adminLogout.addEventListener('click', lockAdminSession);
+    adminBack.addEventListener('click', backFromAdmin);
+    adminClose.addEventListener('click', closeOffice);
+    const CALC_SETTINGS_KEY = 'bxb_calc_settings';
+    const REGION_SALARIES_KEY = 'bxb_region_salaries';
+    const FX_RATES_KEY = 'bxb_fx_rates';
+    const DEV_APPS_KEY = 'bxb_dev_applications';
+
+    const DEFAULT_CALC = { commission_rate:0.17, delivery_cost_pct:0.30, payment_fee_pct:0.03, profit_target_pct:0.20, fx_buffer_pct:0.03, deals_required:5, prices_in:'USD' };
+    const DEFAULT_SALARIES = [
+      { id:'gh', name:'Ghana', currency_code:'GHS', is_usd:false, salary_min_usd:220, salary_max_usd:220, bespoke_region_id:'ghana', store_region_id:'ghana' },
+      { id:'us', name:'USA',   currency_code:'USD', is_usd:true,  salary_min_usd:4279,salary_max_usd:5916, bespoke_region_id:'mena',  store_region_id:'mena' }
+    ];
+    const DEFAULT_FX = [
+      { currency_code:'GHS', rate_to_usd:0.0667, locked_on:'2026-11-01' },
+      { currency_code:'USD', rate_to_usd:1,      locked_on:'2026-11-01' }
+    ];
+
+    function getCalcSettings(){ try{ return JSON.parse(localStorage.getItem(CALC_SETTINGS_KEY))||DEFAULT_CALC; }catch{ return DEFAULT_CALC; } }
+    function getRegionSalaries(){ try{ const r=JSON.parse(localStorage.getItem(REGION_SALARIES_KEY)); return Array.isArray(r)?r:[...DEFAULT_SALARIES]; }catch{ return [...DEFAULT_SALARIES]; } }
+    function getFxRates(){ try{ const r=JSON.parse(localStorage.getItem(FX_RATES_KEY)); return Array.isArray(r)?r:[...DEFAULT_FX]; }catch{ return [...DEFAULT_FX]; } }
+    function getDevApps(){ try{ return JSON.parse(localStorage.getItem(DEV_APPS_KEY))||[]; }catch{ return []; } }
+    function getFxRate(code){ const r=getFxRates().find(x=>x.currency_code===code); return r?r.rate_to_usd:1; }
+    function toUSD(amount,code){ return amount*getFxRate(code); }
+    function fromUSD(usd,code){ const r=getFxRate(code); return r?usd/r:usd; }
+    function fmt(n,code){ return new Intl.NumberFormat('en-US',{style:'currency',currency:code||'USD',maximumFractionDigits:0}).format(n); }
+
+    function calcMRT(salaryUSD, cfg, fx_buffer){
+      const buf = cfg.payment_fee_pct + (fx_buffer||0);
+      return salaryUSD / (cfg.delivery_cost_pct - buf);
+    }
+
+    const jobsCard = document.getElementById('jobsCard');
+    const jobsHeaderWrap = document.getElementById('jobsHeaderWrap');
+    const jobsBody = document.getElementById('jobsBody');
+    const jobsBack = document.getElementById('jobsBack');
+    const jobsClose = document.getElementById('jobsClose');
+    let jobsView = 'menu';
+    let jobsCalcMode = 'rep';
+
+    function getCalcCatalog(regionSalary){
+      const stores = getStores();
+      const bespokeRegs = getBespokeRegions();
+      let catalog = [];
+      const sr = stores.find(s=>s.id===regionSalary.store_region_id);
+      if(sr) sr.apps.forEach(a=>{ const p=parseFloat((a.pricePerMonth||'0').replace(/[^0-9.]/g,''))||0; catalog.push({id:a.id,name:a.name,priceUSD:regionSalary.is_usd?p:toUSD(p,regionSalary.currency_code),priceLoc:p,source:'store'}); });
+      const br = bespokeRegs.find(b=>b.id===regionSalary.bespoke_region_id);
+      if(br) br.items.forEach(it=>{ const p=parseFloat((it.price||'0').replace(/[^0-9.]/g,''))||0; catalog.push({id:it.id,name:it.name,priceUSD:regionSalary.is_usd?p:toUSD(p,regionSalary.currency_code),priceLoc:p,source:'bespoke'}); });
+      return catalog;
+    }
+
+    function renderJobsView(){
+      jobsHeaderWrap.innerHTML = '<span class="why-tag">BXB JOBS</span>';
+      if(jobsView==='menu'){
+        jobsBody.innerHTML=`<div class="office-stack" style="margin-top:8px;">
+          <button class="office-btn" id="devBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Dev positions</span><span>→</span></button>
+          <button class="office-btn" id="salesPosBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Sales positions</span><span>→</span></button>
+        </div>`;
+        document.getElementById('devBtn').onclick=()=>{ jobsView='dev'; renderJobsView(); };
+        document.getElementById('salesPosBtn').onclick=()=>{ jobsView='sales'; jobsCalcMode='rep'; renderJobsView(); };
+        return;
+      }
+      if(jobsView==='dev'){
+        jobsHeaderWrap.innerHTML='<span class="why-tag">DEV POSITIONS</span>';
+        jobsBody.innerHTML=`<form class="sales-login-box" id="devAppForm" novalidate style="max-width:520px;">
+          <p class="project-desc" style="margin-bottom:4px;">OPEN APPLICATION — WE REVIEW ALL SUBMISSIONS.</p>
+          <input class="glass-input" id="devName" type="text" placeholder="FULL NAME" autocomplete="off"/>
+          <input class="glass-input" id="devCountry" type="text" placeholder="COUNTRY" autocomplete="off"/>
+          <input class="glass-input" id="devGithub" type="text" placeholder="GITHUB LINK" autocomplete="off"/>
+          <input class="glass-input" id="devEmail" type="email" placeholder="EMAIL ADDRESS" autocomplete="off"/>
+          <div class="sales-error" id="devErr"></div>
+          <button class="store-purchase-btn" type="submit">APPLY</button>
+        </form>`;
+        document.getElementById('devAppForm').onsubmit=e=>{
+          e.preventDefault();
+          const name=document.getElementById('devName');
+          const country=document.getElementById('devCountry');
+          const github=document.getElementById('devGithub');
+          const email=document.getElementById('devEmail');
+          const err=document.getElementById('devErr');
+          [name,country,github,email].forEach(i=>i.classList.remove('input-error'));
+          let valid=true;
+          function markErr(el,msg){ el.classList.add('input-error'); err.textContent=msg; void el.offsetWidth; valid=false; }
+          if(!email.value.trim()||!email.value.includes('@')) markErr(email,'PLEASE ENTER A VALID EMAIL ADDRESS.');
+          if(!github.value.trim()) markErr(github,'PLEASE ENTER YOUR GITHUB LINK.');
+          if(!country.value.trim()) markErr(country,'PLEASE ENTER YOUR COUNTRY.');
+          if(!name.value.trim()) markErr(name,'PLEASE ENTER YOUR FULL NAME.');
+          if(!valid) return;
+          const apps=getDevApps();
+          apps.push({id:'dev-'+Date.now(),name:name.value.trim(),country:country.value.trim(),github:github.value.trim(),email:email.value.trim(),submitted:new Date().toISOString()});
+          localStorage.setItem(DEV_APPS_KEY,JSON.stringify(apps));
+          if (window.BXB_DB) window.BXB_DB.submitDevApp(apps[apps.length - 1]);
+          jobsBody.innerHTML=`<div class="calc-output-box" style="margin-top:12px;"><p class="calc-big">APPLICATION RECEIVED ✓</p><p class="calc-sub">WE WILL BE IN TOUCH AT ${email.value.trim().toUpperCase()}.</p></div>`;
+        };
+        return;
+      }
+      if(jobsView==='sales'){
+        jobsHeaderWrap.innerHTML='<span class="why-tag">SALES POSITIONS</span>';
+        const cfg=getCalcSettings();
+        const salaries=getRegionSalaries();
+        const salesLeadId = (() => { try{ return sessionStorage.getItem('bxb_sales_lead_logged_region'); }catch{ return null; }})();
+
+        // Determine available mode based on login state
+        const isAdmin = adminUnlocked;
+        const isSalesLead = !!salesLeadId;
+
+        let modeBar='';
+        if(isAdmin) modeBar=`<div class="calc-row" style="gap:8px;margin-bottom:12px;">
+          <button class="admin-tab ${jobsCalcMode==='rep'?'active':''}" data-cmode="rep">REP VIEW</button>
+          <button class="admin-tab ${jobsCalcMode==='lead'?'active':''}" data-cmode="lead">SALES LEAD</button>
+          <button class="admin-tab ${jobsCalcMode==='admin'?'active':''}" data-cmode="admin">ADMIN</button>
+        </div>`;
+        else if(isSalesLead) modeBar=`<div class="calc-row" style="gap:8px;margin-bottom:12px;">
+          <button class="admin-tab ${jobsCalcMode==='rep'?'active':''}" data-cmode="rep">REP VIEW</button>
+          <button class="admin-tab ${jobsCalcMode==='lead'?'active':''}" data-cmode="lead">SALES LEAD</button>
+        </div>`;
+
+        const regionOpts = salaries.map((s, i) => ({ value: String(i), label: `${s.name} (${s.currency_code})`.toUpperCase() }));
+        const bandOpts = [{ value: 'min', label: 'LOW (MIN)' }, { value: 'max', label: 'HIGH (MAX)' }];
+
+        function buildGlassDd(id, opts, initVal) {
+          const cur = opts.find((o) => o.value === initVal) || opts[0];
+          return `
+            <div class="glass-dd" data-dd="${id}">
+              <input type="hidden" id="${id}" value="${cur ? cur.value : ''}" />
+              <button type="button" class="glass-dd-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="glass-dd-val">${cur ? cur.label : ''}</span>
+                <span class="glass-dd-chev">▾</span>
+              </button>
+              <div class="glass-dd-menu" role="listbox">
+                ${opts.map((o) => `<button type="button" class="glass-dd-opt ${cur && o.value === cur.value ? 'selected' : ''}" role="option" aria-selected="${cur && o.value === cur.value ? 'true' : 'false'}" data-val="${o.value}"><span>${o.label}</span><span>${cur && o.value === cur.value ? '✓' : ''}</span></button>`).join('')}
+              </div>
+            </div>`;
+        }
+
+        jobsBody.innerHTML = `
+          <div class="calc-section">
+            <p class="project-desc" style="line-height:1.75;margin-bottom:6px;">
+              POSITION EXPLANATION<br/><br/>
+              How your pay works. Every sale you close earns you 17% commission on its price, no matter how many deals you close that month. On top of that, you unlock your monthly base salary when you do two things: close at least 5 paid deals, and make sure those 5 deals add up to at least your country's Minimum Revenue Target. The target exists because every sale must first pay for delivering the service, payment fees, your commission, and the company's profit before any money is left for a salary. We call what remains the Safe Share, which is 30% of every dollar sold. Your target is your country's monthly salary divided by 0.30, plus a small 3% currency buffer if you are paid in a non-USD currency. For example, a rep in Ghana with a $220 salary needs about $756 in total sales across 5 deals, roughly $151 per deal. A rep in the USA with a $4,279 salary needs about $14,263, roughly $2,853 per deal. Salaries differ by country because they are matched to local living costs, and the target scales with them, so everyone faces the same fairness rule: your salary must be paid for by the sales you bring in. All targets are calculated in USD and shown in your local currency using an exchange rate locked on the 1st of each month, so the target will not change on you mid-month. Service prices in the calculator are shown in your own country's prices, so you can see exactly which services and how many deals get you to your target. If you close more than 5 deals, you simply earn more commission. Refunded or unpaid sales do not count.
+            </p>
+            ${modeBar}
+            <hr style="border:none;border-top:1px solid rgba(0,0,0,0.1);margin:4px 0;"/>
+            <p class="calc-title">SALES & EARNINGS CALCULATOR</p>
+            <div class="calc-row" style="gap:14px;">
+              <div><p class="calc-title" style="margin-bottom:6px;">REGION</p>${buildGlassDd('calcRegion', regionOpts, '0')}</div>
+              <div><p class="calc-title" style="margin-bottom:6px;">SALARY BAND</p>${buildGlassDd('calcBand', bandOpts, 'min')}</div>
+            </div>
+            <div id="calcOutput" class="calc-output-stack"></div>
+          </div>`;
+
+        // Mode tab switching
+        jobsBody.querySelectorAll('[data-cmode]').forEach(btn=>{
+          btn.onclick=()=>{ jobsCalcMode=btn.dataset.cmode; renderJobsView(); };
+        });
+
+        function computeCalc(){
+          const ridx=parseInt(document.getElementById('calcRegion').value)||0;
+          const band=document.getElementById('calcBand').value;
+          const sal=salaries[ridx]||salaries[0];
+          const salUSD=band==='max'?sal.salary_max_usd:sal.salary_min_usd;
+          const fxBuf=sal.is_usd?0:cfg.fx_buffer_pct;
+          const mrt=calcMRT(salUSD,cfg,fxBuf);
+          const avgDeal=mrt/cfg.deals_required;
+          const catalog=getCalcCatalog(sal);
+          const fxRate=getFxRate(sal.currency_code);
+          const mrtLoc=sal.is_usd?mrt:fromUSD(mrt,sal.currency_code);
+          const avgDealLoc=sal.is_usd?avgDeal:fromUSD(avgDeal,sal.currency_code);
+          const salLoc=sal.is_usd?salUSD:fromUSD(salUSD,sal.currency_code);
+
+          const dealStates = window._dealStates||{};
+          const dealQtys = window._dealQtys||{};
+
+          let totalRevenueUSD=0, paidDeals=0;
+          catalog.forEach(item=>{
+            const qty=dealQtys[item.id]||0;
+            const st=dealStates[item.id]||'paid';
+            if(st==='paid'){ totalRevenueUSD+=item.priceUSD*qty; paidDeals+=qty; }
+          });
+          const commissionUSD=totalRevenueUSD*cfg.commission_rate;
+          const deliveryCost=totalRevenueUSD*cfg.delivery_cost_pct;
+          const payFees=totalRevenueUSD*cfg.payment_fee_pct;
+          const companyProfit=totalRevenueUSD-(commissionUSD+deliveryCost+payFees+salUSD);
+          const profitTarget=totalRevenueUSD*cfg.profit_target_pct;
+          const salaryUnlocked=paidDeals>=cfg.deals_required && totalRevenueUSD>=mrt;
+          const repTotalUSD=commissionUSD+(salaryUnlocked?salUSD:0);
+          const dealPct=Math.min(100,(paidDeals/cfg.deals_required)*100);
+          const revPct=Math.min(100,(totalRevenueUSD/mrt)*100);
+          const profitWarn=totalRevenueUSD>0&&companyProfit<profitTarget;
+
+          // Suggestions
+          let suggestions='';
+          const remaining=Math.max(0,mrt-totalRevenueUSD);
+          const dealsLeft=Math.max(0,cfg.deals_required-paidDeals);
+          if(remaining>0&&catalog.length>0){
+            const sorted=[...catalog].filter(i=>(i.priceUSD||0)>0).sort((a,b)=>b.priceUSD-a.priceUSD).slice(0,3);
+            suggestions=`<div class="suggest-box"><p class="calc-title" style="margin-bottom:6px;">WHAT DO I STILL NEED?</p>` +
+              sorted.map(it=>{
+                const needed=Math.ceil(remaining/it.priceUSD);
+                const loc=sal.is_usd?it.priceUSD:fromUSD(it.priceUSD,sal.currency_code);
+                return `· ${Math.max(needed,dealsLeft)} × ${it.name} @ ${fmt(loc,sal.currency_code)} closes the gap.`;
+              }).join('<br/>') + '</div>';
+          }
+
+          // Deal rows
+          const dealRows=catalog.length?catalog.map(item=>{
+            const qty=dealQtys[item.id]||0;
+            const st=dealStates[item.id]||'paid';
+            const loc=sal.is_usd?item.priceUSD:fromUSD(item.priceUSD,sal.currency_code);
+            return `<div class="deal-row" data-item="${item.id}">
+              <span style="flex:1;font-size:0.76rem;letter-spacing:0.05em;">${item.name}<br/><span style="opacity:0.65;">${fmt(loc,sal.currency_code)}</span></span>
+              <div class="qty-ctrl"><button class="qty-minus" data-item="${item.id}">−</button><span style="font-size:0.8rem;min-width:20px;text-align:center;">${qty}</span><button class="qty-plus" data-item="${item.id}">+</button></div>
+              <div class="deal-toggle">
+                <button class="toggle-paid ${st==='paid'?'selected':''}" data-item="${item.id}">PAID</button>
+                <button class="toggle-refund ${st==='refund'?'selected':''}" data-item="${item.id}">REFUND</button>
+                <button class="toggle-unpaid ${st==='unpaid'?'selected':''}" data-item="${item.id}">UNPAID</button>
+              </div>
+            </div>`;
+          }).join(''): '<div class="calc-empty-box">NO CATALOG ITEMS FOR THIS REGION YET.</div>';
+
+          // Admin extras
+          let adminPanel='';
+          if(jobsCalcMode==='admin'){
+            const teamRows=salaries.map(s=>{
+              const su=band==='max'?s.salary_max_usd:s.salary_min_usd;
+              const fb=s.is_usd?0:cfg.fx_buffer_pct;
+              const mt=calcMRT(su,cfg,fb);
+              const ad=mt/cfg.deals_required;
+              return `<div class="deal-row"><span style="flex:1;font-size:0.76rem;">${s.name}</span><span class="calc-sub">${fmt(su,'USD')} SALARY</span><span class="calc-sub">MRT ${fmt(mt,'USD')}</span><span class="calc-sub">AVG DEAL ${fmt(ad,'USD')}</span></div>`;
+            }).join('');
+
+            const fxAdminRows=getFxRates().map(r=>`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+              <span style="font-size:0.76rem;min-width:48px;">${r.currency_code}</span>
+              <input class="calc-input-sm fx-rate-input" data-code="${r.currency_code}" type="number" value="${r.rate_to_usd}" step="0.0001" style="width:110px;"/>
+              <span class="calc-sub">LOCKED ${r.locked_on}</span>
+              <button class="sales-save-btn save-fx-btn" data-code="${r.currency_code}" style="font-size:0.65rem;">SAVE</button>
+            </div>`).join('');
+
+            adminPanel=`<div class="calc-output-box" style="margin-top:8px;gap:12px;">
+              <p class="calc-title">TEAM TARGET TABLE</p>${teamRows}
+              <p class="calc-title" style="margin-top:8px;">FX RATES (LOCKED ${new Date().toISOString().slice(0,10)})</p>
+              ${fxAdminRows}
+              <button class="store-purchase-btn" id="exportCsvBtn" style="margin-top:4px;">EXPORT TO CSV</button>
+            </div>`;
+          }
+
+          // Sales lead price editor
+          let leadPanel='';
+          if(jobsCalcMode==='lead'){
+            const ridx2=parseInt(document.getElementById('calcRegion').value)||0;
+            const sal2=salaries[ridx2]||salaries[0];
+            const br=getBespokeRegions().find(b=>b.id===sal2.bespoke_region_id);
+            if(br){
+              const editorRows=(br.items||[]).map(it=>{
+                const p=parseFloat((it.price||'0').replace(/[^0-9.]/g,''))||0;
+                return `<div class="price-editor-row">
+                  <span style="flex:1;font-size:0.76rem;">${it.name}</span>
+                  <input class="calc-input-sm lead-price-inp" data-bid="${br.id}" data-iid="${it.id}" type="text" value="${it.price||''}" style="width:120px;"/>
+                  <button class="sales-save-btn lead-save-price" data-bid="${br.id}" data-iid="${it.id}">SAVE</button>
+                </div>`;
+              }).join('');
+              leadPanel=`<div class="calc-output-box" style="margin-top:8px;gap:10px;">
+                <p class="calc-title">PRICE EDITOR — ${br.name} ${(br.categoryLabel||'SERVICES').toUpperCase()}</p>
+                ${editorRows||'<p class="calc-sub">NO ITEMS.</p>'}
+              </div>`;
+            }
+          }
+
+          document.getElementById('calcOutput').innerHTML=`
+            <div class="calc-output-box">
+              <p class="calc-title">YOUR MINIMUM REVENUE TARGET (MRT)</p>
+              <p class="calc-big">${fmt(mrtLoc,sal.currency_code)} <span class="calc-sub">(${fmt(mrt,'USD')})</span></p>
+              <p class="calc-sub">YOU NEED AT LEAST ${cfg.deals_required} PAID DEALS TOTALLING THIS AMOUNT · ROUGHLY ${fmt(avgDealLoc,sal.currency_code)} / DEAL</p>
+              <p class="calc-title" style="margin-top:8px;">SALARY BAND</p>
+              <p class="calc-big">${fmt(salLoc,sal.currency_code)} / MONTH <span class="calc-sub">(${fmt(salUSD,'USD')})</span></p>
+            </div>
+            <div class="calc-sim-card">
+              <div class="calc-sim-head">
+                <p class="calc-title" style="margin:0;">DEAL SIMULATOR</p>
+                <span class="calc-sub">${catalog.length} ${catalog.length === 1 ? 'SERVICE' : 'SERVICES'}</span>
+              </div>
+              ${dealRows}
+            </div>
+            <div class="calc-output-box">
+              <p class="calc-title">DEAL COUNT <span style="float:right;">${paidDeals} / ${cfg.deals_required}</span></p>
+              <div class="calc-bar-wrap"><div class="calc-bar-fill" style="width:${dealPct}%"></div></div>
+              <p class="calc-title" style="margin-top:8px;">REVENUE <span style="float:right;">${fmt(totalRevenueUSD,'USD')} / ${fmt(mrt,'USD')}</span></p>
+              <div class="calc-bar-wrap"><div class="calc-bar-fill" style="width:${revPct}%"></div></div>
+              <div class="calc-row" style="margin-top:10px;gap:12px;flex-wrap:wrap;">
+                <div><p class="calc-title">COMMISSION</p><p class="calc-big">${fmt(commissionUSD,'USD')}</p></div>
+                <div><p class="calc-title">TOTAL PAY</p><p class="calc-big">${fmt(repTotalUSD,'USD')} <span class="calc-sub">${fmt(sal.is_usd?repTotalUSD:fromUSD(repTotalUSD,sal.currency_code),sal.currency_code)}</span></p></div>
+                <div><p class="calc-title">SALARY STATUS</p><span class="calc-badge ${salaryUnlocked?'badge-unlocked':'badge-locked'}">${salaryUnlocked?'✓ UNLOCKED':'⟳ LOCKED'}</span></div>
+              </div>
+              ${profitWarn?`<p class="warn-red" style="margin-top:8px;">⚠ COMPANY PROFIT (${fmt(companyProfit,'USD')}) IS BELOW ${(cfg.profit_target_pct*100).toFixed(0)}% TARGET AT CURRENT SALES.</p>`:''}
+            </div>
+            ${suggestions}
+            ${leadPanel}
+            ${adminPanel}
+            <div class="calc-formula-card">
+              <button type="button" class="collapsible-trigger" id="formulaTrigger" aria-expanded="false">
+                <span>▸ HOW IS THIS CALCULATED?</span>
+              </button>
+              <div class="formula-box" id="formulaBox">
+                PRICE_USD → converted at locked FX rate<br/>
+                COMMISSION = PRICE_USD × ${(cfg.commission_rate*100).toFixed(0)}%<br/>
+                DELIVERY_COST = TOTAL_SALES × ${(cfg.delivery_cost_pct*100).toFixed(0)}%<br/>
+                PAYMENT_FEES = TOTAL_SALES × ${(cfg.payment_fee_pct*100).toFixed(0)}%<br/>
+                SAFE_SHARE = ${(cfg.delivery_cost_pct*100).toFixed(0)}% of every dollar sold<br/>
+                MRT = SALARY_USD ÷ SAFE_SHARE + ${(cfg.fx_buffer_pct*100).toFixed(0)}% FX buffer<br/>
+                COMPANY_PROFIT = TOTAL − COMMISSION − DELIVERY − FEES − SALARY
+              </div>
+            </div>
+          `;
+
+          document.getElementById('formulaTrigger').onclick = () => {
+            const trig = document.getElementById('formulaTrigger');
+            const fb = document.getElementById('formulaBox');
+            const open = fb.classList.toggle('open');
+            trig.setAttribute('aria-expanded', open ? 'true' : 'false');
+            trig.innerHTML = `<span>${open ? '▾' : '▸'} HOW IS THIS CALCULATED?</span>`;
+          };
+
+          // Deal controls
+          jobsBody.querySelectorAll('.qty-plus').forEach(btn=>btn.onclick=()=>{
+            const id=btn.dataset.item; window._dealQtys=window._dealQtys||{}; window._dealQtys[id]=(window._dealQtys[id]||0)+1; computeCalc();
+          });
+          jobsBody.querySelectorAll('.qty-minus').forEach(btn=>btn.onclick=()=>{
+            const id=btn.dataset.item; window._dealQtys=window._dealQtys||{}; window._dealQtys[id]=Math.max(0,(window._dealQtys[id]||0)-1); computeCalc();
+          });
+          jobsBody.querySelectorAll('.toggle-paid').forEach(btn=>btn.onclick=()=>{ window._dealStates=window._dealStates||{}; window._dealStates[btn.dataset.item]='paid'; computeCalc(); });
+          jobsBody.querySelectorAll('.toggle-refund').forEach(btn=>btn.onclick=()=>{ window._dealStates=window._dealStates||{}; window._dealStates[btn.dataset.item]='refund'; computeCalc(); });
+          jobsBody.querySelectorAll('.toggle-unpaid').forEach(btn=>btn.onclick=()=>{ window._dealStates=window._dealStates||{}; window._dealStates[btn.dataset.item]='unpaid'; computeCalc(); });
+
+          // Admin FX save
+          jobsBody.querySelectorAll('.save-fx-btn').forEach(btn=>btn.onclick=()=>{
+            const code=btn.dataset.code;
+            const val=parseFloat(jobsBody.querySelector(`.fx-rate-input[data-code="${code}"]`).value)||1;
+            const rates=getFxRates();
+            const idx=rates.findIndex(r=>r.currency_code===code);
+            const today=new Date().toISOString().slice(0,10);
+            if(idx>=0) rates[idx]={...rates[idx],rate_to_usd:val,locked_on:today};
+            else rates.push({currency_code:code,rate_to_usd:val,locked_on:today});
+            localStorage.setItem(FX_RATES_KEY,JSON.stringify(rates));
+            btn.textContent='SAVED ✓'; setTimeout(()=>btn.textContent='SAVE',1600);
+            computeCalc();
+          });
+
+          // Admin CSV export
+          const csvBtn=document.getElementById('exportCsvBtn');
+          if(csvBtn) csvBtn.onclick=()=>{
+            const rows=[['REGION','SALARY USD','MRT USD','AVG DEAL USD'],...salaries.map(s=>{ const su=band==='max'?s.salary_max_usd:s.salary_min_usd; const fb=s.is_usd?0:cfg.fx_buffer_pct; const mt=calcMRT(su,cfg,fb); return [s.name,su.toFixed(0),(mt).toFixed(0),(mt/cfg.deals_required).toFixed(0)]; })];
+            const csv=rows.map(r=>r.join(',')).join('\n');
+            const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='bxb_team_targets.csv'; a.click();
+          };
+
+          // Lead price save
+          jobsBody.querySelectorAll('.lead-save-price').forEach(btn=>btn.onclick=()=>{
+            const inp=jobsBody.querySelector(`.lead-price-inp[data-iid="${btn.dataset.iid}"]`);
+            if(!inp) return;
+            updateBespokeItem(btn.dataset.bid,btn.dataset.iid,{price:inp.value.trim().toUpperCase()});
+            btn.textContent='SAVED ✓'; setTimeout(()=>btn.textContent='SAVE',1600);
+            computeCalc();
+          });
+        }
+
+        jobsBody.querySelectorAll('.glass-dd').forEach((dd) => {
+          const trig = dd.querySelector('.glass-dd-trigger');
+          const valSpan = dd.querySelector('.glass-dd-val');
+          const hidden = dd.querySelector('input[type="hidden"]');
+          const opts = dd.querySelectorAll('.glass-dd-opt');
+
+          function closeDd() {
+            dd.classList.remove('open');
+            trig.setAttribute('aria-expanded', 'false');
+          }
+
+          trig.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const willOpen = !dd.classList.contains('open');
+            jobsBody.querySelectorAll('.glass-dd.open').forEach((other) => {
+              other.classList.remove('open');
+              other.querySelector('.glass-dd-trigger').setAttribute('aria-expanded', 'false');
+            });
+            if (willOpen) {
+              dd.classList.add('open');
+              trig.setAttribute('aria-expanded', 'true');
+            }
+          });
+
+          opts.forEach((opt) => {
+            opt.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              hidden.value = opt.dataset.val;
+              valSpan.textContent = opt.firstElementChild.textContent;
+              opts.forEach((o) => {
+                const sel = o === opt;
+                o.classList.toggle('selected', sel);
+                o.setAttribute('aria-selected', sel ? 'true' : 'false');
+                o.lastElementChild.textContent = sel ? '✓' : '';
+              });
+              closeDd();
+              computeCalc();
+            });
+          });
+        });
+
+        if (!window._glassDdBound) {
+          window._glassDdBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.glass-dd.open').forEach((dd) => {
+              dd.classList.remove('open');
+              dd.querySelector('.glass-dd-trigger').setAttribute('aria-expanded', 'false');
+            });
+          });
+          document.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Escape') {
+              document.querySelectorAll('.glass-dd.open').forEach((dd) => {
+                dd.classList.remove('open');
+                dd.querySelector('.glass-dd-trigger').setAttribute('aria-expanded', 'false');
+              });
+            }
+          });
+        }c;
+        window._dealStates={}; window._dealQtys={};
+        computeCalc();
+      }
+    }
+
+    document.querySelector('.office-btn[data-role="jobs"]').addEventListener('click', ()=>{
+      jobsView='menu'; window._dealStates={}; window._dealQtys={};
+      renderJobsView();
+      officeMenuWrap.style.display='none';
+      jobsCard.classList.add('active');
+      requestAnimationFrame(()=>jobsCard.classList.add('visible'));
+    });
+
+    function backFromJobs(){
+      jobsCard.classList.remove('visible');
+      setTimeout(()=>{
+        jobsCard.classList.remove('active');
+        officeMenuWrap.style.display='flex';
+        officeBtns.forEach(b=>b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach(b=>b.classList.add('wave-in'));
+      },220);
+    }
+
+    jobsBack.addEventListener('click',()=>{
+      if(jobsView!=='menu'){ jobsView='menu'; renderJobsView(); }
+      else backFromJobs();
     });
     jobsClose.addEventListener('click', closeOffice);
     const GLOBE_COUNTRIES_KEY = 'globe_countries';
@@ -3632,31 +4844,23 @@ npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
       if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
       if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
       if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
-
-      officeMenuWrap.style.animation = 'officeMenuExit 0.19s cubic-bezier(0.22, 1, 0.36, 1) forwards';
-      setTimeout(() => {
-        officeMenuWrap.style.display = 'none';
-        officeMenuWrap.style.animation = '';
-        updateTeamsHeaderLabels();
-        teamsFrame.classList.remove('frame-ready');
-        teamsCard.classList.add('active', 'visible');
-        teamsCard.style.animation = 'cardSpringIn 0.38s cubic-bezier(0.16, 1.15, 0.3, 1) forwards';
-        loadTeamsFrame();
-      }, 180);
+      officeMenuWrap.style.display = 'none';
+      updateTeamsHeaderLabels();
+      teamsCard.classList.add('active');
+      requestAnimationFrame(() => teamsCard.classList.add('visible'));
+      loadTeamsFrame();
     }
 
     function backFromTeams() {
-      teamsCard.style.animation = 'cardSpringOut 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards';
+      teamsCard.classList.remove('visible');
       setTimeout(() => {
-        teamsCard.style.animation = '';
-        hideTeamsWorkspace();
+        teamsCard.classList.remove('active');
+        teardownTeamsFrame();
         officeMenuWrap.style.display = 'flex';
-        officeMenuWrap.style.animation = 'officeMenuEnter 0.32s cubic-bezier(0.16, 1.15, 0.3, 1) forwards';
         officeBtns.forEach((b) => b.classList.remove('wave-in'));
-        void officeMenuWrap.offsetWidth;
+        void officeOverlay.offsetWidth;
         officeBtns.forEach((b) => b.classList.add('wave-in'));
-        setTimeout(() => { officeMenuWrap.style.animation = ''; }, 330);
-      }, 210);
+      }, 220);
     }
 
     function syncTeamsLayout() {
