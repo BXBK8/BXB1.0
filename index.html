@@ -1647,67 +1647,7 @@
     .teams-frame.frame-ready {
       opacity: 1;
     }
-  
-/* ─── PHYSICAL SPRING MOTION KEYFRAMES ─── */
-@keyframes bxbCardSpringIn {
-  0% { opacity: 0; transform: translateY(44px) scale(0.92); filter: blur(5px); }
-  65% { opacity: 1; transform: translateY(-5px) scale(1.012); filter: blur(0); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-@keyframes bxbCardSpringOut {
-  0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-  100% { opacity: 0; transform: translateY(38px) scale(0.93); filter: blur(5px); }
-}
-@keyframes bxbFloatIn {
-  0% { opacity: 0; transform: translateY(32px) scale(0.94); filter: blur(4px); }
-  65% { opacity: 1; transform: translateY(-4px) scale(1.008); filter: blur(0); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-@keyframes bxbFloatOut {
-  0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-  100% { opacity: 0; transform: translateY(-20px) scale(0.95); filter: blur(4px); }
-}
-@keyframes bxbMenuFadeOut {
-  0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-  100% { opacity: 0; transform: translateY(-20px) scale(0.95); filter: blur(4px); }
-}
-@keyframes bxbMenuFadeIn {
-  0% { opacity: 0; transform: translateY(-20px) scale(0.95); filter: blur(4px); }
-  65% { opacity: 1; transform: translateY(4px) scale(1.01); filter: blur(0); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-.bxb-card-in {
-  animation: bxbCardSpringIn 0.42s cubic-bezier(0.16, 1.15, 0.3, 1) both !important;
-}
-.bxb-card-out {
-  animation: bxbCardSpringOut 0.24s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-  pointer-events: none !important;
-}
-.bxb-float-in {
-  animation: bxbFloatIn 0.38s cubic-bezier(0.16, 1.15, 0.3, 1) both !important;
-}
-.bxb-float-out {
-  animation: bxbFloatOut 0.2s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-  pointer-events: none !important;
-}
-.bxb-menu-out {
-  animation: bxbMenuFadeOut 0.2s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-  pointer-events: none !important;
-}
-.bxb-menu-in {
-  animation: bxbMenuFadeIn 0.35s cubic-bezier(0.16, 1.15, 0.3, 1) both !important;
-}
-
-.teams-frame {
-  opacity: 0;
-  transition: opacity 0.44s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity;
-}
-.teams-frame.frame-ready {
-  opacity: 1;
-}
-</style>
+  </style>
 </head>
 <body>
   <div class="mesh-bg">
@@ -2999,42 +2939,21 @@
     }
 
     function closeOffice() {
-  if (window._bxbOfficeAnimating) return;
-  window._bxbOfficeAnimating = true;
-
-  const activeCard = [
-    (typeof teamsCard !== 'undefined' ? teamsCard : null),
-    (typeof jobsCard !== 'undefined' ? jobsCard : null),
-    (typeof collabCard !== 'undefined' ? collabCard : null),
-    (typeof adminCard !== 'undefined' ? adminCard : null),
-    (typeof salesLeadCard !== 'undefined' ? salesLeadCard : null)
-  ].find((el) => el && el.classList.contains('active'));
-
-  if (activeCard) {
-    activeCard.classList.remove('bxb-card-in');
-    activeCard.classList.add('bxb-card-out');
-  }
-
-  officeOverlay.classList.remove('open');
-  officeOverlay.setAttribute('aria-hidden', 'true');
-  officeBtns.forEach((btn) => btn.classList.remove('wave-in'));
-
-  setTimeout(() => {
-    try {
       if (typeof hideTeamsWorkspace === 'function') hideTeamsWorkspace();
-      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-      if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-      if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-      if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-      if (typeof officeMenuWrap !== 'undefined') {
-        officeMenuWrap.style.display = 'flex';
-        officeMenuWrap.classList.remove('bxb-menu-out', 'bxb-menu-in');
+      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
+      if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
+      if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
+      if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible');
+      if (typeof officeMenuWrap !== 'undefined') officeMenuWrap.style.display = 'flex';
+      officeOverlay.classList.remove('open');
+      officeOverlay.setAttribute('aria-hidden', 'true');
+      officeBtns.forEach((btn) => btn.classList.remove('wave-in'));
+      if (typeof teardownTeamsFrame === 'function') teardownTeamsFrame();
+      if (!whyOverlay.classList.contains('open') && !portfolioOverlay.classList.contains('open') && !storeOverlay.classList.contains('open') && !bespokeOverlay.classList.contains('open')) {
       }
-    } finally {
-      window._bxbOfficeAnimating = false;
     }
-  }, 240);
-}navOffice.addEventListener('click', openOffice);
+
+    navOffice.addEventListener('click', openOffice);
     officeClose.addEventListener('click', closeOffice);
     officeOverlay.addEventListener('click', (e) => {
       if (e.target === officeOverlay) closeOffice();
@@ -3893,57 +3812,15 @@
       return catalog;
     }
 
-    function animateJobsTransition(targetView, setupFn) {
-  if (window._bxbJobsAnimating) return;
-  window._bxbJobsAnimating = true;
-
-  const body = document.getElementById('jobsBody');
-  const hdr = document.getElementById('jobsHeaderWrap');
-  if (!body) {
-    try {
-      jobsView = targetView;
-      if (setupFn) setupFn();
-      renderJobsView();
-    } finally {
-      window._bxbJobsAnimating = false;
-    }
-    return;
-  }
-
-  body.classList.remove('bxb-float-in');
-  body.classList.add('bxb-float-out');
-  if (hdr) {
-    hdr.classList.remove('bxb-float-in');
-    hdr.classList.add('bxb-float-out');
-  }
-
-  setTimeout(() => {
-    try {
-      jobsView = targetView;
-      if (setupFn) setupFn();
-      renderJobsView();
-      body.classList.remove('bxb-float-out');
-      void body.offsetWidth;
-      body.classList.add('bxb-float-in');
-      if (hdr) {
-        hdr.classList.remove('bxb-float-out');
-        void hdr.offsetWidth;
-        hdr.classList.add('bxb-float-in');
-      }
-    } finally {
-      window._bxbJobsAnimating = false;
-    }
-  }, 190);
-}
-function renderJobsView(){
+    function renderJobsView(){
       jobsHeaderWrap.innerHTML = '<span class="why-tag">BXB JOBS</span>';
       if(jobsView==='menu'){
         jobsBody.innerHTML=`<div class="office-stack" style="margin-top:8px;">
           <button class="office-btn" id="devBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Dev positions</span><span>→</span></button>
           <button class="office-btn" id="salesPosBtn" type="button" style="opacity:1;transform:none;border-radius:16px;"><span>Sales positions</span><span>→</span></button>
         </div>`;
-        document.getElementById('devBtn').onclick = () => animateJobsTransition('dev');
-        document.getElementById('salesPosBtn').onclick = () => animateJobsTransition('sales', () => { jobsCalcMode = 'rep'; });
+        document.getElementById('devBtn').onclick=()=>{ jobsView='dev'; renderJobsView(); };
+        document.getElementById('salesPosBtn').onclick=()=>{ jobsView='sales'; jobsCalcMode='rep'; renderJobsView(); };
         return;
       }
       if(jobsView==='dev'){
@@ -4312,61 +4189,30 @@ function renderJobsView(){
       }
     }
 
-    document.querySelector('.office-btn[data-role="jobs"]').addEventListener('click', () => {
-  if (window._bxbOfficeAnimating) return;
-  window._bxbOfficeAnimating = true;
-
-  officeMenuWrap.classList.remove('bxb-menu-in');
-  officeMenuWrap.classList.add('bxb-menu-out');
-
-  setTimeout(() => {
-    try {
-      officeMenuWrap.style.display = 'none';
-      officeMenuWrap.classList.remove('bxb-menu-out');
-      jobsView = 'menu';
-      window._dealStates = {};
-      window._dealQtys = {};
+    document.querySelector('.office-btn[data-role="jobs"]').addEventListener('click', ()=>{
+      jobsView='menu'; window._dealStates={}; window._dealQtys={};
       renderJobsView();
-      jobsCard.classList.remove('bxb-card-out');
-      jobsCard.classList.add('active', 'visible', 'bxb-card-in');
-    } finally {
-      window._bxbOfficeAnimating = false;
+      officeMenuWrap.style.display='none';
+      jobsCard.classList.add('active');
+      requestAnimationFrame(()=>jobsCard.classList.add('visible'));
+    });
+
+    function backFromJobs(){
+      jobsCard.classList.remove('visible');
+      setTimeout(()=>{
+        jobsCard.classList.remove('active');
+        officeMenuWrap.style.display='flex';
+        officeBtns.forEach(b=>b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach(b=>b.classList.add('wave-in'));
+      },220);
     }
-  }, 190);
-});
 
-function backFromJobs() {
-  if (window._bxbOfficeAnimating) return;
-  window._bxbOfficeAnimating = true;
-
-  jobsCard.classList.remove('bxb-card-in');
-  jobsCard.classList.add('bxb-card-out');
-
-  setTimeout(() => {
-    try {
-      jobsCard.classList.remove('active', 'visible', 'bxb-card-out');
-      officeMenuWrap.style.display = 'flex';
-      officeMenuWrap.classList.remove('bxb-menu-out');
-      officeMenuWrap.classList.add('bxb-menu-in');
-      officeBtns.forEach((b) => b.classList.remove('wave-in'));
-      void officeMenuWrap.offsetWidth;
-      officeBtns.forEach((b) => b.classList.add('wave-in'));
-      setTimeout(() => {
-        try { officeMenuWrap.classList.remove('bxb-menu-in'); } finally {}
-      }, 360);
-    } finally {
-      window._bxbOfficeAnimating = false;
-    }
-  }, 220);
-}
-jobsBack.addEventListener('click', () => {
-  if (jobsView !== 'menu') {
-    animateJobsTransition('menu');
-  } else {
-    backFromJobs();
-  }
-});
-jobsClose.addEventListener('click', closeOffice);
+    jobsBack.addEventListener('click',()=>{
+      if(jobsView!=='menu'){ jobsView='menu'; renderJobsView(); }
+      else backFromJobs();
+    });
+    jobsClose.addEventListener('click', closeOffice);
     const GLOBE_COUNTRIES_KEY = 'globe_countries';
     const COUNTRY_JOURNAL_KEY = 'country_journal';
     const H24_MS = 86400000;
@@ -4926,29 +4772,33 @@ jobsClose.addEventListener('click', closeOffice);
     }
 
     function teardownTeamsFrame() {
-      teamsFrame.classList.remove('frame-ready');
-teamsFrame.onload = () => {
-  if (teamsFrame.src === 'about:blank') return;
-  requestAnimationFrame(() => {
-    try {
-      teamsFrame.classList.add('frame-ready');
-      if (typeof teamsState !== 'undefined' && teamsState) teamsState.classList.add('hidden');
-    } finally {}
-  });
-};
-teamsFrame.onerror = () => {
-  try {
-    teamsFrame.classList.add('frame-ready');
-    showTeamsFallback('COULD NOT LOAD BXB TEAMS', url);
-  } finally {}
-};
-setTimeout(() => {
-  try {
-    if (teamsFrame.src && teamsFrame.src !== 'about:blank') {
-      teamsFrame.classList.add('frame-ready');
+      teamsFrame.onload = null;
+      teamsFrame.onerror = null;
+      teamsFrame.src = 'about:blank';
+      teamsCard.classList.remove('is-fullscreen');
+      updateTeamsHeaderLabels();
     }
-  } finally {}
-}, 3000);
+
+    function showTeamsFallback(reason, currentUrl) {
+      teamsState.classList.remove('hidden');
+      teamsState.innerHTML = `
+        <p class="calc-big">${reason || 'BXB TEAMS BUILD NOT FOUND YET'}</p>
+        <p class="calc-sub" style="max-width:600px;">EMBEDDED SAFELY IN AN ISOLATED SANDBOXED FRAME. BUILD BXB-TEAMS INTO ./bxb-teams/ OR CONNECT ITS LOCAL DEV URL WITHOUT TOUCHING ITS SUPABASE DATABASE:</p>
+        <pre class="teams-code">git clone https://github.com/BXBK8/BXB-Teams.git ../BXB-Teams
+cd ../BXB-Teams &amp;&amp; npm install
+npx vite build --base=./ --outDir ../BXB1.0/bxb-teams
+# (Keep ../BXB-Teams/.env untouched — do NOT run supabase link or db push there)</pre>
+        <div class="sales-price-edit" style="width:100%;max-width:560px;">
+          <input class="glass-input" id="teamsUrlInput" type="text" value="${currentUrl}" placeholder="https://bxb-teams.pages.dev/" style="text-transform:none;" />
+          <button class="sales-save-btn" id="teamsSaveUrlBtn" type="button">LOAD URL</button>
+          <button class="sales-save-btn" id="teamsResetUrlBtn" type="button">DEFAULT</button>
+        </div>
+      `;
+      document.getElementById('teamsSaveUrlBtn').onclick = () => {
+        const val = document.getElementById('teamsUrlInput').value.trim();
+        if (val) localStorage.setItem(TEAMS_URL_KEY, val);
+        loadTeamsFrame();
+      };
       document.getElementById('teamsResetUrlBtn').onclick = () => {
         localStorage.removeItem(TEAMS_URL_KEY);
         loadTeamsFrame();
@@ -4990,58 +4840,61 @@ setTimeout(() => {
     }
 
     function showTeamsCard() {
-  if (window._bxbOfficeAnimating) return;
-  window._bxbOfficeAnimating = true;
-
-  if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-  if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-  if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-  if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible', 'bxb-card-in', 'bxb-card-out');
-
-  officeMenuWrap.classList.remove('bxb-menu-in');
-  officeMenuWrap.classList.add('bxb-menu-out');
-
-  setTimeout(() => {
-    try {
+      if (typeof salesLeadCard !== 'undefined') salesLeadCard.classList.remove('active', 'visible');
+      if (typeof adminCard !== 'undefined') adminCard.classList.remove('active', 'visible');
+      if (typeof jobsCard !== 'undefined') jobsCard.classList.remove('active', 'visible');
+      if (typeof collabCard !== 'undefined') collabCard.classList.remove('active', 'visible');
       officeMenuWrap.style.display = 'none';
-      officeMenuWrap.classList.remove('bxb-menu-out');
       updateTeamsHeaderLabels();
-      teamsFrame.classList.remove('frame-ready');
-      teamsCard.classList.remove('bxb-card-out');
-      teamsCard.classList.add('active', 'visible', 'bxb-card-in');
+      teamsCard.classList.add('active');
+      requestAnimationFrame(() => teamsCard.classList.add('visible'));
       loadTeamsFrame();
-    } finally {
-      window._bxbOfficeAnimating = false;
     }
-  }, 190);
-}
 
-function backFromTeams() {
-  if (window._bxbOfficeAnimating) return;
-  window._bxbOfficeAnimating = true;
-
-  teamsCard.classList.remove('bxb-card-in');
-  teamsCard.classList.add('bxb-card-out');
-
-  setTimeout(() => {
-    try {
-      teamsCard.classList.remove('bxb-card-out');
-      hideTeamsWorkspace();
-      officeMenuWrap.style.display = 'flex';
-      officeMenuWrap.classList.remove('bxb-menu-out');
-      officeMenuWrap.classList.add('bxb-menu-in');
-      officeBtns.forEach((b) => b.classList.remove('wave-in'));
-      void officeMenuWrap.offsetWidth;
-      officeBtns.forEach((b) => b.classList.add('wave-in'));
+    function backFromTeams() {
+      teamsCard.classList.remove('visible');
       setTimeout(() => {
-        try { officeMenuWrap.classList.remove('bxb-menu-in'); } finally {}
-      }, 360);
-    } finally {
-      window._bxbOfficeAnimating = false;
+        teamsCard.classList.remove('active');
+        teardownTeamsFrame();
+        officeMenuWrap.style.display = 'flex';
+        officeBtns.forEach((b) => b.classList.remove('wave-in'));
+        void officeOverlay.offsetWidth;
+        officeBtns.forEach((b) => b.classList.add('wave-in'));
+      }, 220);
     }
-  }, 220);
-}
-document.querySelector('.office-btn[data-role="teams"]').addEventListener('click', showTeamsCard);
+
+    function syncTeamsLayout() {
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 280);
+    }
+
+    function setTeamsFullscreen(enable) {
+      teamsCard.classList.toggle('is-fullscreen', enable);
+      updateTeamsHeaderLabels();
+      syncTeamsLayout();
+    }
+
+    window.addEventListener('resize', updateTeamsHeaderLabels);
+    updateTeamsHeaderLabels();
+
+    teamsFullscreen.addEventListener('click', () => {
+      setTeamsFullscreen(!teamsCard.classList.contains('is-fullscreen'));
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && teamsCard.classList.contains('is-fullscreen')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        setTeamsFullscreen(false);
+      }
+    }, true);
+
+    teamsSetupBtn.addEventListener('click', () => {
+      if (teamsState.classList.contains('hidden')) showTeamsFallback('BXB TEAMS · ISOLATION & BUILD INFO', getTeamsUrl());
+      else teamsState.classList.add('hidden');
+    });
+
+    document.querySelector('.office-btn[data-role="teams"]').addEventListener('click', showTeamsCard);
     teamsBack.addEventListener('click', backFromTeams);
     teamsClose.addEventListener('click', closeOffice);
 
